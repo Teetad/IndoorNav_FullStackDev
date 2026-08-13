@@ -1,0 +1,17 @@
+meta {
+  name: Invalid Floor Filter
+  type: http
+  seq: 90
+}
+
+get {
+  url: {{baseUrl}}/places?floor=abc
+  body: none
+  auth: none
+}
+
+tests {
+  test("rejects a non-integer floor filter", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

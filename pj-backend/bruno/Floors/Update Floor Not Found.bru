@@ -1,0 +1,21 @@
+meta {
+  name: Update Floor Not Found
+  type: http
+  seq: 93
+}
+
+put {
+  url: {{baseUrl}}/floors/{{unknownId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  { "floor_plan_image": "https://example.com/unknown.png" }
+}
+
+tests {
+  test("returns 404 when updating an unknown floor", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

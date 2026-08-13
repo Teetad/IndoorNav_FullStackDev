@@ -1,0 +1,17 @@
+meta {
+  name: Delete Floor
+  type: http
+  seq: 98
+}
+
+delete {
+  url: {{baseUrl}}/floors/{{floorId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("deletes a floor", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

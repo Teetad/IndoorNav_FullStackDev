@@ -1,0 +1,17 @@
+meta {
+  name: Place Not Found
+  type: http
+  seq: 91
+}
+
+get {
+  url: {{baseUrl}}/places/{{unknownId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 404 for an unknown place", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

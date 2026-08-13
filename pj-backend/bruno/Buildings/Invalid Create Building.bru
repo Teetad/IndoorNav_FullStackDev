@@ -1,0 +1,21 @@
+meta {
+  name: Invalid Create Building
+  type: http
+  seq: 90
+}
+
+post {
+  url: {{baseUrl}}/buildings
+  body: json
+  auth: none
+}
+
+body:json {
+  {}
+}
+
+tests {
+  test("rejects a missing building_name", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

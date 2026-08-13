@@ -1,0 +1,18 @@
+meta {
+  name: Search Places
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/places?search=lab
+  body: none
+  auth: none
+}
+
+tests {
+  test("searches place names case-insensitively", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.be.an("array");
+  });
+}

@@ -1,0 +1,17 @@
+meta {
+  name: Delete Place
+  type: http
+  seq: 97
+}
+
+delete {
+  url: {{baseUrl}}/places/{{placeId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("deletes a place", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

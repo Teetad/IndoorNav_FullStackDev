@@ -1,0 +1,17 @@
+meta {
+  name: Invalid Floor Number
+  type: http
+  seq: 90
+}
+
+get {
+  url: {{baseUrl}}/floors/{{seedBuildingId}}/abc
+  body: none
+  auth: none
+}
+
+tests {
+  test("rejects a non-integer floor number", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

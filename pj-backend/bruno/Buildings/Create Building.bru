@@ -1,0 +1,29 @@
+meta {
+  name: Create Building
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/buildings
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "building_name": "Bruno Test Building {{$randomInt}}",
+    "description": "Created by Bruno integration verification"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 201) bru.setEnvVar("buildingId", res.getBody().building_id);
+}
+
+tests {
+  test("creates a building", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody()).to.have.property("building_id");
+  });
+}

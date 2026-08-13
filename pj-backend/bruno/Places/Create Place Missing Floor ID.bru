@@ -1,0 +1,21 @@
+meta {
+  name: Create Place Missing Floor ID
+  type: http
+  seq: 92
+}
+
+post {
+  url: {{baseUrl}}/places
+  body: json
+  auth: none
+}
+
+body:json {
+  { "place_name": "Missing Floor" }
+}
+
+tests {
+  test("rejects a missing floor_id", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

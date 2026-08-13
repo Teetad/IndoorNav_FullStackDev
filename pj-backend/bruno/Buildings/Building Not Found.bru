@@ -1,0 +1,17 @@
+meta {
+  name: Building Not Found
+  type: http
+  seq: 91
+}
+
+get {
+  url: {{baseUrl}}/buildings/{{unknownId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 404 for an unknown building", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

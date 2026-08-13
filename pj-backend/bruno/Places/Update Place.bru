@@ -1,0 +1,25 @@
+meta {
+  name: Update Place
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/places/{{placeId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "place_name": "Updated Bruno Navigation Lab",
+    "room_number": "BR-02"
+  }
+}
+
+tests {
+  test("updates a place", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().place_name).to.equal("Updated Bruno Navigation Lab");
+  });
+}

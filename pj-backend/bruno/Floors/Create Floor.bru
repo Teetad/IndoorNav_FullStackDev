@@ -1,0 +1,32 @@
+meta {
+  name: Create Floor
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/floors
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "building_id": "{{seedBuildingId}}",
+    "floor_number": 50,
+    "floor_plan_image": "https://example.com/floor-50.png"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    bru.setEnvVar("floorId", res.getBody().floor_id);
+  }
+}
+
+tests {
+  test("creates a floor", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody()).to.have.property("floor_id");
+  });
+}

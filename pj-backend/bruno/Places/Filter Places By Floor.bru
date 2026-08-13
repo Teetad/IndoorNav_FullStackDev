@@ -1,0 +1,18 @@
+meta {
+  name: Filter Places By Floor
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/places?floor=6
+  body: none
+  auth: none
+}
+
+tests {
+  test("filters places by floor number", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.be.an("array");
+  });
+}

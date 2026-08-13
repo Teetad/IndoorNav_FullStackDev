@@ -1,0 +1,6 @@
+{
+  "version": "1",
+  "name": "Indoor Navigation Phase 1",
+  "type": "collection",
+  "ignore": ["node_modules", ".git"]
+}

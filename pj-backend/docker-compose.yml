@@ -1,0 +1,47 @@
+name: preflight # You can also change this to another name to avoid warning with existing group.
+services:
+  backend:
+    container_name: pf-backend
+    build: .
+    ports:
+      - ${PROD_PORT}:3000
+    networks:
+      - pf-net
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_APP_USER=${POSTGRES_APP_USER}
+      - POSTGRES_APP_PASSWORD=${POSTGRES_APP_PASSWORD}
+    volumes:
+      - ./logs:/app/logs
+    post_start:
+      - command:
+          [
+            "sh",
+            "-c",
+            'pnpm run db:migrate | awk ''{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush(); }'' | tee -a /app/logs/migration.log',
+          ]
+  postgres:
+    image: postgres:18-alpine
+    container_name: pf-db
+    ports:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - pf-data:/var/lib/postgresql
+      - ./_entrypoint:/docker-entrypoint-initdb.d
+    environment:
+      - TZ=Asia/Bangkok
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_APP_USER=${POSTGRES_APP_USER}
+      - POSTGRES_APP_PASSWORD=${POSTGRES_APP_PASSWORD}
+    networks:
+      - pf-net
+
+volumes:
+  pf-data:
+
+networks:
+  pf-net:

@@ -1,0 +1,21 @@
+meta {
+  name: Create Place Missing Name
+  type: http
+  seq: 93
+}
+
+post {
+  url: {{baseUrl}}/places
+  body: json
+  auth: none
+}
+
+body:json {
+  { "floor_id": "{{seedFloorId}}" }
+}
+
+tests {
+  test("rejects a missing place_name", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

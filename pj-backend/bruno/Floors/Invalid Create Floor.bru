@@ -1,0 +1,21 @@
+meta {
+  name: Invalid Create Floor
+  type: http
+  seq: 92
+}
+
+post {
+  url: {{baseUrl}}/floors
+  body: json
+  auth: none
+}
+
+body:json {
+  { "floor_plan_image": "https://example.com/missing-ids.png" }
+}
+
+tests {
+  test("rejects missing building_id and floor_number", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

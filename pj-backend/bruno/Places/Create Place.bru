@@ -1,0 +1,32 @@
+meta {
+  name: Create Place
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/places
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "floor_id": "{{seedFloorId}}",
+    "place_name": "Bruno Navigation Lab",
+    "room_number": "BR-01",
+    "description": "Created by Bruno integration verification",
+    "image_url": "https://example.com/bruno-lab.png"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 201) bru.setEnvVar("placeId", res.getBody().place_id);
+}
+
+tests {
+  test("creates a place", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody()).to.have.property("place_id");
+  });
+}

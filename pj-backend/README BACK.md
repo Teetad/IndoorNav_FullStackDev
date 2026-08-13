@@ -1,3 +1,0 @@
-## Buildings
-## Floors
-## Places

@@ -1,0 +1,21 @@
+meta {
+  name: Update Place Not Found
+  type: http
+  seq: 94
+}
+
+put {
+  url: {{baseUrl}}/places/{{unknownId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  { "place_name": "Unknown" }
+}
+
+tests {
+  test("returns 404 when updating an unknown place", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

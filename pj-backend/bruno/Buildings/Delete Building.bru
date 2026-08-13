@@ -1,0 +1,17 @@
+meta {
+  name: Delete Building
+  type: http
+  seq: 99
+}
+
+delete {
+  url: {{baseUrl}}/buildings/{{buildingId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("deletes the building", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

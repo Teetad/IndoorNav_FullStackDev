@@ -1,0 +1,18 @@
+meta {
+  name: Get Floor By Number
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/floors/{{seedBuildingId}}/6
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns a floor by building and number", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("floor_id");
+  });
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Update Floor
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/floors/{{floorId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  { "floor_plan_image": "https://example.com/updated-floor-50.png" }
+}
+
+tests {
+  test("updates a floor", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().floor_plan_image).to.equal("https://example.com/updated-floor-50.png");
+  });
+}
