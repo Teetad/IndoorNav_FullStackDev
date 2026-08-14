@@ -1,30 +1,27 @@
-export interface Node {
+export interface GridNode {
   x: number;
   y: number;
   isWall: boolean;
   g: number;
   h: number;
   f: number;
-  parent: Node | null;
+  parent: GridNode | null;
 }
 
-export function createNode(x: number, y: number, isWall = false): Node {
+export function createNode(x: number, y: number, isWall = false): GridNode {
   return { x, y, isWall, g: 0, h: 0, f: 0, parent: null };
 }
 
-// Manhattan Distance heuristic (ideal for 4-directional grid movement)
-function heuristic(nodeA: Node, nodeB: Node): number {
+function heuristic(nodeA: GridNode, nodeB: GridNode): number {
   return Math.abs(nodeA.x - nodeB.x) + Math.abs(nodeA.y - nodeB.y);
 }
 
-export function findPath(grid: Node[][], start: Node, goal: Node): Node[] {
-  const openSet: Node[] = [];
-  const closedSet: Set<Node> = new Set();
-
+export function findPath(grid: GridNode[][], start: GridNode, goal: GridNode): GridNode[] {
+  const openSet: GridNode[] = [];
+  const closedSet: Set<GridNode> = new Set();
   openSet.push(start);
 
   while (openSet.length > 0) {
-    // Find node with the lowest f cost
     let lowestIndex = 0;
     for (let i = 1; i < openSet.length; i++) {
       if (openSet[i].f < openSet[lowestIndex].f) {
@@ -34,10 +31,9 @@ export function findPath(grid: Node[][], start: Node, goal: Node): Node[] {
 
     const current = openSet[lowestIndex];
 
-    // Destination reached: reconstruct and return path
     if (current === goal) {
-      const path: Node[] = [];
-      let temp: Node | null = current;
+      const path: GridNode[] = [];
+      let temp: GridNode | null = current;
       while (temp) {
         path.push(temp);
         temp = temp.parent;
@@ -45,7 +41,6 @@ export function findPath(grid: Node[][], start: Node, goal: Node): Node[] {
       return path.reverse();
     }
 
-    // Move current node from open to closed set
     openSet.splice(lowestIndex, 1);
     closedSet.add(current);
 
@@ -56,7 +51,7 @@ export function findPath(grid: Node[][], start: Node, goal: Node): Node[] {
         continue;
       }
 
-      const tentativeG = current.g + 1; // Distance between adjacent nodes is 1
+      const tentativeG = current.g + 1;
       let newPath = false;
 
       if (openSet.includes(neighbor)) {
@@ -77,22 +72,19 @@ export function findPath(grid: Node[][], start: Node, goal: Node): Node[] {
       }
     }
   }
-
-  // No path found
   return [];
 }
 
-function getNeighbors(grid: Node[][], node: Node): Node[] {
-  const neighbors: Node[] = [];
+function getNeighbors(grid: GridNode[][], node: GridNode): GridNode[] {
+  const neighbors: GridNode[] = [];
   const { x, y } = node;
   const rows = grid.length;
   const cols = grid[0].length;
 
-  // 4-directional orthogonal neighbors (Up, Down, Left, Right)
-  if (y > 0) neighbors.push(grid[y - 1][x]);        // Up
-  if (y < rows - 1) neighbors.push(grid[y + 1][x]);  // Down
-  if (x > 0) neighbors.push(grid[y][x - 1]);        // Left
-  if (x < cols - 1) neighbors.push(grid[y][x + 1]);  // Right
+  if (y > 0) neighbors.push(grid[y - 1][x]);
+  if (y < rows - 1) neighbors.push(grid[y + 1][x]);
+  if (x > 0) neighbors.push(grid[y][x - 1]);
+  if (x < cols - 1) neighbors.push(grid[y][x + 1]);
 
   return neighbors;
 }

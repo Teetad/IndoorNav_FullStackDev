@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "@tsconfig/node-lts/tsconfig.json",
+    "@tsconfig/node-ts/tsconfig.json"
+  ],
+  "compilerOptions": {
+    "types": ["node"],
+    "rootDir": ".",
+    "outDir": "./dist",
+    "paths": {
+      "@db/*": ["./db/*"]
+    }
+  },
+  "include": ["./db/**/*", "./drizzle.config.ts"]
+}
