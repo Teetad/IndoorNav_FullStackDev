@@ -5,9 +5,9 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
-import buildingRouter from "./routes/Buildings.route.js";
-import floorRouter from "./routes/Floors.route.js";
-import placeRouter from "./routes/Places.route.js";
+import buildingRouter from "./routes/building/Buildings.route.js";
+import floorRouter from "./routes/building/Floors.route.js";
+import placeRouter from "./routes/building/Places.route.js";
 
 const app = express();
 app.use(morgan("dev"));
