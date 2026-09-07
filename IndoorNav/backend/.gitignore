@@ -1,0 +1,6 @@
+.env
+.env.test
+dist
+logs
+node_modules/
+migration/
