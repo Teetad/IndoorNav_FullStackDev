@@ -1,0 +1,19 @@
+meta {
+  name: 09 Invalid Floor
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/places?floor=abc
+  body: none
+  auth: none
+}
+
+tests {
+  test("09 Invalid Floor", function () {
+    expect(res.getStatus()).to.equal(400);
+    expect(res.getBody()).to.have.property("message");
+  });
+}
+

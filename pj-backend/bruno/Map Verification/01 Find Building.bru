@@ -1,0 +1,28 @@
+meta {
+  name: 01 Find Building
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/buildings
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  bru.setVar("mapBuildingId", "");
+  bru.setVar("mapPlaceId", "");
+}
+
+tests {
+  test("01 Find Building", function () {
+    expect(res.getStatus()).to.equal(200);
+    const rows = res.getBody();
+    expect(rows).to.be.an("array");
+    const matches = rows.filter(row => row.building_name === "อาคาร 30 ปี");
+    expect(matches.length, "Import map data first with pnpm seed:maps --apply").to.equal(1);
+    bru.setVar("mapBuildingId", matches[0].building_id);
+  });
+}
+

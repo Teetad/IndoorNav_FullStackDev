@@ -1,0 +1,23 @@
+meta {
+  name: 03 Places Floor 4
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/places?building_id={{mapBuildingId}}&floor=4
+  body: none
+  auth: none
+}
+
+tests {
+  test("03 Places Floor 4", function () {
+    expect(res.getStatus()).to.equal(200);
+    const rows = res.getBody();
+    expect(rows).to.be.an("array");
+    expect(rows.length).to.be.greaterThan(0);
+    expect(rows.every(row => row.floor_number === 4 && row.building_id === bru.getVar("mapBuildingId"))).to.equal(true);
+    expect(rows.some(row => row.room_number === "413A")).to.equal(true);
+  });
+}
+

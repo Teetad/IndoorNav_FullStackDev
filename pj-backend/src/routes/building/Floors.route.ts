@@ -3,12 +3,9 @@ import { Buildings, Floors } from "@db/schema.js";
 import { and, eq } from "drizzle-orm";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
+import { parseFloorNumber } from "../../utils/validation.js";
 
 const router = Router();
-const parseFloorNumber = (value: unknown) => {
-  const parsed = typeof value === "number" ? value : Number(value);
-  return Number.isInteger(parsed) ? parsed : null;
-};
 
 router.get("/", async (req, res) => {
   try {

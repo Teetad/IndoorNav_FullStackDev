@@ -1,0 +1,23 @@
+meta {
+  name: 06 Places Floor 7
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/places?building_id={{mapBuildingId}}&floor=7
+  body: none
+  auth: none
+}
+
+tests {
+  test("06 Places Floor 7", function () {
+    expect(res.getStatus()).to.equal(200);
+    const rows = res.getBody();
+    expect(rows).to.be.an("array");
+    expect(rows.length).to.be.greaterThan(0);
+    expect(rows.every(row => row.floor_number === 7 && row.building_id === bru.getVar("mapBuildingId"))).to.equal(true);
+    expect(rows.some(row => row.room_number === "701")).to.equal(true);
+  });
+}
+

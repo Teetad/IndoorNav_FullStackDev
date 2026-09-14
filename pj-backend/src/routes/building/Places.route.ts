@@ -3,6 +3,7 @@ import { Buildings, Floors, Places } from "@db/schema.js";
 import { and, eq, ilike, or } from "drizzle-orm";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
+import { parseFloorNumber } from "../../utils/validation.js";
 
 const router = Router();
 
@@ -31,7 +32,7 @@ router.get("/", async (req, res) => {
   try {
     const { floor, search, building_id } = req.query;
 
-    if (floor !== undefined && (typeof floor !== "string" || !Number.isInteger(Number(floor)))) {
+    if (floor !== undefined && (typeof floor !== "string" || parseFloorNumber(floor) === null)) {
       return res.status(400).json({ message: "floor must be an integer" });
     }
     if (search !== undefined && (typeof search !== "string" || !search.trim())) {

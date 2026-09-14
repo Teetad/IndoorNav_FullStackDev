@@ -1,0 +1,25 @@
+meta {
+  name: 07 Search Room
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/places?building_id={{mapBuildingId}}&floor=4&search=413A
+  body: none
+  auth: none
+}
+
+tests {
+  test("07 Search Room", function () {
+    expect(res.getStatus()).to.equal(200);
+    const rows = res.getBody();
+    expect(rows).to.be.an("array");
+    const place = rows.find(row => row.room_number === "413A");
+    expect(place).to.be.an("object");
+    expect(place.floor_number).to.equal(4);
+    expect(place.building_id).to.equal(bru.getVar("mapBuildingId"));
+    bru.setVar("mapPlaceId", place.place_id);
+  });
+}
+

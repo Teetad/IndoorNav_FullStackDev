@@ -11,7 +11,8 @@
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit migrate",
     "db:prototype": "tsx ./db/prototype.ts",
-    "seed": "tsx db/seed.ts"
+    "seed": "tsx db/seed.ts",
+    "seed:maps": "tsx db/seed-maps.ts"
   },
   "keywords": [],
   "author": "",

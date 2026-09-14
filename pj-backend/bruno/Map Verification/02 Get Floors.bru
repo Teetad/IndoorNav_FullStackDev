@@ -1,0 +1,22 @@
+meta {
+  name: 02 Get Floors
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/floors?building_id={{mapBuildingId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("02 Get Floors", function () {
+    expect(res.getStatus()).to.equal(200);
+    const rows = res.getBody();
+    expect(rows).to.be.an("array");
+    expect(rows.map(row => row.floor_number)).to.include.members([4, 5, 6, 7]);
+    expect(rows.every(row => row.building_id === bru.getVar("mapBuildingId"))).to.equal(true);
+  });
+}
+

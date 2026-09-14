@@ -6,6 +6,7 @@ PostgreSQL, and Drizzle ORM.
 ## Run locally
 
 ```bash
+cd pj-backend
 cp .env.example .env
 pnpm install
 docker compose up -d postgres
@@ -13,6 +14,7 @@ pnpm run db:migrate
 pnpm run seed
 pnpm run dev
 ```
+
 
 The default local API URL is `http://localhost:3001` (from `PORT` in `.env`).
 
@@ -32,3 +34,26 @@ The default local API URL is `http://localhost:3001` (from `PORT` in `.env`).
 Open `bruno/` in Bruno and select the `Local` environment for manual and
 integration verification.
 
+## Building 30 map data
+
+`pnpm seed:maps` previews the floor 4–7 dataset without connecting to PostgreSQL.
+`pnpm seed:maps --apply` imports it in a transaction without deleting existing data.
+See [map sources and unresolved labels](db/data/README.md) before using the data.
+The original `pnpm seed` command above is a destructive demo reset, not the map importer.
+
+## Verify map APIs in Bruno
+
+1. Import the map data with `pnpm seed:maps --apply` and start the API with `pnpm dev`.
+2. Open the `pj-backend/bruno` collection in Bruno and select the `Local` environment.
+3. Run only the `Map Verification` folder, sequentially from 01 to 09.
+   Request 01 discovers the building ID; request 07 discovers the place ID used by 08.
+4. Expect HTTP 200 for requests 01–08 and HTTP 400 for request 09.
+   Check the Tests results as well as the HTTP status.
+
+All requests in this folder are read-only. Other folders include create/update/delete requests.
+The map checks discover IDs dynamically; the older `seedPlaceId` variable belongs to demo data.
+If Bruno CLI is installed, run from `pj-backend/bruno`:
+
+```bash
+bru run "Map Verification" --env Local
+```
