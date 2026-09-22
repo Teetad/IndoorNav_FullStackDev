@@ -5,3 +5,7 @@ export const placeTypes = [
 ] as const;
 
 export type PlaceType = typeof placeTypes[number];
+
+export function isPlaceType(value: unknown): value is PlaceType {
+  return typeof value === "string" && placeTypes.some(type => type === value);
+}

@@ -1,15 +1,12 @@
 import { dbClient } from "@db/client.js";
 import { Buildings, Floors, Places } from "@db/schema.js";
-import { placeTypes } from "@db/place-types.js";
+import { isPlaceType, type PlaceType } from "@db/place-types.js";
 import { and, eq, ilike, or } from "drizzle-orm";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
 import { parseFloorNumber } from "../../utils/validation.js";
 
 const router = Router();
-const isPlaceType = (value: unknown): value is typeof placeTypes[number] =>
-  typeof value === "string" && placeTypes.some(type => type === value);
-
 // เลือกข้อมูลสถานที่พร้อมข้อมูลชั้นและอาคาร
 const placeColumns = {
   place_id: Places.place_id,
@@ -168,7 +165,7 @@ router.put("/:place_id", async (req, res) => {
     const updateData: {
       floor_id?: string;
       place_name?: string;
-      place_type?: typeof placeTypes[number] | null;
+      place_type?: PlaceType | null;
       room_number?: string | null;
       description?: string | null;
       image_url?: string | null;
