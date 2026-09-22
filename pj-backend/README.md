@@ -11,7 +11,7 @@ cp .env.example .env
 pnpm install
 docker compose up -d postgres
 pnpm run db:migrate
-pnpm run seed
+pnpm seed:maps --apply
 pnpm run dev
 ```
 
@@ -30,6 +30,7 @@ The default local API URL is `http://localhost:3001` (from `PORT` in `.env`).
 - `GET /places?search=lab`
 - `GET /places?floor=6`
 - `GET /places?building_id=:building_id`
+- `GET /places?place_type=classroom`
 
 Open `bruno/` in Bruno and select the `Local` environment for manual and
 integration verification.
@@ -39,7 +40,7 @@ integration verification.
 `pnpm seed:maps` previews the floor 4–7 dataset without connecting to PostgreSQL.
 `pnpm seed:maps --apply` imports it in a transaction without deleting existing data.
 See [map sources and unresolved labels](db/data/README.md) before using the data.
-The original `pnpm seed` command above is a destructive demo reset, not the map importer.
+`pnpm seed` is a destructive demo reset. Use `seed:maps --apply` for the map data.
 
 ## Verify map APIs in Bruno
 

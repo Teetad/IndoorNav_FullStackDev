@@ -13,6 +13,7 @@ put {
 body:json {
   {
     "place_name": "Updated Bruno Navigation Lab",
+    "place_type": "coworking_space",
     "room_number": "BR-02"
   }
 }
@@ -21,5 +22,6 @@ tests {
   test("updates a place", function () {
     expect(res.getStatus()).to.equal(200);
     expect(res.getBody().place_name).to.equal("Updated Bruno Navigation Lab");
+    expect(res.getBody().place_type).to.equal("coworking_space");
   });
 }

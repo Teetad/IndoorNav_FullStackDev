@@ -61,14 +61,25 @@ if (args.includes("--apply")) {
           // สร้าง ID จาก key และชั้น
           const id = uuidv5(`place:${place.key}`, floor.floor_id);
           // ข้ามสถานที่ที่ตรง ID ชื่อ หรือเลขห้องเดิม
-          if (existing.some(row => row.place_id === id || row.place_name === place.place_name ||
+          const imported = existing.find(row => row.place_id === id);
+          if (imported) {
+            // เติมประเภทเฉพาะรายการที่สคริปต์นี้เคยนำเข้า
+            if (imported.place_type === null && place.place_type !== null) {
+              await tx.update(Places).set({ place_type: place.place_type })
+                .where(eq(Places.place_id, imported.place_id));
+            }
+            skipped++;
+            continue;
+          }
+          if (existing.some(row => row.place_name === place.place_name ||
             (place.room_number !== null && row.room_number === place.room_number))) {
-            skipped++; // ++ คือเพิ่มตัวนับอีก 1
+            skipped++;
             continue;
           }
           // เพิ่มสถานที่พร้อมชั้นและแหล่งอ้างอิง
           await tx.insert(Places).values({
             place_id: id, floor_id: floor.floor_id, place_name: place.place_name,
+            place_type: place.place_type,
             room_number: place.room_number,
             description: `${place.description} | แหล่งอ้างอิง: ${source.source}`,
           });

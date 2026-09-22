@@ -1,0 +1,1 @@
+ALTER TABLE "places" ADD COLUMN "place_type" varchar(40);
