@@ -1,7 +1,7 @@
 .env
 .npmrc
 node_modules/
-migration/
+/migration/
 dist/
 # Logs
 logs
@@ -31,4 +31,4 @@ dist-ssr
 dist
 logs
 node_modules/
-migration/
+/migration/

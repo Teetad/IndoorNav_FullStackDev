@@ -1,16 +1,13 @@
 {
-  "extends": [
-    "@tsconfig/node-lts/tsconfig.json",
-    "@tsconfig/node-ts/tsconfig.json"
-  ],
   "compilerOptions": {
-    "types": ["node"],
-    "rootDir": ".",
-    "outDir": "./dist",
-    "paths": {
-      "@db/*": ["./db/*"],
-      "@src/*": ["./src/*"]
-    }
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "rootDir": "./src",
+    "outDir": "./dist"
   },
-  "include": ["./db/**/*", "./drizzle.config.ts", "./src/**/*"]
+  "include": ["src/**/*"]
 }
