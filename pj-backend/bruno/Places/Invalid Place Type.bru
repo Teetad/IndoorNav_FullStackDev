@@ -1,0 +1,17 @@
+meta {
+  name: Invalid Place Type
+  type: http
+  seq: 15
+}
+
+get {
+  url: {{baseUrl}}/places?place_type=not_a_type
+  body: none
+  auth: none
+}
+
+tests {
+  test("rejects invalid place type", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

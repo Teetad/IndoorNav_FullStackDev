@@ -16,8 +16,8 @@ tests {
     const place = res.getBody();
     expect(place.place_id).to.equal(bru.getVar("mapPlaceId"));
     expect(place.room_number).to.equal("413A");
+    expect(place.place_type).to.equal("classroom");
     expect(place.floor_number).to.equal(4);
     expect(place.building_name).to.equal("อาคาร 30 ปี");
   });
 }
-

@@ -36,6 +36,7 @@ export const Places = pgTable("places", {
     .references(() => Floors.floor_id, { onDelete: "cascade" })
     .notNull(),
   place_name: varchar("place_name", { length: 120 }).notNull(),
+  place_type: varchar("place_type", { length: 40 }),
   room_number: varchar("room_number", { length: 30 }),
   description: varchar("description", { length: 500 }),
   image_url: varchar("image_url", { length: 500 }),

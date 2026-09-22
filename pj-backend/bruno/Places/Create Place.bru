@@ -14,6 +14,7 @@ body:json {
   {
     "floor_id": "{{seedFloorId}}",
     "place_name": "Bruno Navigation Lab",
+    "place_type": "laboratory",
     "room_number": "BR-01",
     "description": "Created by Bruno integration verification",
     "image_url": "https://example.com/bruno-lab.png"
@@ -28,5 +29,6 @@ tests {
   test("creates a place", function () {
     expect(res.getStatus()).to.equal(201);
     expect(res.getBody()).to.have.property("place_id");
+    expect(res.getBody().place_type).to.equal("laboratory");
   });
 }

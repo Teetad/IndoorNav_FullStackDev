@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1786626299204,
+      "tag": "0000_phase1_indoor_navigation",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786627427589,
+      "tag": "0001_align_phase1_design",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790065175892,
+      "tag": "0002_many_jamie_braddock",
+      "breakpoints": true
+    }
+  ]
+}

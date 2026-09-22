@@ -18,6 +18,6 @@ tests {
     expect(rows.length).to.be.greaterThan(0);
     expect(rows.every(row => row.floor_number === 4 && row.building_id === bru.getVar("mapBuildingId"))).to.equal(true);
     expect(rows.some(row => row.room_number === "413A")).to.equal(true);
+    expect(rows.find(row => row.room_number === "413A").place_type).to.equal("classroom");
   });
 }
-

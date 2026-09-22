@@ -1,16 +1,20 @@
 import { dbClient } from "@db/client.js";
 import { Buildings, Floors, Places } from "@db/schema.js";
+import { placeTypes } from "@db/place-types.js";
 import { and, eq, ilike, or } from "drizzle-orm";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
 import { parseFloorNumber } from "../../utils/validation.js";
 
 const router = Router();
+const isPlaceType = (value: unknown): value is typeof placeTypes[number] =>
+  typeof value === "string" && placeTypes.some(type => type === value);
 
 // เลือกข้อมูลสถานที่พร้อมข้อมูลชั้นและอาคาร
 const placeColumns = {
   place_id: Places.place_id,
   place_name: Places.place_name,
+  place_type: Places.place_type,
   room_number: Places.room_number,
   description: Places.description,
   image_url: Places.image_url,
@@ -30,7 +34,7 @@ const selectPlaces = () => dbClient
 
 router.get("/", async (req, res) => {
   try {
-    const { floor, search, building_id } = req.query;
+    const { floor, search, building_id, place_type } = req.query;
 
     if (floor !== undefined && (typeof floor !== "string" || parseFloorNumber(floor) === null)) {
       return res.status(400).json({ message: "floor must be an integer" });
@@ -40,6 +44,9 @@ router.get("/", async (req, res) => {
     }
     if (building_id !== undefined && (typeof building_id !== "string" || !isUUID(building_id))) {
       return res.status(400).json({ message: "building_id must be a valid UUID" });
+    }
+    if (place_type !== undefined && !isPlaceType(place_type)) {
+      return res.status(400).json({ message: "place_type is invalid" });
     }
 
     // ค้นหาสถานที่จากเลขชั้น ชื่อสถานที่ หรืออาคาร
@@ -52,6 +59,7 @@ router.get("/", async (req, res) => {
       ));
     }
     if (building_id !== undefined) filters.push(eq(Buildings.building_id, building_id));
+    if (place_type !== undefined) filters.push(eq(Places.place_type, place_type));
 
     const query = selectPlaces();
     const places = filters.length > 0
@@ -90,7 +98,7 @@ router.get("/:place_id", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { floor_id, place_name, room_number, description, image_url } = req.body;
+    const { floor_id, place_name, place_type, room_number, description, image_url } = req.body;
 
     if (typeof floor_id !== "string" || !isUUID(floor_id)) {
       return res.status(400).json({ message: "floor_id is required and must be a valid UUID" });
@@ -100,6 +108,9 @@ router.post("/", async (req, res) => {
     }
     if (place_name.trim().length > 120) {
       return res.status(400).json({ message: "place_name must not exceed 120 characters" });
+    }
+    if (place_type !== undefined && place_type !== null && !isPlaceType(place_type)) {
+      return res.status(400).json({ message: "place_type is invalid" });
     }
     if (description !== undefined && (typeof description !== "string" || description.trim().length > 500)) {
       return res.status(400).json({ message: "description must not exceed 500 characters" });
@@ -127,6 +138,7 @@ router.post("/", async (req, res) => {
       .values({
         floor_id,
         place_name: place_name.trim(),
+        place_type: place_type ?? null,
         room_number: typeof room_number === "string" ? room_number.trim() || null : null,
         description: typeof description === "string" ? description.trim() || null : null,
         image_url: typeof image_url === "string" ? image_url.trim() || null : null,
@@ -143,12 +155,12 @@ router.post("/", async (req, res) => {
 router.put("/:place_id", async (req, res) => {
   try {
     const { place_id } = req.params;
-    const { floor_id, place_name, room_number, description, image_url } = req.body;
+    const { floor_id, place_name, place_type, room_number, description, image_url } = req.body;
 
     if (!isUUID(place_id)) {
       return res.status(400).json({ message: "place_id must be a valid UUID" });
     }
-    if (floor_id === undefined && place_name === undefined && room_number === undefined &&
+    if (floor_id === undefined && place_name === undefined && place_type === undefined && room_number === undefined &&
         description === undefined && image_url === undefined) {
       return res.status(400).json({ message: "At least one editable field is required" });
     }
@@ -156,6 +168,7 @@ router.put("/:place_id", async (req, res) => {
     const updateData: {
       floor_id?: string;
       place_name?: string;
+      place_type?: typeof placeTypes[number] | null;
       room_number?: string | null;
       description?: string | null;
       image_url?: string | null;
@@ -179,6 +192,13 @@ router.put("/:place_id", async (req, res) => {
         return res.status(400).json({ message: "place_name must be 1-120 characters" });
       }
       updateData.place_name = place_name.trim();
+    }
+
+    if (place_type !== undefined) {
+      if (place_type !== null && !isPlaceType(place_type)) {
+        return res.status(400).json({ message: "place_type is invalid" });
+      }
+      updateData.place_type = place_type;
     }
 
     if (description !== undefined) {
