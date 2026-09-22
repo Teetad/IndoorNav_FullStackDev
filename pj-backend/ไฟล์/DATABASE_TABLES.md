@@ -1,6 +1,6 @@
-# Database Table
+# Database Tables
 
-อ้างอิงโค้ด `pj-backend/db/schema.ts` ณ วันที่ 14 กันยายน 2026
+อ้างอิงโค้ด `pj-backend/db/schema.ts` และ migration ล่าสุด `0002_many_jamie_braddock.sql`
 
 ✅ มีใน schema ปัจจุบัน | ⏳ เป็นแผน ยังไม่ได้สร้าง
 
