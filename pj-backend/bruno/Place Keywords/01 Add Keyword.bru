@@ -1,0 +1,30 @@
+meta {
+  name: 01 Add Keyword
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/places/{{mapPlaceId}}/keywords
+  body: json
+  auth: none
+}
+
+script:pre-request {
+  bru.setVar("testKeyword", "bruno-" + Date.now());
+}
+
+body:json {
+  {
+    "keyword": "{{testKeyword}}"
+  }
+}
+
+tests {
+  test("adds a keyword", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().keyword).to.equal(bru.getVar("testKeyword"));
+    expect(res.getBody().place_id).to.equal(bru.getVar("mapPlaceId"));
+    bru.setVar("testKeywordId", res.getBody().keyword_id);
+  });
+}

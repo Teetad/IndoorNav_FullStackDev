@@ -1,0 +1,19 @@
+meta {
+  name: 02 List Keywords
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/places/{{mapPlaceId}}/keywords
+  body: none
+  auth: none
+}
+
+tests {
+  test("lists the new keyword", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.be.an("array");
+    expect(res.getBody().some(row => row.keyword_id === bru.getVar("testKeywordId"))).to.equal(true);
+  });
+}

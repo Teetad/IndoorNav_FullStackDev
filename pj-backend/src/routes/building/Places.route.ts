@@ -1,13 +1,13 @@
 import { dbClient } from "@db/client.js";
-import { Buildings, Floors, Places } from "@db/schema.js";
+import { Buildings, Floors, PlaceKeywords, Places } from "@db/schema.js";
 import { isPlaceType, type PlaceType } from "@db/place-types.js";
-import { and, eq, ilike, or } from "drizzle-orm";
+import { and, eq, exists, ilike, or } from "drizzle-orm";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
 import { parseFloorNumber } from "../../utils/validation.js";
 
 const router = Router();
-// เลือกข้อมูลสถานที่พร้อมข้อมูลชั้นและอาคาร
+// ฟิลด์ที่จะส่งกลับจาก GET /places และ GET /places/:place_id
 const placeColumns = {
   place_id: Places.place_id,
   place_name: Places.place_name,
@@ -23,6 +23,7 @@ const placeColumns = {
   building_name: Buildings.building_name,
 };
 
+// JOIN เพื่อให้แต่ละสถานที่มีเลขชั้นและชื่ออาคารในผลลัพธ์เดียวกัน
 const selectPlaces = () => dbClient
   .select(placeColumns)
   .from(Places)
@@ -46,13 +47,20 @@ router.get("/", async (req, res) => {
       return res.status(400).json({ message: "place_type is invalid" });
     }
 
-    // ค้นหาสถานที่จากเลขชั้น ชื่อสถานที่ หรืออาคาร
+    // ค้นหาสถานที่จากเลขชั้น ชื่อสถานที่ เลขห้อง หรือคำค้น
     const filters = [];
     if (floor !== undefined) filters.push(eq(Floors.floor_number, Number(floor)));
     if (search !== undefined) {
       filters.push(or(
         ilike(Places.place_name, `%${search.trim()}%`),
         ilike(Places.room_number, `%${search.trim()}%`),
+        // EXISTS ตรวจว่ามีคำค้นตรงหรือไม่ โดยไม่ทำให้สถานที่ซ้ำหลายแถว
+        exists(dbClient.select({ id: PlaceKeywords.keyword_id })
+          .from(PlaceKeywords)
+          .where(and(
+            eq(PlaceKeywords.place_id, Places.place_id),
+            ilike(PlaceKeywords.keyword, `%${search.trim()}%`),
+          ))),
       ));
     }
     if (building_id !== undefined) filters.push(eq(Buildings.building_id, building_id));
@@ -67,6 +75,70 @@ router.get("/", async (req, res) => {
   } catch (error) {
     console.error("GET /places failed:", error);
     return res.status(500).json({ message: "Unable to get places" });
+  }
+});
+
+// อ่านคำค้นของสถานที่หนึ่งแห่ง
+router.get("/:place_id/keywords", async (req, res) => {
+  try {
+    const { place_id } = req.params;
+    if (!isUUID(place_id)) return res.status(400).json({ message: "place_id must be a valid UUID" });
+
+    const [place] = await dbClient.select({ id: Places.place_id }).from(Places)
+      .where(eq(Places.place_id, place_id));
+    if (!place) return res.status(404).json({ message: "Place not found" });
+
+    const keywords = await dbClient.select().from(PlaceKeywords)
+      .where(eq(PlaceKeywords.place_id, place_id));
+    return res.status(200).json(keywords);
+  } catch (error) {
+    console.error("GET /places/:place_id/keywords failed:", error);
+    return res.status(500).json({ message: "Unable to get keywords" });
+  }
+});
+
+// เพิ่มคำค้นหนึ่งคำ; ตัดช่องว่างและแปลงเป็นตัวพิมพ์เล็กก่อนบันทึก
+router.post("/:place_id/keywords", async (req, res) => {
+  try {
+    const { place_id } = req.params;
+    const { keyword } = req.body ?? {};
+    if (!isUUID(place_id)) return res.status(400).json({ message: "place_id must be a valid UUID" });
+    if (typeof keyword !== "string" || !keyword.trim() || keyword.trim().length > 100) {
+      return res.status(400).json({ message: "keyword must be 1-100 characters" });
+    }
+
+    const [place] = await dbClient.select({ id: Places.place_id }).from(Places)
+      .where(eq(Places.place_id, place_id));
+    if (!place) return res.status(404).json({ message: "Place not found" });
+
+    const [created] = await dbClient.insert(PlaceKeywords)
+      .values({ place_id, keyword: keyword.trim().toLowerCase() }).returning();
+    return res.status(201).json(created);
+  } catch (error: any) {
+    if (error?.code === "23505" || error?.cause?.code === "23505") {
+      return res.status(409).json({ message: "Keyword already exists for this place" });
+    }
+    console.error("POST /places/:place_id/keywords failed:", error);
+    return res.status(500).json({ message: "Unable to create keyword" });
+  }
+});
+
+// ต้องตรงทั้ง place_id และ keyword_id จึงลบได้
+router.delete("/:place_id/keywords/:keyword_id", async (req, res) => {
+  try {
+    const { place_id, keyword_id } = req.params;
+    if (!isUUID(place_id) || !isUUID(keyword_id)) {
+      return res.status(400).json({ message: "place_id and keyword_id must be valid UUIDs" });
+    }
+
+    const [deleted] = await dbClient.delete(PlaceKeywords)
+      .where(and(eq(PlaceKeywords.place_id, place_id), eq(PlaceKeywords.keyword_id, keyword_id)))
+      .returning();
+    if (!deleted) return res.status(404).json({ message: "Keyword not found" });
+    return res.status(200).json({ message: "Keyword deleted", data: deleted });
+  } catch (error) {
+    console.error("DELETE /places/:place_id/keywords/:keyword_id failed:", error);
+    return res.status(500).json({ message: "Unable to delete keyword" });
   }
 });
 

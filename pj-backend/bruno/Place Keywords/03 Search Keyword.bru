@@ -1,0 +1,18 @@
+meta {
+  name: 03 Search Keyword
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/places?search={{testKeyword}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("finds the place by keyword", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().some(row => row.place_id === bru.getVar("mapPlaceId"))).to.equal(true);
+  });
+}

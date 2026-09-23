@@ -36,9 +36,29 @@ export const Places = pgTable("places", {
     .references(() => Floors.floor_id, { onDelete: "cascade" })
     .notNull(),
   place_name: varchar("place_name", { length: 120 }).notNull(),
+  // null หมายถึงยังไม่ทราบประเภท เช่น ห้อง 712
   place_type: varchar("place_type", { length: 40 }),
   room_number: varchar("room_number", { length: 30 }),
   description: varchar("description", { length: 500 }),
   image_url: varchar("image_url", { length: 500 }),
   favCount: integer("fav_count").default(0).notNull(),
 });
+
+// หนึ่งสถานที่มีได้หลายคำค้น; ลบสถานที่แล้วคำค้นถูกลบตามด้วย
+export const PlaceKeywords = pgTable(
+  "place_keywords",
+  {
+    keyword_id: uuid("keyword_id").primaryKey().defaultRandom(),
+    place_id: uuid("place_id")
+      .references(() => Places.place_id, { onDelete: "cascade" })
+      .notNull(),
+    keyword: varchar("keyword", { length: 100 }).notNull(),
+  },
+  (table) => [
+    // ป้องกันคำค้นเดียวกันซ้ำในสถานที่เดียวกัน
+    uniqueIndex("place_keywords_place_keyword_unique").on(
+      table.place_id,
+      table.keyword,
+    ),
+  ],
+);
