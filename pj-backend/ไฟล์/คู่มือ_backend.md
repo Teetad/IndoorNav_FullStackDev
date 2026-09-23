@@ -1,8 +1,8 @@
 # คู่มืออ่านโค้ด Backend (เริ่มจากศูนย์)
 
-ไฟล์ `.db` นี้เป็นเอกสารข้อความสำหรับอ่าน ไม่ใช่ไฟล์ฐานข้อมูล PostgreSQL
+ไฟล์ `.md` นี้เป็นเอกสาร Markdown สำหรับอ่าน ไม่ใช่ไฟล์ฐานข้อมูล PostgreSQL
 
-ไฟล์นี้อธิบายโฟลเดอร์ `pj-backend` ทั้งหมด โดยเก็บไว้ในโฟลเดอร์ `ไฟล์/`
+ไฟล์นี้อธิบายโฟลเดอร์ `pj-backend` ตามโค้ดปัจจุบัน โดยเก็บไว้ในโฟลเดอร์ `ไฟล์/`
 ไม่จำเป็นต้องจำทุกไฟล์ในครั้งเดียว เริ่มอ่านตามหัวข้อ
 "ข้อมูลเดินทางอย่างไร" แล้วเปิดไฟล์ที่ลิงก์ไว้ทีละไฟล์
 
@@ -18,8 +18,8 @@
 | Seed | สคริปต์ใส่ข้อมูลเริ่มต้นลงฐานข้อมูล |
 | UUID / ID | รหัสของแถวข้อมูล เช่น `place_id`; ไม่ใช่เลขห้องที่ผู้ใช้เห็น |
 
-`place_type` คือ **ประเภทที่ระบบกำหนดไว้** เช่น `classroom` หรือ `laboratory`.
-`place_keywords` คือ **คำค้นที่เพิ่มให้แต่ละสถานที่** เช่น ชื่อย่อหรือคำที่คนใช้เรียก.
+`place_type` คือ **ประเภทที่ระบบกำหนดไว้** เช่น `classroom` หรือ `laboratory`
+`place_keywords` คือ **คำค้นที่เพิ่มให้แต่ละสถานที่** เช่น ชื่อย่อหรือคำที่คนใช้เรียก
 สถานที่หนึ่งแห่งมี `place_type` ได้หนึ่งค่า แต่มี keyword ได้หลายคำ
 
 ## ข้อมูลเดินทางอย่างไร
@@ -46,7 +46,7 @@ Bruno
 | ไฟล์ | ทำหน้าที่อะไร |
 |---|---|
 | [../package.json](../package.json) | รายชื่อไลบรารีและคำสั่ง `pnpm dev`, `build`, `db:migrate`, `seed:maps` |
-| [../src/index.ts](../src/index.ts) | สร้าง Express app, เปิดพอร์ต, ลงทะเบียน `/buildings`, `/floors`, `/places`, มี `/` และ `/health/database` |
+| [../src/index.ts](../src/index.ts) | สร้าง Express app, เปิดพอร์ต, ลงทะเบียน `/buildings`, `/floors`, `/places`, มี `/` และ `/health/database`; health check นับสามตารางหลักและยังไม่นับ keyword |
 | [../src/routes/building/Buildings.route.ts](../src/routes/building/Buildings.route.ts) | API อ่าน เพิ่ม และลบอาคาร |
 | [../src/routes/building/Floors.route.ts](../src/routes/building/Floors.route.ts) | API อ่าน เพิ่ม แก้ และลบชั้นของอาคาร |
 | [../src/routes/building/Places.route.ts](../src/routes/building/Places.route.ts) | API สถานที่ รวมการกรองประเภท การค้นชื่อ/เลขห้อง/keyword และ API เพิ่มหรือลบ keyword |
@@ -144,9 +144,9 @@ ID ที่สคริปต์สร้างจาก `key` มีค่า�
 | [../_entrypoint/init.sh](../_entrypoint/init.sh) | สร้างผู้ใช้ฐานข้อมูลและ schema สำหรับ Drizzle เมื่อ PostgreSQL เริ่มด้วยฐานข้อมูลใหม่ |
 | [../bruno/](../bruno/) | ชุด request สำหรับลอง API; `environments/Local.bru` ตั้ง `baseUrl` เป็น `http://localhost:3001` |
 | [../bruno/bruno.json](../bruno/bruno.json) | ตั้งค่าชุด request (collection) ของ Bruno |
-| [../ไฟล์/API_SPECS.md](../ไฟล์/API_SPECS.md) | สรุป endpoint ที่มีแล้วและที่ยังเป็นแผน |
-| [../ไฟล์/DATABASE_TABLES.md](../ไฟล์/DATABASE_TABLES.md) | สรุปตารางและความสัมพันธ์ |
-| [../ไฟล์/PROGRESS.md](../ไฟล์/PROGRESS.md) | สถานะงานและสิ่งที่ยังต้องตรวจ |
+| [API_SPECS.md](API_SPECS.md) | สรุป endpoint, body, query และ status code ที่ใช้จริง |
+| [DATABASE_TABLES.md](DATABASE_TABLES.md) | สรุปตาราง migration และความสัมพันธ์ |
+| [PROGRESS.md](PROGRESS.md) | สถานะงานและสิ่งที่ยังต้องตรวจ |
 | `node_modules/`, `dist/` | ไฟล์ที่เครื่องสร้างจากการติดตั้งและ build; ปกติไม่แก้ด้วยมือ |
 | `pnpm-lock.yaml` | ล็อกเวอร์ชันไลบรารีให้ติดตั้งซ้ำได้ตรงกัน |
 
@@ -167,6 +167,7 @@ pnpm seed:maps               # ดูข้อมูลแผนที่ก่�
 pnpm seed:maps --apply       # นำเข้าข้อมูลแผนที่จริง
 pnpm dev                     # เปิด API ที่ localhost:3001
 pnpm build                   # ตรวจและแปลง TypeScript
+./node_modules/.bin/tsc --noEmit # ตรวจ TypeScript โดยไม่สร้าง dist
 ```
 
 ถ้า `relation "buildings" does not exist` แปลว่าฐานข้อมูลที่ต่ออยู่ไม่มีตาราง
@@ -184,6 +185,9 @@ pnpm build                   # ตรวจและแปลง TypeScript
 | เปลี่ยนวิธีค้น/เพิ่ม/ลบสถานที่หรือ keyword | `src/routes/building/Places.route.ts` |
 | เปลี่ยน API อาคารหรือชั้น | `Buildings.route.ts` หรือ `Floors.route.ts` |
 | ตรวจผล API ด้วยมือ | `bruno/` และ `ไฟล์/API_SPECS.md` |
+
+ถ้าต้องการเพิ่มระบบนำทาง ต้องออกแบบตารางพิกัด โหนด และเส้นเชื่อมก่อน
+เพราะ `places` ปัจจุบันยังไม่มีตำแหน่ง `x`, `y`, ประตู กำแพง หรือทางเดิน
 
 ก่อนแก้ข้อมูลจริง ควรดู `git diff` เพื่อเห็นว่าแก้ไฟล์ไหน และตรวจว่าใช้ฐานข้อมูล
 ตัวไหนใน `.env` เพราะโค้ด, migration และข้อมูลในฐานข้อมูลเป็นคนละส่วนกัน

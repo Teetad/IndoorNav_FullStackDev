@@ -1,135 +1,99 @@
-# Database Tables
+# Database Tables — สถานะปัจจุบัน
 
-อ้างอิงโค้ด `pj-backend/db/schema.ts` และ migration ล่าสุด `0003_gorgeous_azazel.sql`
+เอกสารนี้อ้างอิง `db/schema.ts` และ migration ล่าสุด
+`db/migration/0003_gorgeous_azazel.sql` ณ วันที่ 23 กันยายน 2026
 
-✅ มีใน schema ปัจจุบัน | ⏳ เป็นแผน ยังไม่ได้สร้าง
+> Schema ในโค้ดและ schema ในฐานข้อมูลจริงเป็นคนละส่วนกัน ต้องรัน
+> `pnpm db:migrate` จึงจะนำ migration ไปใช้กับฐานข้อมูลที่ระบุใน `.env`
 
-## Buildings ✅
+## `buildings`
 
-ชื่อตารางจริง: `buildings`
+| คอลัมน์ | ชนิด | ข้อบังคับ |
+|---|---|---|
+| `building_id` | UUID | Primary Key, สร้างอัตโนมัติด้วย `gen_random_uuid()` |
+| `building_name` | VARCHAR(120) | NOT NULL, UNIQUE |
+| `description` | VARCHAR(500) | NULL ได้ |
 
-- building_id (UUID) — Primary Key, สร้างอัตโนมัติเมื่อไม่ส่ง ID
-- building_name (VARCHAR(120)) — NOT NULL, UNIQUE
-- description (VARCHAR(500)) — NULL ได้
+## `floors`
 
-## Floors ✅
+| คอลัมน์ | ชนิด | ข้อบังคับ |
+|---|---|---|
+| `floor_id` | UUID | Primary Key, สร้างอัตโนมัติ |
+| `building_id` | UUID | NOT NULL, Foreign Key → `buildings.building_id` |
+| `floor_number` | INTEGER | NOT NULL |
+| `floor_plan_image` | VARCHAR(500) | NULL ได้ |
 
-ชื่อตารางจริง: `floors`
+Unique index `floors_building_floor_number_unique` ครอบคลุม
+`(building_id, floor_number)` จึงห้ามมีเลขชั้นซ้ำในอาคารเดียวกัน
 
-- floor_id (UUID) — Primary Key, สร้างอัตโนมัติเมื่อไม่ส่ง ID
-- building_id (UUID) — NOT NULL, Foreign Key → Buildings.building_id
-- floor_number (INTEGER) — NOT NULL
-- floor_plan_image (VARCHAR(500)) — NULL ได้
+## `places`
 
-UNIQUE (building_id, floor_number): เลขชั้นห้ามซ้ำภายในอาคารเดียวกัน
+| คอลัมน์ | ชนิด | ข้อบังคับ |
+|---|---|---|
+| `place_id` | UUID | Primary Key, สร้างอัตโนมัติ |
+| `floor_id` | UUID | NOT NULL, Foreign Key → `floors.floor_id` |
+| `place_name` | VARCHAR(120) | NOT NULL |
+| `place_type` | VARCHAR(40) | NULL ได้เมื่อยังไม่ทราบประเภท |
+| `room_number` | VARCHAR(30) | NULL ได้ |
+| `description` | VARCHAR(500) | NULL ได้ |
+| `image_url` | VARCHAR(500) | NULL ได้ |
+| `fav_count` | INTEGER | NOT NULL, DEFAULT 0 |
 
-## Places ✅
+- `fav_count` ในฐานข้อมูลถูก map เป็น `favCount` ใน TypeScript และ JSON
+- `place_type` เป็นข้อความในฐานข้อมูล ส่วน API จำกัดค่าด้วย `db/place-types.ts`
+- ฐานข้อมูลยังไม่มี CHECK constraint สำหรับ `place_type`
+- ไม่มี unique constraint บน `place_name` หรือ `room_number`
+- ยังไม่มี API Favorites แม้มี `fav_count`
 
-ชื่อตารางจริง: `places`
+## `place_keywords`
 
-- place_id (UUID) — Primary Key, สร้างอัตโนมัติเมื่อไม่ส่ง ID
-- floor_id (UUID) — NOT NULL, Foreign Key → Floors.floor_id
-- place_name (VARCHAR(120)) — NOT NULL
-- place_type (VARCHAR(40)) — NULL ได้เมื่อยังไม่ยืนยันประเภท; ค่าที่ API รับอยู่ใน `db/place-types.ts`
-- room_number (VARCHAR(30)) — NULL ได้ เช่น 413A
-- description (VARCHAR(500)) — NULL ได้
-- image_url (VARCHAR(500)) — NULL ได้
-- fav_count (INTEGER) — NOT NULL, DEFAULT 0
+| คอลัมน์ | ชนิด | ข้อบังคับ |
+|---|---|---|
+| `keyword_id` | UUID | Primary Key, สร้างอัตโนมัติ |
+| `place_id` | UUID | NOT NULL, Foreign Key → `places.place_id` |
+| `keyword` | VARCHAR(100) | NOT NULL |
 
-`favCount` เป็นชื่อที่ใช้ใน TypeScript และ JSON; `fav_count` เป็นชื่อคอลัมน์ในฐานข้อมูล
-ไม่มี UNIQUE บังคับชื่อสถานที่หรือเลขห้องห้ามซ้ำ
-ยังไม่มีระบบ Favorites แม้จะมีคอลัมน์เก็บจำนวนแล้ว
+Unique index `place_keywords_place_keyword_unique` ครอบคลุม
+`(place_id, keyword)` คำค้นเดียวกันจึงซ้ำในสถานที่เดียวกันไม่ได้
+API เป็นส่วนที่แปลง keyword เป็นตัวพิมพ์เล็กและตัดช่องว่างก่อนบันทึก
 
-## Place Keywords ✅
-
-ชื่อตารางจริง: `place_keywords`
-
-- keyword_id (UUID) — Primary Key, สร้างอัตโนมัติ
-- place_id (UUID) — NOT NULL, Foreign Key → Places.place_id; ลบสถานที่แล้วลบคำค้นตาม
-- keyword (VARCHAR(100)) — NOT NULL
-
-UNIQUE (place_id, keyword): สถานที่เดียวกันมีคำค้นซ้ำไม่ได้
-API เก็บคำค้นเป็นตัวพิมพ์เล็กและตัดช่องว่างหัวท้าย
-
-## Relationship Summary — ปัจจุบัน ✅
-
-```text
-Buildings
-└── Floors
-    └── building_id → Buildings.building_id
-
-Floors
-└── Places
-    ├── floor_id → Floors.floor_id
-    └── Place_Keywords (place_id)
-```
-
-อาคารหนึ่งมีหลายชั้น และชั้นหนึ่งมีหลายสถานที่
-Foreign Key ทั้งสองกำหนด ON DELETE CASCADE:
-
-- ลบอาคาร → ลบชั้นและสถานที่ภายใน
-- ลบชั้น → ลบสถานที่ภายใน
-- ลบสถานที่ → ไม่ลบชั้นหรืออาคาร
-- ลบสถานที่ → ลบคำค้นของสถานที่นั้น
-
-## Routes — ปัจจุบัน ✅
+## ความสัมพันธ์และการลบตาม
 
 ```text
-src/routes/
-└── building/
-    ├── Buildings.route.ts
-    ├── Floors.route.ts
-    └── Places.route.ts
+buildings
+└── floors
+    └── places
+        └── place_keywords
 ```
 
-[src/index.ts](../src/index.ts) ลงทะเบียน `/buildings`, `/floors` และ `/places`
-รายละเอียด endpoint อยู่ใน [API_SPECS.md](API_SPECS.md)
-ยังไม่มี `/admin`, `/user`, `/row` หรือโฟลเดอร์ navigation, interaction และ search
+Foreign key ทุกระดับใช้ `ON DELETE CASCADE`:
 
-## ตารางตามแผน — ยังไม่ได้สร้าง ⏳
+- ลบอาคาร → ลบชั้น สถานที่ และคำค้นภายใน
+- ลบชั้น → ลบสถานที่และคำค้นภายใน
+- ลบสถานที่ → ลบคำค้นของสถานที่
+- ลบคำค้น → ไม่กระทบสถานที่ ชั้น หรืออาคาร
 
-| ตาราง | หน้าที่ตามร่างเดิม |
+## ลำดับ Migration
+
+| ไฟล์ | หน้าที่ |
 |---|---|
-| Users | ข้อมูลผู้ใช้ CMU และบทบาท USER / ADMIN |
-| Reviews | รีวิวสถานที่ |
-| Review_Likes | การกดถูกใจรีวิว |
-| Favorites | สถานที่โปรดของผู้ใช้ |
-| Reports | รายงานปัญหาและสถานะ |
-| Navigation_Nodes | จุดและพิกัดสำหรับนำทาง |
-| Navigation_Edges | ทางเชื่อมระหว่างจุด |
+| `0000_phase1_indoor_navigation.sql` | สร้าง `buildings`, `floors`, `places` รุ่นแรกและ foreign key |
+| `0001_align_phase1_design.sql` | ตัดคอลัมน์เดิมบางส่วน เพิ่มรูปผัง รูปสถานที่ และ `fav_count` |
+| `0002_many_jamie_braddock.sql` | เพิ่ม `places.place_type` กลับมาเป็น VARCHAR(40) |
+| `0003_gorgeous_azazel.sql` | สร้าง `place_keywords`, foreign key และ unique index |
 
-ตารางเหล่านี้ยังไม่มีใน [schema.ts](../db/schema.ts)
-ฟิลด์จากร่างเดิม เช่น cmu_email, role, isReview, isFav, updated_at,
-category (แยกจาก `place_type`) และ status ยังไม่ใช่โครงสร้างที่โค้ดประกาศไว้
-จึงต้องกำหนดชนิดข้อมูล ค่า ENUM และข้อบังคับก่อนพัฒนา
+ไม่ควรแก้ migration ที่เคยนำไปใช้แล้ว เมื่อต้องการเปลี่ยนตารางให้แก้
+`db/schema.ts` แล้วสร้าง migration ลำดับใหม่ด้วย `pnpm db:generate`
 
-## Relationship Summary — ตามแผนเท่านั้น ⏳
+## ตารางที่ยังไม่มี
 
-```text
-Floors
-└── Navigation_Nodes (floor_id)
+Schema ปัจจุบันยังไม่มีตารางต่อไปนี้:
 
-Places
-├── Reviews (place_id)
-├── Favorites (place_id)
-└── Reports (place_id)
+- Users และระบบบัญชี CMU
+- Reviews และ Review Likes
+- Favorites
+- Reports
+- Navigation Nodes และ Navigation Edges
 
-Users
-├── Reviews (user_id)
-├── Favorites (user_id)
-├── Reports (user_id)
-└── Review_Likes (user_id)
-
-Reviews
-└── Review_Likes (review_id)
-
-Navigation_Nodes
-└── Navigation_Edges
-    ├── from_node_id → Navigation_Nodes.node_id
-    └── to_node_id   → Navigation_Nodes.node_id
-```
-
-Node คือจุด ส่วน Edge คือทางเชื่อม โดย from_node_id เป็นจุดเริ่มและ to_node_id เป็นจุดปลาย
-ทั้งสองอ้างอิงตาราง Nodes เดียวกัน ความสัมพันธ์ส่วนนี้ยังไม่ได้สร้างในโค้ด
-
-เอกสารนี้อ้างอิง schema ในไฟล์ ไม่ได้ยืนยันสถานะ migration ของฐานข้อมูลที่กำลังรัน
+จึงยังไม่มีคอลัมน์ `user_id`, `review_id`, `node_id`, พิกัดนำทาง หรือความสัมพันธ์
+สำหรับระบบ A* ในฐานข้อมูลชุดนี้
