@@ -4,6 +4,7 @@ import "./App.css";
 import fourthFloorPlan from "./assets/4th_floor.png";
 import fifthFloorPlan from "./assets/5th_floor.png";
 import sixthFloorPlan from "./assets/6th_floor.png";
+import seventhFloorPlan from "./assets/7th_floor.png";
 
 const WIDTH = 27;
 const HEIGHT = 27;
@@ -13,6 +14,7 @@ const FLOORS = [
   { id: "4", label: "4th Floor", image: fourthFloorPlan },
   { id: "5", label: "5th Floor", image: fifthFloorPlan },
   { id: "6", label: "6th Floor", image: sixthFloorPlan },
+  { id: "7", label: "7th Floor", image: seventhFloorPlan },
 ] as const;
 
 type FloorId = (typeof FLOORS)[number]["id"];
@@ -35,6 +37,7 @@ const INITIAL_ENDPOINTS_BY_FLOOR: EndpointsByFloor = {
   "4": DEFAULT_ENDPOINTS,
   "5": DEFAULT_ENDPOINTS,
   "6": DEFAULT_ENDPOINTS,
+  "7": DEFAULT_ENDPOINTS,
 };
 
 const INITIAL_WALLS: Wall[] = [
@@ -46,18 +49,21 @@ const INITIAL_WALLS_BY_FLOOR: WallsByFloor = {
   "4": INITIAL_WALLS,
   "5": [],
   "6": [],
+  "7": [],
 };
 
 const INITIAL_STAIRS_BY_FLOOR: StairsByFloor = {
   "4": [],
   "5": [],
   "6": [],
+  "7": [],
 };
 
 const INITIAL_ROOMS_BY_FLOOR: RoomsByFloor = {
   "4": [],
   "5": [],
   "6": [],
+  "7": [],
 };
 
 const TOOLS: { id: Tool; label: string }[] = [
