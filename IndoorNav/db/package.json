@@ -7,6 +7,7 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx ./db/seed.ts",
     "db:prototype": "tsx ./db/prototype.ts",
     "build": "tsc && tsc-alias",
     "eol": "eolConverter _entrypoint/*.sh"
