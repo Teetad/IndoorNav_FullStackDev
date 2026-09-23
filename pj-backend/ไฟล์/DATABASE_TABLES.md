@@ -1,6 +1,6 @@
 # Database Tables
 
-อ้างอิงโค้ด `pj-backend/db/schema.ts` และ migration ล่าสุด `0002_many_jamie_braddock.sql`
+อ้างอิงโค้ด `pj-backend/db/schema.ts` และ migration ล่าสุด `0003_gorgeous_azazel.sql`
 
 ✅ มีใน schema ปัจจุบัน | ⏳ เป็นแผน ยังไม่ได้สร้าง
 
@@ -37,8 +37,19 @@ UNIQUE (building_id, floor_number): เลขชั้นห้ามซ้ำ�
 - fav_count (INTEGER) — NOT NULL, DEFAULT 0
 
 `favCount` เป็นชื่อที่ใช้ใน TypeScript และ JSON; `fav_count` เป็นชื่อคอลัมน์ในฐานข้อมูล
-ยังไม่มี `keyword_id` และไม่มี UNIQUE บังคับชื่อสถานที่หรือเลขห้องห้ามซ้ำ
+ไม่มี UNIQUE บังคับชื่อสถานที่หรือเลขห้องห้ามซ้ำ
 ยังไม่มีระบบ Favorites แม้จะมีคอลัมน์เก็บจำนวนแล้ว
+
+## Place Keywords ✅
+
+ชื่อตารางจริง: `place_keywords`
+
+- keyword_id (UUID) — Primary Key, สร้างอัตโนมัติ
+- place_id (UUID) — NOT NULL, Foreign Key → Places.place_id; ลบสถานที่แล้วลบคำค้นตาม
+- keyword (VARCHAR(100)) — NOT NULL
+
+UNIQUE (place_id, keyword): สถานที่เดียวกันมีคำค้นซ้ำไม่ได้
+API เก็บคำค้นเป็นตัวพิมพ์เล็กและตัดช่องว่างหัวท้าย
 
 ## Relationship Summary — ปัจจุบัน ✅
 
@@ -49,7 +60,8 @@ Buildings
 
 Floors
 └── Places
-    └── floor_id → Floors.floor_id
+    ├── floor_id → Floors.floor_id
+    └── Place_Keywords (place_id)
 ```
 
 อาคารหนึ่งมีหลายชั้น และชั้นหนึ่งมีหลายสถานที่
@@ -58,6 +70,7 @@ Foreign Key ทั้งสองกำหนด ON DELETE CASCADE:
 - ลบอาคาร → ลบชั้นและสถานที่ภายใน
 - ลบชั้น → ลบสถานที่ภายใน
 - ลบสถานที่ → ไม่ลบชั้นหรืออาคาร
+- ลบสถานที่ → ลบคำค้นของสถานที่นั้น
 
 ## Routes — ปัจจุบัน ✅
 
@@ -78,7 +91,6 @@ src/routes/
 | ตาราง | หน้าที่ตามร่างเดิม |
 |---|---|
 | Users | ข้อมูลผู้ใช้ CMU และบทบาท USER / ADMIN |
-| Place_Keywords | คำค้นของสถานที่ |
 | Reviews | รีวิวสถานที่ |
 | Review_Likes | การกดถูกใจรีวิว |
 | Favorites | สถานที่โปรดของผู้ใช้ |
@@ -100,8 +112,7 @@ Floors
 Places
 ├── Reviews (place_id)
 ├── Favorites (place_id)
-├── Reports (place_id)
-└── Place_Keywords (place_id)
+└── Reports (place_id)
 
 Users
 ├── Reviews (user_id)

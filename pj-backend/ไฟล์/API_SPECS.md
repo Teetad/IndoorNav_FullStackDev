@@ -29,12 +29,15 @@ Base URL ใน Bruno: `{{baseUrl}}` โดย environment `Local` ใช้ `ht
 - PUT `/places/:place_id` — แก้ไขข้อมูลสถานที่บางฟิลด์ได้
 - POST `/places` — เพิ่มสถานที่ โดยต้องมี `floor_id` และ `place_name`
 - DELETE `/places/:place_id` — ลบสถานที่
+- GET `/places/:place_id/keywords` — อ่านคำค้นของสถานที่
+- POST `/places/:place_id/keywords` — เพิ่มคำค้น โดยส่ง `{ "keyword": "..." }`
+- DELETE `/places/:place_id/keywords/:keyword_id` — ลบคำค้น
 
 GET `/places` ใช้ query ร่วมกันได้:
 
 | Query | ความหมาย |
 |---|---|
-| `search` | ค้นบางส่วนของชื่อหรือเลขห้อง ไม่แยกตัวพิมพ์ใหญ่–เล็ก |
+| `search` | ค้นบางส่วนของชื่อ เลขห้อง หรือคำค้น ไม่แยกตัวพิมพ์ใหญ่–เล็ก |
 | `floor` | เลขชั้น เช่น 7 ไม่ใช่ floor_id |
 | `building_id` | UUID ของอาคาร |
 | `place_type` | ประเภทสถานที่ตาม `db/place-types.ts` เช่น `classroom`, `laboratory` |
@@ -47,6 +50,8 @@ GET {{baseUrl}}/places?floor=7&search=701
 
 `POST /places` และ `PUT /places/:place_id` รับ `place_type` เป็นค่าจากรายการใน
 `db/place-types.ts` หรือ `null` เมื่อยังไม่ทราบประเภท; `GET` คืนฟิลด์นี้ด้วย
+คำค้นยาวได้ 1–100 ตัวอักษร ตัดช่องว่างหัวท้ายและเก็บเป็นตัวพิมพ์เล็ก
+หากคำค้นซ้ำในสถานที่เดียวกัน API ตอบ 409
 
 ## Floors ✅
 

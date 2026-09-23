@@ -1,3 +1,4 @@
+// ค่าที่ API ยอมรับใน place_type; ต่างจากคำค้นอิสระใน place_keywords
 export const placeTypes = [
   "classroom", "coworking_space", "administrative_office", "laboratory",
   "meeting_room", "faculty_office", "restroom", "elevator_lobby", "stairs",

@@ -31,6 +31,11 @@ The default local API URL is `http://localhost:3001` (from `PORT` in `.env`).
 - `GET /places?floor=6`
 - `GET /places?building_id=:building_id`
 - `GET /places?place_type=classroom`
+- `GET|POST /places/:place_id/keywords`
+- `DELETE /places/:place_id/keywords/:keyword_id`
+
+`search` also matches place keywords. Add keywords through `POST /places/:place_id/keywords`;
+the map importer does not invent keywords for rooms.
 
 Open `bruno/` in Bruno and select the `Local` environment for manual and
 integration verification.
@@ -53,6 +58,8 @@ See [map sources and unresolved labels](db/data/README.md) before using the data
 
 All requests in this folder are read-only. Other folders include create/update/delete requests.
 The map checks discover IDs dynamically; the older `seedPlaceId` variable belongs to demo data.
+To test keywords, run `Map Verification` first, then `Place Keywords` in order 01–04.
+The keyword tests add and remove one temporary keyword.
 If Bruno CLI is installed, run from `pj-backend/bruno`:
 
 ```bash

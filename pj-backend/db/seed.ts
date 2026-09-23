@@ -50,7 +50,7 @@ const placesData = [
 
 async function seed() {
   try {
-    // ล้างเฉพาะข้อมูล Phase 1 เพื่อให้ได้ sample data ชุดเดิมทุกครั้ง
+    // คำสั่งตัวอย่างนี้ลบข้อมูลทั้งหมดในสามตารางก่อนใส่ sample data
     await dbClient.delete(Places);
     await dbClient.delete(Floors);
     await dbClient.delete(Buildings);

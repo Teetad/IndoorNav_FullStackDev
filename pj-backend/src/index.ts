@@ -9,6 +9,7 @@ import buildingRouter from "./routes/building/Buildings.route.js";
 import floorRouter from "./routes/building/Floors.route.js";
 import placeRouter from "./routes/building/Places.route.js";
 
+// app คือจุดรับ HTTP request ก่อนส่งต่อให้ route ของแต่ละหมวด
 const app = express();
 app.use(morgan("dev"));
 app.use(helmet());
@@ -34,6 +35,7 @@ app.get("/health/database", async (_req, res) => {
   }
 });
 
+// เช่น GET /places จะถูกส่งไปจัดการใน Places.route.ts
 app.use("/buildings", buildingRouter);
 app.use("/floors", floorRouter);
 app.use("/places", placeRouter);
