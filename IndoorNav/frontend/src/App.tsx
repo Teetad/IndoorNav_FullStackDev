@@ -27,6 +27,7 @@ type EndpointsByFloor = Record<FloorId, Endpoints>;
 type Room = { number: string; x: number; y: number };
 type RoomsByFloor = Record<FloorId, Room[]>;
 type Tool = "view" | "wall" | "start" | "goal" | "room" | "stairs";
+type Arrow = "→" | "←" | "↓" | "↑";
 
 const DEFAULT_ENDPOINTS: Endpoints = {
   start: { x: 0, y: 0 },
@@ -40,10 +41,7 @@ const INITIAL_ENDPOINTS_BY_FLOOR: EndpointsByFloor = {
   "7": DEFAULT_ENDPOINTS,
 };
 
-const INITIAL_WALLS: Wall[] = [
-  [3, 0], [3, 1], [3, 2], [3, 3], [3, 4], [6, 0], [6, 1],
-  [6, 2], [6, 3], [6, 4], [6, 5], [6, 6], [6, 7]
-];
+const INITIAL_WALLS: Wall[] = [];
 
 const INITIAL_WALLS_BY_FLOOR: WallsByFloor = {
   "4": INITIAL_WALLS,
@@ -59,11 +57,27 @@ const INITIAL_STAIRS_BY_FLOOR: StairsByFloor = {
   "7": [],
 };
 
+// Default room tags. Edit/add entries per floor here, the same way INITIAL_WALLS
+// seeds floor 4's walls. Coordinates are grid cells (0-26), not pixels.
+const INITIAL_ROOMS_4: Room[] = [
+  {number:"413B","x":4,"y":15},
+  {number:"415A","x":11,"y":13},
+  {number:"AS lab","x":6,"y":13}
+];
+
+const INITIAL_ROOMS_5: Room[] = [
+  { number: "512", x: 11, y: 13 },
+  { number: "518", x: 4, y: 15 }
+];
+
+const INITIAL_ROOMS_6: Room[] = [];
+const INITIAL_ROOMS_7: Room[] = [];
+
 const INITIAL_ROOMS_BY_FLOOR: RoomsByFloor = {
-  "4": [],
-  "5": [],
-  "6": [],
-  "7": [],
+  "4": INITIAL_ROOMS_4,
+  "5": INITIAL_ROOMS_5,
+  "6": INITIAL_ROOMS_6,
+  "7": INITIAL_ROOMS_7,
 };
 
 const TOOLS: { id: Tool; label: string }[] = [
@@ -101,6 +115,35 @@ async function fetchPath(
 
 function distance(a: Point, b: Point) {
   return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+// Given the full path, returns a map of "x-y" -> arrow character,
+// based on the direction from that cell to the next one in the path.
+function getPathArrows(path: Point[]): Map<string, Arrow> {
+  const arrows = new Map<string, Arrow>();
+
+  for (let i = 0; i < path.length - 1; i++) {
+    const current = path[i];
+    const next = path[i + 1];
+    let arrow: Arrow;
+
+    if (next.x > current.x) arrow = "→";
+    else if (next.x < current.x) arrow = "←";
+    else if (next.y > current.y) arrow = "↓";
+    else arrow = "↑";
+
+    arrows.set(`${current.x}-${current.y}`, arrow);
+  }
+
+  // Last cell (the goal) has no "next" step, so just reuse the previous direction.
+  if (path.length > 1) {
+    const last = path[path.length - 1];
+    const secondLast = path[path.length - 2];
+    const prevArrow = arrows.get(`${secondLast.x}-${secondLast.y}`);
+    if (prevArrow) arrows.set(`${last.x}-${last.y}`, prevArrow);
+  }
+
+  return arrows;
 }
 
 // Finds a room by number across every floor (case-insensitive, trimmed).
@@ -185,11 +228,13 @@ export default function App() {
   const [routeSummary, setRouteSummary] = useState<RouteSummary | null>(null);
   const [searching, setSearching] = useState(false);
   // Some preview/embedded environments block window.prompt/alert/confirm, so room
-  // tagging, notices, and the clear-walls confirmation are all done with on-page UI instead.
+  // tagging, notices, and the clear-walls/clear-rooms confirmations are all done
+  // with on-page UI instead.
   const [pendingRoomCell, setPendingRoomCell] = useState<Point | null>(null);
   const [pendingRoomValue, setPendingRoomValue] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
   const [confirmingClearWalls, setConfirmingClearWalls] = useState(false);
+  const [confirmingClearRooms, setConfirmingClearRooms] = useState(false);
   const toolbarRef = useRef<HTMLElement>(null);
   const toolsRef = useRef<HTMLElement>(null);
   const searchRef = useRef<HTMLElement>(null);
@@ -309,6 +354,7 @@ export default function App() {
     setSelectedFloorId(floorId);
     setPendingRoomCell(null);
     setConfirmingClearWalls(false);
+    setConfirmingClearRooms(false);
   };
 
   const handleCellClick = (x: number, y: number) => {
@@ -326,11 +372,25 @@ export default function App() {
       .catch(() => setNotice("Couldn't copy to clipboard in this environment."));
   };
 
+  const copyRooms = () => {
+    navigator.clipboard
+      .writeText(JSON.stringify(rooms))
+      .then(() => setNotice(`${selectedFloor.label} rooms copied to clipboard!`))
+      .catch(() => setNotice("Couldn't copy to clipboard in this environment."));
+  };
+
   const clearWalls = () => setConfirmingClearWalls(true);
 
   const confirmClearWalls = () => {
     setWallsByFloor((prev) => ({ ...prev, [selectedFloorId]: [] }));
     setConfirmingClearWalls(false);
+  };
+
+  const clearRooms = () => setConfirmingClearRooms(true);
+
+  const confirmClearRooms = () => {
+    setRoomsByFloor((prev) => ({ ...prev, [selectedFloorId]: [] }));
+    setConfirmingClearRooms(false);
   };
 
   // Looks up the two room numbers, then either paths within one floor or
@@ -505,6 +565,7 @@ export default function App() {
   }, [selectedFloorId, walls, start, goal]);
 
   const pathSet = new Set(path.map((p) => `${p.x}-${p.y}`));
+  const pathArrows = getPathArrows(path);
 
   const toolHint =
     tool === "start"
@@ -599,6 +660,14 @@ export default function App() {
         </div>
       )}
 
+      {confirmingClearRooms && (
+        <div className="notice notice-confirm" role="alertdialog">
+          <span>Clear all room tags on {selectedFloor.label}?</span>
+          <button type="button" onClick={confirmClearRooms}>Yes, clear</button>
+          <button type="button" onClick={() => setConfirmingClearRooms(false)}>Cancel</button>
+        </div>
+      )}
+
       <section className="search" aria-label="Find route by room number" ref={searchRef}>
         <input
           type="text"
@@ -641,7 +710,9 @@ export default function App() {
           </button>
         ))}
         <button type="button" onClick={copyWalls}>Copy Walls JSON</button>
+        <button type="button" onClick={copyRooms}>Copy Rooms JSON</button>
         <button type="button" onClick={clearWalls}>Clear Walls</button>
+        <button type="button" onClick={clearRooms}>Clear Rooms</button>
         <span>{toolHint}</span>
       </section>
 
@@ -690,7 +761,7 @@ export default function App() {
                 cellClass += " wall";
               } else if (isPath) {
                 cellClass += " path";
-                cellText = ".";
+                cellText = pathArrows.get(`${x}-${y}`) ?? ".";
               }
 
               if (tool !== "view") cellClass += " editable";
