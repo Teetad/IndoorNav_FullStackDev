@@ -1,18 +1,22 @@
-name: preflight # You can also change this to another name to avoid warning with existing group.
+name: project
 services:
   backend:
-    container_name: pf-backend
+    container_name: pj-backend
     build: .
     ports:
       - ${PROD_PORT}:3000
     networks:
-      - pf-net
+      - pj-net
     environment:
+      - PORT=3000
       - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=pj-db
       - POSTGRES_APP_USER=${POSTGRES_APP_USER}
       - POSTGRES_APP_PASSWORD=${POSTGRES_APP_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
     volumes:
       - ./logs:/app/logs
     post_start:
@@ -24,11 +28,11 @@ services:
           ]
   postgres:
     image: postgres:18-alpine
-    container_name: pf-db
+    container_name: pj-db
     ports:
       - ${POSTGRES_PORT}:5432
     volumes:
-      - pf-data:/var/lib/postgresql
+      - pj-data:/var/lib/postgresql
       - ./_entrypoint:/docker-entrypoint-initdb.d
     environment:
       - TZ=Asia/Bangkok
@@ -38,10 +42,15 @@ services:
       - POSTGRES_APP_USER=${POSTGRES_APP_USER}
       - POSTGRES_APP_PASSWORD=${POSTGRES_APP_PASSWORD}
     networks:
-      - pf-net
+      - pj-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
-  pf-data:
+  pj-data:
 
 networks:
-  pf-net:
+  pj-net:
