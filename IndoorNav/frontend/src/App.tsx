@@ -1,64 +1,30 @@
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import "./App.css";
-import fourthFloorPlan from "./assets/4th_floor.png";
-import fifthFloorPlan from "./assets/5th_floor.png";
-import sixthFloorPlan from "./assets/6th_floor.png";
+import {
+  WIDTH,
+  HEIGHT,
+  IMAGE_WIDTH,
+  IMAGE_HEIGHT,
+  FLOORS,
+  INITIAL_ENDPOINTS_BY_FLOOR,
+  INITIAL_WALLS_BY_FLOOR,
+  INITIAL_STAIRS_BY_FLOOR,
+  INITIAL_ROOMS_BY_FLOOR,
+} from "./Floor_Information";
+import type {
+  FloorId,
+  Point,
+  Wall,
+  WallsByFloor,
+  StairsByFloor,
+  EndpointsByFloor,
+  Room,
+  RoomsByFloor,
+} from "./Floor_Information";
 
-const WIDTH = 27;
-const HEIGHT = 27;
-const IMAGE_WIDTH = 1260;
-const IMAGE_HEIGHT = 1260;
-const FLOORS = [
-  { id: "4", label: "4th Floor", image: fourthFloorPlan },
-  { id: "5", label: "5th Floor", image: fifthFloorPlan },
-  { id: "6", label: "6th Floor", image: sixthFloorPlan },
-] as const;
-
-type FloorId = (typeof FLOORS)[number]["id"];
-type Point = { x: number; y: number };
-type Wall = [number, number];
-type WallsByFloor = Record<FloorId, Wall[]>;
-type StairsByFloor = Record<FloorId, Wall[]>;
-type Endpoints = { start: Point; goal: Point };
-type EndpointsByFloor = Record<FloorId, Endpoints>;
-type Room = { number: string; x: number; y: number };
-type RoomsByFloor = Record<FloorId, Room[]>;
 type Tool = "view" | "wall" | "start" | "goal" | "room" | "stairs";
-
-const DEFAULT_ENDPOINTS: Endpoints = {
-  start: { x: 0, y: 0 },
-  goal: { x: 9, y: 0 },
-};
-
-const INITIAL_ENDPOINTS_BY_FLOOR: EndpointsByFloor = {
-  "4": DEFAULT_ENDPOINTS,
-  "5": DEFAULT_ENDPOINTS,
-  "6": DEFAULT_ENDPOINTS,
-};
-
-const INITIAL_WALLS: Wall[] = [
-  [3, 0], [3, 1], [3, 2], [3, 3], [3, 4], [6, 0], [6, 1],
-  [6, 2], [6, 3], [6, 4], [6, 5], [6, 6], [6, 7]
-];
-
-const INITIAL_WALLS_BY_FLOOR: WallsByFloor = {
-  "4": INITIAL_WALLS,
-  "5": [],
-  "6": [],
-};
-
-const INITIAL_STAIRS_BY_FLOOR: StairsByFloor = {
-  "4": [],
-  "5": [],
-  "6": [],
-};
-
-const INITIAL_ROOMS_BY_FLOOR: RoomsByFloor = {
-  "4": [],
-  "5": [],
-  "6": [],
-};
+type Arrow = "→" | "←" | "↓" | "↑";
 
 const TOOLS: { id: Tool; label: string }[] = [
   { id: "view", label: "View" },
@@ -95,6 +61,35 @@ async function fetchPath(
 
 function distance(a: Point, b: Point) {
   return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+// Given the full path, returns a map of "x-y" -> arrow character,
+// based on the direction from that cell to the next one in the path.
+function getPathArrows(path: Point[]): Map<string, Arrow> {
+  const arrows = new Map<string, Arrow>();
+
+  for (let i = 0; i < path.length - 1; i++) {
+    const current = path[i];
+    const next = path[i + 1];
+    let arrow: Arrow;
+
+    if (next.x > current.x) arrow = "→";
+    else if (next.x < current.x) arrow = "←";
+    else if (next.y > current.y) arrow = "↓";
+    else arrow = "↑";
+
+    arrows.set(`${current.x}-${current.y}`, arrow);
+  }
+
+  // Last cell (the goal) has no "next" step, so just reuse the previous direction.
+  if (path.length > 1) {
+    const last = path[path.length - 1];
+    const secondLast = path[path.length - 2];
+    const prevArrow = arrows.get(`${secondLast.x}-${secondLast.y}`);
+    if (prevArrow) arrows.set(`${last.x}-${last.y}`, prevArrow);
+  }
+
+  return arrows;
 }
 
 // Finds a room by number across every floor (case-insensitive, trimmed).
@@ -179,11 +174,13 @@ export default function App() {
   const [routeSummary, setRouteSummary] = useState<RouteSummary | null>(null);
   const [searching, setSearching] = useState(false);
   // Some preview/embedded environments block window.prompt/alert/confirm, so room
-  // tagging, notices, and the clear-walls confirmation are all done with on-page UI instead.
+  // tagging, notices, and the clear-walls/clear-rooms confirmations are all done
+  // with on-page UI instead.
   const [pendingRoomCell, setPendingRoomCell] = useState<Point | null>(null);
   const [pendingRoomValue, setPendingRoomValue] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
   const [confirmingClearWalls, setConfirmingClearWalls] = useState(false);
+  const [confirmingClearRooms, setConfirmingClearRooms] = useState(false);
   const toolbarRef = useRef<HTMLElement>(null);
   const toolsRef = useRef<HTMLElement>(null);
   const searchRef = useRef<HTMLElement>(null);
@@ -197,7 +194,7 @@ export default function App() {
   const allRoomNumbers = FLOORS.flatMap((floor) => roomsByFloor[floor.id].map((r) => r.number));
 
   const isOccupied = (x: number, y: number) =>
-    (x === start.x && y === start.y) || (x === goal.x && y === goal.y);
+    (!!start && x === start.x && y === start.y) || (!!goal && x === goal.x && y === goal.y);
 
   const toggleWall = (x: number, y: number) => {
     if (isOccupied(x, y)) return;
@@ -275,7 +272,7 @@ export default function App() {
 
   const placeEndpoint = (kind: "start" | "goal", x: number, y: number) => {
     const other = kind === "start" ? goal : start;
-    if (other.x === x && other.y === y) return;
+    if (other && other.x === x && other.y === y) return;
 
     setEndpointsByFloor((prev) => ({
       ...prev,
@@ -303,6 +300,7 @@ export default function App() {
     setSelectedFloorId(floorId);
     setPendingRoomCell(null);
     setConfirmingClearWalls(false);
+    setConfirmingClearRooms(false);
   };
 
   const handleCellClick = (x: number, y: number) => {
@@ -320,11 +318,28 @@ export default function App() {
       .catch(() => setNotice("Couldn't copy to clipboard in this environment."));
   };
 
+  const copyRooms = () => {
+    // Bundles rooms and stairs together, since both are "points of interest"
+    // on the floor and are usually edited/reviewed together.
+    const payload = { rooms, stairs };
+    navigator.clipboard
+      .writeText(JSON.stringify(payload))
+      .then(() => setNotice(`${selectedFloor.label} rooms + stairs copied to clipboard!`))
+      .catch(() => setNotice("Couldn't copy to clipboard in this environment."));
+  };
+
   const clearWalls = () => setConfirmingClearWalls(true);
 
   const confirmClearWalls = () => {
     setWallsByFloor((prev) => ({ ...prev, [selectedFloorId]: [] }));
     setConfirmingClearWalls(false);
+  };
+
+  const clearRooms = () => setConfirmingClearRooms(true);
+
+  const confirmClearRooms = () => {
+    setRoomsByFloor((prev) => ({ ...prev, [selectedFloorId]: [] }));
+    setConfirmingClearRooms(false);
   };
 
   // Looks up the two room numbers, then either paths within one floor or
@@ -473,6 +488,13 @@ export default function App() {
   // This also renders each leg of a searched multi-floor route once you switch to that floor,
   // since findRoute() already set that floor's start/goal.
   useEffect(() => {
+    // Nothing placed yet — keep the map blank instead of calling the backend.
+    if (!start || !goal) {
+      setPath([]);
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
     setLoading(true);
     fetch("http://localhost:3001/api/find-path", {
@@ -499,6 +521,7 @@ export default function App() {
   }, [selectedFloorId, walls, start, goal]);
 
   const pathSet = new Set(path.map((p) => `${p.x}-${p.y}`));
+  const pathArrows = getPathArrows(path);
 
   const toolHint =
     tool === "start"
@@ -519,6 +542,8 @@ export default function App() {
           <p className="status">
             {loading
               ? "Calculating path..."
+              : !start || !goal
+              ? `Search a route above, or use "Set Start" / "Set Goal" to place points on ${selectedFloor.label}.`
               : path.length > 0
               ? `Path found: ${path.length} steps on ${selectedFloor.label}.`
               : `No path found on ${selectedFloor.label}.`}
@@ -593,6 +618,14 @@ export default function App() {
         </div>
       )}
 
+      {confirmingClearRooms && (
+        <div className="notice notice-confirm" role="alertdialog">
+          <span>Clear all room tags on {selectedFloor.label}?</span>
+          <button type="button" onClick={confirmClearRooms}>Yes, clear</button>
+          <button type="button" onClick={() => setConfirmingClearRooms(false)}>Cancel</button>
+        </div>
+      )}
+
       <section className="search" aria-label="Find route by room number" ref={searchRef}>
         <input
           type="text"
@@ -635,7 +668,9 @@ export default function App() {
           </button>
         ))}
         <button type="button" onClick={copyWalls}>Copy Walls JSON</button>
+        <button type="button" onClick={copyRooms}>Copy Rooms + Stairs JSON</button>
         <button type="button" onClick={clearWalls}>Clear Walls</button>
+        <button type="button" onClick={clearRooms}>Clear Rooms</button>
         <span>{toolHint}</span>
       </section>
 
@@ -659,8 +694,8 @@ export default function App() {
               let cellText = "";
               let title: string | undefined;
 
-              const isStart = x === start.x && y === start.y;
-              const isGoal = x === goal.x && y === goal.y;
+              const isStart = !!start && x === start.x && y === start.y;
+              const isGoal = !!goal && x === goal.x && y === goal.y;
               const isStairs = stairs.some(([sx, sy]) => sx === x && sy === y);
               const room = rooms.find((r) => r.x === x && r.y === y);
               const isWall = walls.some(([wx, wy]) => wx === x && wy === y);
@@ -684,7 +719,7 @@ export default function App() {
                 cellClass += " wall";
               } else if (isPath) {
                 cellClass += " path";
-                cellText = ".";
+                cellText = pathArrows.get(`${x}-${y}`) ?? ".";
               }
 
               if (tool !== "view") cellClass += " editable";

@@ -16,6 +16,24 @@ function heuristic(nodeA: GridNode, nodeB: GridNode): number {
   return Math.abs(nodeA.x - nodeB.x) + Math.abs(nodeA.y - nodeB.y);
 }
 
+type Dir = "N" | "S" | "E" | "W" | null;
+
+function getDirection(from: GridNode, to: GridNode): Dir {
+  if (to.x > from.x) return "E";
+  if (to.x < from.x) return "W";
+  if (to.y > from.y) return "S";
+  if (to.y < from.y) return "N";
+  return null;
+}
+
+// Tune this: 0 = ignore turns entirely, higher = straighter/more "hallway-like" paths.
+const TURN_PENALTY = 0.5;
+
+function turnCost(prevDir: Dir, nextDir: Dir): number {
+  if (prevDir === null || prevDir === nextDir) return 0; // first move, or going straight
+  return TURN_PENALTY;
+}
+
 export function findPath(grid: GridNode[][], start: GridNode, goal: GridNode): GridNode[] {
   const openSet: GridNode[] = [];
   const closedSet: Set<GridNode> = new Set();
@@ -44,6 +62,7 @@ export function findPath(grid: GridNode[][], start: GridNode, goal: GridNode): G
     openSet.splice(lowestIndex, 1);
     closedSet.add(current);
 
+    const currentDir = current.parent ? getDirection(current.parent, current) : null;
     const neighbors = getNeighbors(grid, current);
 
     for (const neighbor of neighbors) {
@@ -51,7 +70,8 @@ export function findPath(grid: GridNode[][], start: GridNode, goal: GridNode): G
         continue;
       }
 
-      const tentativeG = current.g + 1;
+      const neighborDir = getDirection(current, neighbor);
+      const tentativeG = current.g + 1 + turnCost(currentDir, neighborDir);
       let newPath = false;
 
       if (openSet.includes(neighbor)) {
