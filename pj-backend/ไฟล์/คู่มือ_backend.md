@@ -63,6 +63,10 @@ Role ที่เก็บใน `users` มี `USER`, `ADMIN`, `DEVELOPER` ส
 ยังไม่ login จึงไม่มีข้อมูลในตาราง `users` Admin และ Developer กำหนดจากรายชื่อ email
 ใน `.env` ตอน login; route เดิมยังไม่บังคับ role จนกว่าทีมจะตกลง permission ครบ
 
+ของที่ยังไม่ได้ทำมี Review, Like, Favorite, Report, รูปหลายรูป และ Navigation
+ตอนนี้ `places.image_url` เก็บได้รูปเดียว ส่วน `fav_count` ยังไม่ได้บอกว่า User คนไหน
+Favorite ห้องไหน
+
 ## ไฟล์ใน `db/`
 
 | ไฟล์ | ทำหน้าที่อะไร |

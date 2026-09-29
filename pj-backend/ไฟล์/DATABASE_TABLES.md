@@ -109,7 +109,14 @@ Schema ปัจจุบันยังไม่มีตารางต่อ�
 - Reviews และ Review Likes
 - Favorites
 - Reports
+- Place Images สำหรับเก็บหลายรูปต่อห้อง
 - Navigation Nodes และ Navigation Edges
 
-จึงยังไม่มีคอลัมน์ `review_id`, `node_id`, พิกัดนำทาง หรือความสัมพันธ์
-สำหรับระบบ A* ในฐานข้อมูลชุดนี้
+ตอนนี้จึงยังไม่มีข้อมูล Review, Favorite ของแต่ละ User, Report, รูปหลายรูป
+และพิกัดสำหรับ A*
+
+ใน `places` มีแค่ `image_url` หนึ่งช่อง ถ้าจะใส่ 2–3 รูปต่อห้องต้องเพิ่ม
+ตาราง `place_images` ส่วน `fav_count` เป็นของเดิมและยังบอกไม่ได้ว่าใคร Favorite ห้องไหน
+ตอนทำ Favorite ควรเพิ่มตารางเชื่อม User กับ Place และไม่ต้องส่งจำนวน Favorite ให้หน้าแอป
+
+เวลาเปิด สถานะห้อง และขนาดห้องก็ยังไม่มีใน schema
