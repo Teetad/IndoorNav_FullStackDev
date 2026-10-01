@@ -1,11 +1,12 @@
 # API Specs — สถานะปัจจุบันของ `pj-backend`
 
 เอกสารนี้อ้างอิง route ที่ลงทะเบียนใน `src/index.ts` และโค้ดใน
-`src/routes/building/` ณ วันที่ 23 กันยายน 2026
+`src/routes/` ณ วันที่ 29 กันยายน 2026
 
-- Base URL สำหรับพัฒนาในเครื่อง: `http://localhost:3001`
+- Base URL สำหรับพัฒนาในเครื่อง: `http://localhost:3000`
 - Bruno ใช้ตัวแปร `{{baseUrl}}` จาก environment `Local`
-- ทุก endpoint ยังไม่มีระบบ login หรือการตรวจสิทธิ์ Admin / User
+- มี CPE OAuth login และ session token แล้ว แต่ route Buildings/Floors/Places
+  ยังไม่ได้บังคับสิทธิ์
 - request และ response ใช้ JSON ยกเว้น endpoint ที่ไม่มี body
 
 ## System
@@ -13,10 +14,31 @@
 | Method | Endpoint | ผลลัพธ์เมื่อสำเร็จ |
 |---|---|---|
 | GET | `/` | ข้อความยืนยันว่า Backend ทำงาน (`200`) |
-| GET | `/health/database` | จำนวนข้อมูลใน `buildings`, `floors`, `places` (`200`) |
+| GET | `/health/database` | จำนวนข้อมูลใน `buildings`, `floors`, `places`, `users` (`200`) |
 
 `/health/database` ตอบ `500` เมื่ออ่านฐานข้อมูลไม่ได้ และยังไม่นับ
 `place_keywords` ใน `tableCounts`
+
+## Authentication
+
+| Method | Endpoint | รายละเอียด |
+|---|---|---|
+| GET | `/auth/login` | สร้าง OAuth state cookie แล้ว redirect ไปหน้า CPE OAuth |
+| GET | `/auth/callback` | ตรวจ state, แลก code, อ่าน userinfo, บันทึก User และคืน Bearer token |
+| GET | `/auth/me` | อ่านผู้ใช้ปัจจุบัน ต้องส่ง Bearer token |
+| GET | `/auth/admin-check` | ตรวจ Bearer token และ role `ADMIN` |
+| GET | `/auth/developer-check` | ตรวจ Bearer token และ role `DEVELOPER` |
+
+Callback ที่ลงทะเบียนคือ `http://localhost:3000/auth/callback` Session token มีอายุ
+8 ชั่วโมง ผู้ใช้ใหม่ได้ role `USER`; email ใน `ADMIN_EMAILS` ได้ `ADMIN` และ email ใน
+`DEVELOPER_EMAILS` ได้ `DEVELOPER` ส่วน Guest คือผู้ที่ไม่ได้ login จึงไม่มีแถวในตาราง
+ค่า OAuth secret และ `JWT_SECRET` ต้องอยู่ใน `.env` และห้าม commit
+
+ตัวอย่างเรียก `/auth/me`:
+
+```http
+Authorization: Bearer <token จาก /auth/callback>
+```
 
 ## Buildings
 
@@ -141,17 +163,25 @@ API ตัดช่องว่างหัวท้าย แปลงเป็
 | 400 | UUID, query, body หรือค่าประเภทไม่ถูกต้อง |
 | 404 | ไม่พบข้อมูลหรือไม่พบ route |
 | 409 | ชื่ออาคาร เลขชั้น หรือ keyword ซ้ำตาม unique constraint |
+| 401 | ไม่มี session token หรือ token ไม่ถูกต้อง/หมดอายุ |
+| 403 | login แล้วแต่ role ไม่มีสิทธิ์เรียก endpoint |
 | 500 | เกิดข้อผิดพลาดภายในหรือเชื่อม/อ่านฐานข้อมูลไม่ได้ |
-
-ยังไม่มีการตอบ `401` หรือ `403` เพราะยังไม่มี authentication และ authorization
+| 502 | แลก OAuth token หรืออ่าน userinfo ไม่สำเร็จ |
+| 503 | ยังตั้งค่า OAuth environment ไม่ครบ |
 
 ## API ที่ยังไม่มี
 
-- Authentication และบัญชีผู้ใช้
 - Reviews และ Review Likes
-- Favorites แม้ `places` จะมีตัวนับ `fav_count`
-- Reports
+- Favorites ของแต่ละ User ตอนนี้มีแค่ `fav_count` ของเดิม
+- Reports, My Reports และการแก้สถานะ Report
 - Navigation, Navigation Nodes และ Navigation Edges
-- API สำหรับอัปโหลดไฟล์รูปภาพ
+- API อัปโหลดและอ่านหลายรูปต่อห้อง
+- API เวลาเปิด สถานะห้อง และขนาดห้อง
 
-รายการนี้เป็นงานในอนาคตและยังเรียกใช้ใน `pj-backend` ไม่ได้
+รายการพวกนี้ยังเรียกใช้ใน `pj-backend` ไม่ได้
+
+route ที่แก้ข้อมูล Buildings, Floors, Places และ Keywords ยังเป็น public จนกว่าทีมจะ
+ตกลง policy แล้วนำ `requireAuth`/`requireRole` ไปผูกกับ route เหล่านั้น
+
+ตอนนี้ `/auth/callback` แสดง token เป็น JSON เพื่อใช้เทส Backend ก่อน
+ตอนเชื่อม Frontend ต้องแก้ให้กลับไปหน้า Frontend หลัง login
