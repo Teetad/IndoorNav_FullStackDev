@@ -172,12 +172,16 @@ API ตัดช่องว่างหัวท้าย แปลงเป็
 ## API ที่ยังไม่มี
 
 - Reviews และ Review Likes
-- Favorites แม้ `places` จะมีตัวนับ `fav_count`
-- Reports
+- Favorites ของแต่ละ User ตอนนี้มีแค่ `fav_count` ของเดิม
+- Reports, My Reports และการแก้สถานะ Report
 - Navigation, Navigation Nodes และ Navigation Edges
-- API สำหรับอัปโหลดไฟล์รูปภาพ
+- API อัปโหลดและอ่านหลายรูปต่อห้อง
+- API เวลาเปิด สถานะห้อง และขนาดห้อง
 
-รายการนี้เป็นงานในอนาคตและยังเรียกใช้ใน `pj-backend` ไม่ได้
+รายการพวกนี้ยังเรียกใช้ใน `pj-backend` ไม่ได้
 
 route ที่แก้ข้อมูล Buildings, Floors, Places และ Keywords ยังเป็น public จนกว่าทีมจะ
 ตกลง policy แล้วนำ `requireAuth`/`requireRole` ไปผูกกับ route เหล่านั้น
+
+ตอนนี้ `/auth/callback` แสดง token เป็น JSON เพื่อใช้เทส Backend ก่อน
+ตอนเชื่อม Frontend ต้องแก้ให้กลับไปหน้า Frontend หลัง login
