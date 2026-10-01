@@ -1,10 +1,23 @@
 import {
   integer,
   pgTable,
+  timestamp,
   uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
+export const Users = pgTable("users", {
+  // user_id เป็น ID ภายในระบบ ส่วน oauth_subject เป็น ID ที่ CPE OAuth ส่งมา
+  user_id: uuid("user_id").primaryKey().defaultRandom(),
+  oauth_subject: varchar("oauth_subject", { length: 255 }).notNull().unique(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  display_name: varchar("display_name", { length: 120 }),
+  // ผู้ใช้ที่ login ครั้งแรกเป็น USER จนกว่าจะถูกกำหนดเป็น ADMIN/DEVELOPER
+  role: varchar("role", { length: 20 }).default("USER").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
 
 export const Buildings = pgTable("buildings", {
   building_id: uuid("building_id").primaryKey().defaultRandom(),

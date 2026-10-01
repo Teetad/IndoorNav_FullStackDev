@@ -1,0 +1,21 @@
+meta {
+  name: 03 User Cannot Access Developer
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/auth/developer-check
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("USER ไม่มีสิทธิ์ DEVELOPER", function () {
+    expect(res.getStatus()).to.equal(403);
+  });
+}

@@ -1,4 +1,4 @@
-# ความคืบหน้า Backend — 23 กันยายน 2026
+# ความคืบหน้า Backend — 29 กันยายน 2026
 
 ขอบเขตเอกสารนี้คือโฟลเดอร์ `pj-backend` เท่านั้น ไม่รวม Frontend หรือระบบ A*
 
@@ -6,15 +6,16 @@
 
 | ส่วน | สถานะ |
 |---|---|
-| Express API | มี route ระบบ, Buildings, Floors, Places และ Place Keywords |
-| Database schema | มี 4 ตาราง: `buildings`, `floors`, `places`, `place_keywords` |
+| Express API | มี route ระบบ, Auth, Buildings, Floors, Places และ Place Keywords |
+| Database schema | มี 5 ตาราง: `users`, `buildings`, `floors`, `places`, `place_keywords` |
 | Places | อ่าน เพิ่ม แก้ ลบ ค้นชื่อ/เลขห้อง/keyword และกรองอาคาร ชั้น ประเภทได้ |
 | Place Types | มีรายการค่าที่ API ยอมรับ 11 ประเภท; ใช้ `null` ได้เมื่อยังไม่ทราบ |
 | Place Keywords | อ่าน เพิ่ม ลบ และใช้ค้นหาสถานที่ได้ |
 | ข้อมูลแผนที่ | มีชุดข้อมูลอาคาร 30 ปี ชั้น 4–7 รวม 78 สถานที่ |
 | Map import | preview ได้โดยไม่ต่อ DB และใช้ `--apply` เพื่อนำเข้าแบบ transaction |
 | Bruno | มีคำขอสำหรับ Buildings, Floors, Places, Map Verification และ Place Keywords |
-| Authentication / Admin / User | ยังไม่ได้พัฒนา |
+| Authentication | มี CPE OAuth login, callback, Bearer session และ `/auth/me` |
+| Role | มี `USER`/`ADMIN`/`DEVELOPER` และ route ตรวจ role; Guest คือผู้ที่ไม่ login |
 | Navigation / A* | ยังไม่ได้พัฒนาใน `pj-backend` และยังไม่มีพิกัดนำทางใน schema |
 
 ## งานที่มีอยู่ในโค้ดแล้ว
@@ -27,6 +28,9 @@
 - `db/data/building30.ts` เก็บข้อมูลสถานที่จากแผนที่อาคาร 30 ปี
 - `db/seed-maps.ts` นำเข้าตามลำดับอาคาร → ชั้น → สถานที่โดยไม่ล้างข้อมูลเดิม
 - Bruno มี Map Verification 9 คำขอ และ Place Keywords 4 คำขอ
+- migration `0004` เพิ่มตาราง `users` สำหรับ CPE OAuth และ role
+- `src/auth/` จัดการ config, OAuth state, session token และ middleware
+- `src/routes/auth/Auth.route.ts` มี login, callback, me และ admin-check
 
 ## ชุดข้อมูลอาคาร 30 ปี
 
@@ -68,9 +72,10 @@ pnpm dev
 จากนั้นตรวจ:
 
 ```http
-GET http://localhost:3001/
-GET http://localhost:3001/health/database
-GET http://localhost:3001/places?floor=7&search=701
+GET http://localhost:3000/
+GET http://localhost:3000/health/database
+GET http://localhost:3000/places?floor=7&search=701
+GET http://localhost:3000/auth/login
 ```
 
 ใน Bruno ให้เลือก collection `pj-backend/bruno` และ environment `Local`:
@@ -88,5 +93,5 @@ GET http://localhost:3001/places?floor=7&search=701
 - รัน Bruno ครบทุกคำขอกับฐานข้อมูลปัจจุบันและบันทึกผล
 - ตรวจและลบข้อมูลตัวอย่าง 601–603 หากไม่ต้องการใช้
 - ยืนยันพื้นที่ในแผนที่ที่ยังอ่านชื่อหรือประเภทไม่ได้
-- ออกแบบ Authentication และสิทธิ์ Admin / User ก่อนสร้าง route ที่เกี่ยวข้อง
+- ตกลง policy แล้วผูก `requireAuth`/`requireRole` กับ route ที่ต้องจำกัดสิทธิ์
 - ออกแบบพิกัด โหนด และเส้นเชื่อมก่อนนำระบบนำทางหรือ A* เข้ามาใช้
