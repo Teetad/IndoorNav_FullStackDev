@@ -10,7 +10,6 @@ const ExplorePage = () => {
       <h1 className="text-grey-700">
         Hello
       </h1>
-      <BottomNav />
     </div>
   );
 };
