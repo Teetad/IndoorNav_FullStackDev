@@ -6,13 +6,13 @@ export default function MainLayout() {
     <div className="min-h-screen bg-map-background flex flex-col md:flex-row">
       
       {/* 1. Desktop Sidebar (แสดงผลเฉพาะจอคอม md ขึ้นไป) */}
-      <aside className="hidden md:flex flex-col w-64 bg-white border-r p-4">
-        <h2 className="text-xl font-bold mb-6">Logo / App Name</h2>
+      <aside className="hidden md:flex flex-col w-64 bg-map-backkground p-4">
+
         {/* เมนู Sidebar ของ Desktop ตามภาพที่ 1 */}
-        <nav className="space-y-2">
+        <nav className="space-y-2 pt-16">
           <a href="/" className="flex items-center gap-3 p-3 rounded-lg bg-secondary font-medium">Dashboard</a>
-          <a href="/map" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100">Map</a>
-          <a href="/report" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100">Reports</a>
+          <a href="/map" className="flex items-center gap-3 p-3 rounded-lg hover:bg-white">Map</a>
+          <a href="/report" className="flex items-center gap-3 p-3 rounded-lg hover:bg-white">Reports</a>
         </nav>
       </aside>
 

@@ -10,13 +10,12 @@
   --color-primary-dark: #5D7889;
 
   --color-secondary: #EEE1CB;
-
+  --color-success: #5F8A72; /* แก้ไขจุดที่ขาดเครื่องหมาย Semicolon ตรงนี้ให้แล้วครับ */
   --color-accent: #D7C0AF;
   --color-dark-accent: #967E76;
 
   --color-map-background: #F8F6F2;
 }
-
 
 :root {
   font-family: "Outfit", sans-serif;
@@ -113,4 +112,26 @@ small {
   small {
     font-size: 14px;
   }
+}
+
+/* =========================
+   Custom Animation (Bottom Sheet)
+========================= */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ถ้า body หรือแอปมีคลาสสไตล์นี้เมื่อเปิด popup ให้ซ่อน BottomNav ทันที */
+body:has(.showroom-open) nav,
+body:has(.showroom-open) .bottom-nav-class {
+  display: none !important;
 }
