@@ -33,6 +33,9 @@ pnpm dev
 | `01 Current User` | `200 OK` และ role `USER` |
 | `02 User Cannot Access Admin` | `403 Forbidden` |
 | `03 User Cannot Access Developer` | `403 Forbidden` |
+| `04 Current User With Cookie` | `200 OK` และมีข้อมูล User |
+| `05 Logout` | `200 OK` |
+| `06 Missing Session` | `401 Unauthorized` |
 
 หลังทดสอบให้เปลี่ยน Header กลับเป็น `Bearer {{sessionToken}}` และอย่า commit token
 
