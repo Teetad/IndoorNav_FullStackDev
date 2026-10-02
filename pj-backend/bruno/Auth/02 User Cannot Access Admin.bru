@@ -1,0 +1,21 @@
+meta {
+  name: 02 User Cannot Access Admin
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/auth/admin-check
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("USER ไม่มีสิทธิ์ ADMIN", function () {
+    expect(res.getStatus()).to.equal(403);
+  });
+}

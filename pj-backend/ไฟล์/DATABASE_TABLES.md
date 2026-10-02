@@ -1,10 +1,26 @@
 # Database Tables — สถานะปัจจุบัน
 
 เอกสารนี้อ้างอิง `db/schema.ts` และ migration ล่าสุด
-`db/migration/0003_gorgeous_azazel.sql` ณ วันที่ 23 กันยายน 2026
+`db/migration/0004_good_nico_minoru.sql` ณ วันที่ 29 กันยายน 2026
 
 > Schema ในโค้ดและ schema ในฐานข้อมูลจริงเป็นคนละส่วนกัน ต้องรัน
 > `pnpm db:migrate` จึงจะนำ migration ไปใช้กับฐานข้อมูลที่ระบุใน `.env`
+
+## `users`
+
+| คอลัมน์ | ชนิด | ข้อบังคับ |
+|---|---|---|
+| `user_id` | UUID | Primary Key, สร้างอัตโนมัติ |
+| `oauth_subject` | VARCHAR(255) | NOT NULL, UNIQUE; รหัสผู้ใช้จาก OAuth provider |
+| `email` | VARCHAR(320) | NOT NULL, UNIQUE |
+| `display_name` | VARCHAR(120) | NULL ได้ |
+| `role` | VARCHAR(20) | NOT NULL, DEFAULT `USER` |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT เวลาปัจจุบัน |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT เวลาปัจจุบัน |
+
+Backend ยอมรับ role `USER`, `ADMIN` และ `DEVELOPER` ปัจจุบันฐานข้อมูลยังไม่มี
+CHECK constraint สำหรับ role โดยผู้ใช้ใหม่ได้ `USER`; environment ใช้กำหนด Admin
+และ Developer ส่วน Guest ไม่ถูกเก็บในตารางเพราะยังไม่ได้ login
 
 ## `buildings`
 
@@ -81,6 +97,7 @@ Foreign key ทุกระดับใช้ `ON DELETE CASCADE`:
 | `0001_align_phase1_design.sql` | ตัดคอลัมน์เดิมบางส่วน เพิ่มรูปผัง รูปสถานที่ และ `fav_count` |
 | `0002_many_jamie_braddock.sql` | เพิ่ม `places.place_type` กลับมาเป็น VARCHAR(40) |
 | `0003_gorgeous_azazel.sql` | สร้าง `place_keywords`, foreign key และ unique index |
+| `0004_good_nico_minoru.sql` | สร้าง `users` สำหรับ CPE OAuth และ role |
 
 ไม่ควรแก้ migration ที่เคยนำไปใช้แล้ว เมื่อต้องการเปลี่ยนตารางให้แก้
 `db/schema.ts` แล้วสร้าง migration ลำดับใหม่ด้วย `pnpm db:generate`
@@ -89,11 +106,10 @@ Foreign key ทุกระดับใช้ `ON DELETE CASCADE`:
 
 Schema ปัจจุบันยังไม่มีตารางต่อไปนี้:
 
-- Users และระบบบัญชี CMU
 - Reviews และ Review Likes
 - Favorites
 - Reports
 - Navigation Nodes และ Navigation Edges
 
-จึงยังไม่มีคอลัมน์ `user_id`, `review_id`, `node_id`, พิกัดนำทาง หรือความสัมพันธ์
+จึงยังไม่มีคอลัมน์ `review_id`, `node_id`, พิกัดนำทาง หรือความสัมพันธ์
 สำหรับระบบ A* ในฐานข้อมูลชุดนี้
