@@ -24,12 +24,15 @@
 | Method | Endpoint | รายละเอียด |
 |---|---|---|
 | GET | `/auth/login` | สร้าง OAuth state cookie แล้ว redirect ไปหน้า CPE OAuth |
-| GET | `/auth/callback` | ตรวจ state, แลก code, อ่าน userinfo, บันทึก User และคืน Bearer token |
-| GET | `/auth/me` | อ่านผู้ใช้ปัจจุบัน ต้องส่ง Bearer token |
+| GET | `/auth/login?mode=json` | Login แบบทดสอบและให้ callback แสดง Bearer token |
+| GET | `/auth/callback` | ตรวจ state, บันทึก User, สร้าง session cookie และ redirect ไป Frontend |
+| GET | `/auth/me` | อ่านผู้ใช้ปัจจุบัน รับ session cookie หรือ Bearer token |
+| POST | `/auth/logout` | ลบ session cookie |
 | GET | `/auth/admin-check` | ตรวจ Bearer token และ role `ADMIN` |
 | GET | `/auth/developer-check` | ตรวจ Bearer token และ role `DEVELOPER` |
 
-Callback ที่ลงทะเบียนคือ `http://localhost:3000/auth/callback` Session token มีอายุ
+Callback ที่ลงทะเบียนคือ `http://localhost:3000/auth/callback` และ Frontend URL ปกติคือ
+`http://localhost:5173` Session token มีอายุ
 8 ชั่วโมง ผู้ใช้ใหม่ได้ role `USER`; email ใน `ADMIN_EMAILS` ได้ `ADMIN` และ email ใน
 `DEVELOPER_EMAILS` ได้ `DEVELOPER` ส่วน Guest คือผู้ที่ไม่ได้ login จึงไม่มีแถวในตาราง
 ค่า OAuth secret และ `JWT_SECRET` ต้องอยู่ใน `.env` และห้าม commit
@@ -183,5 +186,5 @@ API ตัดช่องว่างหัวท้าย แปลงเป็
 route ที่แก้ข้อมูล Buildings, Floors, Places และ Keywords ยังเป็น public จนกว่าทีมจะ
 ตกลง policy แล้วนำ `requireAuth`/`requireRole` ไปผูกกับ route เหล่านั้น
 
-ตอนนี้ `/auth/callback` แสดง token เป็น JSON เพื่อใช้เทส Backend ก่อน
-ตอนเชื่อม Frontend ต้องแก้ให้กลับไปหน้า Frontend หลัง login
+Frontend ต้องส่ง request ด้วย `credentials: "include"` ส่วน Bruno ยังใช้ Bearer token
+จาก `/auth/login?mode=json` ได้

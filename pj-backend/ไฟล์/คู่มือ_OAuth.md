@@ -5,10 +5,10 @@
 1. เปิด `GET http://localhost:3000/auth/login`
 2. ระบบพาไป Login กับ CPE OAuth
 3. OAuth ส่งกลับมาที่ `/auth/callback`
-4. Backend บันทึกผู้ใช้และคืน token
+4. Backend บันทึกผู้ใช้ เก็บ session ใน cookie แล้วกลับไปหน้า Frontend
 5. ผู้ใช้ทั่วไปจะมี role เป็น `USER`
 
-ตอนนี้ callback แสดง token เป็น JSON เพื่อใช้ทดสอบ Backend ก่อน
+ถ้าจะดู token เพื่อเทส Bruno ให้เปิด `http://localhost:3000/auth/login?mode=json`
 
 ## เปิด Backend
 
@@ -18,7 +18,7 @@ docker compose up -d postgres
 pnpm dev
 ```
 
-จากนั้นเปิด `http://localhost:3000/auth/login` ใน Browser และ Login ด้วยบัญชี CMU
+จากนั้นเปิด `http://localhost:3000/auth/login?mode=json` ใน Browser และ Login ด้วยบัญชี CMU
 
 ## ทดสอบใน Bruno
 
@@ -41,8 +41,9 @@ pnpm dev
 | Method | Path | หน้าที่ |
 | --- | --- | --- |
 | `GET` | `/auth/login` | เริ่ม Login |
-| `GET` | `/auth/callback` | รับผลจาก OAuth และสร้าง token |
+| `GET` | `/auth/callback` | รับผลจาก OAuth สร้าง session และกลับหน้า Frontend |
 | `GET` | `/auth/me` | อ่านข้อมูลผู้ใช้ที่ Login |
+| `POST` | `/auth/logout` | ออกจากระบบและลบ session cookie |
 | `GET` | `/auth/admin-check` | ตรวจสิทธิ์ ADMIN |
 | `GET` | `/auth/developer-check` | ตรวจสิทธิ์ DEVELOPER |
 
@@ -58,7 +59,18 @@ Frontend เริ่ม Login ได้ด้วย:
 window.location.href = "http://localhost:3000/auth/login";
 ```
 
-ก่อนเชื่อม Frontend จริง ต้องปรับ Backend ให้ส่งผู้ใช้กลับหน้า Frontend หลัง Login แทนการแสดง JSON
+Frontend ต้องเรียก API โดยใส่ `credentials: "include"` เพื่อส่ง cookie มาด้วย
+
+```ts
+const response = await fetch("http://localhost:3000/auth/me", {
+  credentials: "include",
+});
+const user = await response.json();
+```
+
+หน้า `/auth/callback` ของ Frontend ไม่ต้องอ่าน token ให้เรียก `/auth/me` แล้วพา User
+กลับหน้าแรก ส่วน Logout ให้เรียก `POST http://localhost:3000/auth/logout` พร้อม
+`credentials: "include"`
 
 ตอนนี้มี `requireAuth` และ `requireRole` แล้ว แต่ยังใช้แค่ route สำหรับเทส role
 API เพิ่ม แก้ และลบข้อมูลยังเป็น public อยู่ งานต่อไปคือต้องใส่สิทธิ์ให้ Admin
