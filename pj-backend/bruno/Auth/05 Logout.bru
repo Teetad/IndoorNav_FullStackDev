@@ -1,0 +1,22 @@
+meta {
+  name: 05 Logout
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/auth/logout
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: session_token={{sessionToken}}
+}
+
+tests {
+  test("logout สำเร็จ", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().message).to.equal("Logged out");
+  });
+}
