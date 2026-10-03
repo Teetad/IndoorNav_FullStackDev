@@ -1,7 +1,7 @@
-import { forwardRef } from "react";
-import { FLOORS } from "../../Floor_Information";
-import type { FloorId, Point } from "../../Floor_Information";
-import type { RouteSummary } from "../../Types";
+import React from "react";
+import { FLOORS } from "../Floor_Information";
+import type { FloorId, Point } from "../Floor_Information";
+import type { RouteSummary } from "../types";
 
 type Props = {
   floorLabel: string;
@@ -11,26 +11,28 @@ type Props = {
   goal?: Point | null;
   pathLength: number;
   routeSummary: RouteSummary | null;
+  /** When set, replaces the automatic status line. */
+  statusText?: string;
   onSwitchFloor: (id: FloorId) => void;
 };
 
-function statusText({ loading, start, goal, pathLength, floorLabel }: Props) {
-  if (loading) return "Calculating path...";
-  if (!start || !goal)
-    return `Search a route above, or use "Set Start" / "Set Goal" to place points on ${floorLabel}.`;
-  return pathLength > 0
+export const Toolbar = React.forwardRef<HTMLElement, Props>(function Toolbar(
+  { floorLabel, selectedFloorId, loading, start, goal, pathLength, routeSummary, statusText, onSwitchFloor },
+  ref
+) {
+  const auto = loading
+    ? "Calculating path..."
+    : !start || !goal
+    ? `Use "Set Start" / "Set Goal" to place points on ${floorLabel}.`
+    : pathLength > 0
     ? `Path found: ${pathLength} steps on ${floorLabel}.`
     : `No path found on ${floorLabel}.`;
-}
-
-export const Toolbar = forwardRef<HTMLElement, Props>(function Toolbar(props, ref) {
-  const { selectedFloorId, routeSummary, onSwitchFloor } = props;
 
   return (
     <section className="toolbar" aria-label="Map controls" ref={ref}>
       <div>
         <h1>Indoor Pathfinding</h1>
-        <p className="status">{statusText(props)}</p>
+        <p className="status">{loading ? "Calculating path..." : statusText ?? auto}</p>
         {routeSummary && (
           <p className="status route-status">
             Route "{routeSummary.startRoom}" → "{routeSummary.goalRoom}":{" "}

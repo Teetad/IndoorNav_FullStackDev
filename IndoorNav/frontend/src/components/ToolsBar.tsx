@@ -1,19 +1,27 @@
-import { forwardRef } from "react";
-import { TOOLS } from "../../Constants";
-import type { Tool } from "../../Types";
+import React from "react";
+import type { Tool } from "../types";
+
+const TOOLS: { id: Tool; label: string }[] = [
+  { id: "view", label: "View" },
+  { id: "wall", label: "Edit Walls" },
+  { id: "start", label: "Set Start" },
+  { id: "goal", label: "Set Goal" },
+  { id: "room", label: "Tag Room" },
+  { id: "stairs", label: "Tag Stairs" },
+];
 
 type Props = {
   tool: Tool;
   hint: string;
-  onToolChange: (tool: Tool) => void;
+  onSelectTool: (t: Tool) => void;
   onCopyWalls: () => void;
   onCopyRooms: () => void;
   onClearWalls: () => void;
   onClearRooms: () => void;
 };
 
-export const ToolsBar = forwardRef<HTMLElement, Props>(function ToolsBar(
-  { tool, hint, onToolChange, onCopyWalls, onCopyRooms, onClearWalls, onClearRooms },
+export const Tools = React.forwardRef<HTMLElement, Props>(function Tools(
+  { tool, hint, onSelectTool, onCopyWalls, onCopyRooms, onClearWalls, onClearRooms },
   ref
 ) {
   return (
@@ -23,7 +31,7 @@ export const ToolsBar = forwardRef<HTMLElement, Props>(function ToolsBar(
           key={t.id}
           className={t.id === tool ? "active" : ""}
           type="button"
-          onClick={() => onToolChange(t.id)}
+          onClick={() => onSelectTool(t.id)}
           aria-pressed={t.id === tool}
         >
           {t.label}

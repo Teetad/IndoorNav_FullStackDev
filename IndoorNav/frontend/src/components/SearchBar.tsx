@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import React from "react";
 
 type Props = {
   startValue: string;
@@ -10,7 +10,7 @@ type Props = {
   onSearch: () => void;
 };
 
-export const SearchBar = forwardRef<HTMLElement, Props>(function SearchBar(
+export const SearchBar = React.forwardRef<HTMLElement, Props>(function SearchBar(
   { startValue, goalValue, roomNumbers, searching, onStartChange, onGoalChange, onSearch },
   ref
 ) {
@@ -21,6 +21,7 @@ export const SearchBar = forwardRef<HTMLElement, Props>(function SearchBar(
         placeholder="Start room number"
         value={startValue}
         onChange={(e) => onStartChange(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && onSearch()}
         list="room-numbers"
       />
       <input
@@ -28,18 +29,15 @@ export const SearchBar = forwardRef<HTMLElement, Props>(function SearchBar(
         placeholder="Finish room number"
         value={goalValue}
         onChange={(e) => onGoalChange(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && onSearch()}
         list="room-numbers"
       />
       <datalist id="room-numbers">
-        {roomNumbers.map((num) => (
-          <option key={num} value={num} />
+        {roomNumbers.map((n) => (
+          <option key={n} value={n} />
         ))}
       </datalist>
-      <button
-        type="button"
-        onClick={onSearch}
-        disabled={searching || !startValue.trim() || !goalValue.trim()}
-      >
+      <button type="button" onClick={onSearch} disabled={searching || !startValue.trim() || !goalValue.trim()}>
         {searching ? "Searching..." : "Find Route"}
       </button>
     </section>

@@ -1,5 +1,5 @@
 import { WIDTH, HEIGHT, IMAGE_WIDTH, IMAGE_HEIGHT } from "./Floor_Information";
-import type { Tool } from "./Types";
+import type { Tool } from "./types";
 
 export const API_URL = "http://localhost:3001/api/find-path";
 

@@ -1,4 +1,4 @@
-import type { Point } from "../Floor_Information";
+import type { Point } from "../types";
 
 export function Notice({ message, onDismiss }: { message: string; onDismiss: () => void }) {
   return (
@@ -29,22 +29,26 @@ export function ConfirmBar({
   );
 }
 
-type RoomFormProps = {
+export function RoomForm({
+  cell,
+  value,
+  hasExistingTag,
+  onChange,
+  onSave,
+  onRemove,
+  onCancel,
+}: {
   cell: Point;
   value: string;
-  canRemove: boolean;
-  onChange: (value: string) => void;
-  onSave: (override?: string) => void;
+  hasExistingTag: boolean;
+  onChange: (v: string) => void;
+  onSave: () => void;
+  onRemove: () => void;
   onCancel: () => void;
-};
-
-// Inline form instead of window.prompt, which some embedded/preview environments block.
-export function RoomForm({ cell, value, canRemove, onChange, onSave, onCancel }: RoomFormProps) {
+}) {
   return (
     <div className="room-form" role="dialog" aria-label="Tag room number">
-      <span>
-        Room number for cell ({cell.x}, {cell.y}):
-      </span>
+      <span>Room number for cell ({cell.x}, {cell.y}):</span>
       <input
         type="text"
         autoFocus
@@ -56,10 +60,8 @@ export function RoomForm({ cell, value, canRemove, onChange, onSave, onCancel }:
         }}
         placeholder="e.g. 401"
       />
-      <button type="button" onClick={() => onSave()}>Save</button>
-      {canRemove && (
-        <button type="button" onClick={() => onSave("")}>Remove tag</button>
-      )}
+      <button type="button" onClick={onSave}>Save</button>
+      {hasExistingTag && <button type="button" onClick={onRemove}>Remove tag</button>}
       <button type="button" onClick={onCancel}>Cancel</button>
     </div>
   );
