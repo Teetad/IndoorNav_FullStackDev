@@ -61,7 +61,11 @@ Bruno
 
 Role ที่เก็บใน `users` มี `USER`, `ADMIN`, `DEVELOPER` ส่วน Guest หมายถึงผู้ที่
 ยังไม่ login จึงไม่มีข้อมูลในตาราง `users` Admin และ Developer กำหนดจากรายชื่อ email
-ใน `.env` ตอน login; route เดิมยังไม่บังคับ role จนกว่าทีมจะตกลง permission ครบ
+ใน `.env` ตอน login โดย route ที่เพิ่ม แก้ และลบข้อมูลจะตรวจ role ก่อนทำงาน
+
+- Guest และ USER อ่านหรือค้นหาข้อมูลได้
+- ADMIN แก้ชื่อ รายละเอียด รูป และจัดการ keyword ได้
+- DEVELOPER จัดการข้อมูลโครงสร้าง เช่น อาคาร ชั้น และสถานที่ได้
 
 ของที่ยังไม่ได้ทำมี Review, Like, Favorite, Report, รูปหลายรูป และ Navigation
 ตอนนี้ `places.image_url` เก็บได้รูปเดียว ส่วน `fav_count` ยังไม่ได้บอกว่า User คนไหน

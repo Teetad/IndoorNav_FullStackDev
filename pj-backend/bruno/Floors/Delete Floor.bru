@@ -10,6 +10,10 @@ delete {
   auth: none
 }
 
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
 tests {
   test("deletes a floor", function () {
     expect(res.getStatus()).to.equal(200);

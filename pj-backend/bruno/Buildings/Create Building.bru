@@ -10,6 +10,10 @@ post {
   auth: none
 }
 
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
 body:json {
   {
     "building_name": "Bruno Test Building {{$randomInt}}",

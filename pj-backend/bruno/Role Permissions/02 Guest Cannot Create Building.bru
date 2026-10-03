@@ -1,0 +1,23 @@
+meta {
+  name: 02 Guest Cannot Create Building
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/buildings
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "building_name": "Permission Test Building"
+  }
+}
+
+tests {
+  test("Guest เพิ่มอาคารไม่ได้", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

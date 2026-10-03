@@ -34,6 +34,11 @@ pnpm dev
 | `02 User Cannot Access Admin` | `403 Forbidden` |
 | `03 User Cannot Access Developer` | `403 Forbidden` |
 
+ถ้าทดสอบ API ที่แก้ข้อมูล ให้ใส่ token ตามงานที่ทดสอบ:
+
+- Developer: เพิ่มหรือลบอาคาร และเพิ่ม แก้ หรือลบชั้น/สถานที่
+- Admin: แก้ชื่อ รายละเอียด รูปของสถานที่ และเพิ่มหรือลบ keyword
+
 หลังทดสอบให้เปลี่ยน Header กลับเป็น `Bearer {{sessionToken}}` และอย่า commit token
 
 ## API สำหรับ Frontend
@@ -60,9 +65,9 @@ window.location.href = "http://localhost:3000/auth/login";
 
 ก่อนเชื่อม Frontend จริง ต้องปรับ Backend ให้ส่งผู้ใช้กลับหน้า Frontend หลัง Login แทนการแสดง JSON
 
-ตอนนี้มี `requireAuth` และ `requireRole` แล้ว แต่ยังใช้แค่ route สำหรับเทส role
-API เพิ่ม แก้ และลบข้อมูลยังเป็น public อยู่ งานต่อไปคือต้องใส่สิทธิ์ให้ Admin
-และ Developer ส่วน Guest ให้ดูและค้นหาข้อมูลได้เหมือนเดิม
+ตอนนี้ API ที่เพิ่ม แก้ และลบข้อมูลตรวจ `requireAuth` และ `requireRole` แล้ว
+Guest และ USER ยังดูหรือค้นหาข้อมูลได้ ส่วน ADMIN จัดการข้อมูลที่แสดงและ keyword
+และ DEVELOPER จัดการโครงสร้างอาคาร ชั้น และสถานที่
 
 ## Role
 

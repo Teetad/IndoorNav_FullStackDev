@@ -1,12 +1,11 @@
 # API Specs — สถานะปัจจุบันของ `pj-backend`
 
 เอกสารนี้อ้างอิง route ที่ลงทะเบียนใน `src/index.ts` และโค้ดใน
-`src/routes/` ณ วันที่ 29 กันยายน 2026
+`src/routes/` ณ วันที่ 3 ตุลาคม 2026
 
 - Base URL สำหรับพัฒนาในเครื่อง: `http://localhost:3000`
 - Bruno ใช้ตัวแปร `{{baseUrl}}` จาก environment `Local`
-- มี CPE OAuth login และ session token แล้ว แต่ route Buildings/Floors/Places
-  ยังไม่ได้บังคับสิทธิ์
+- มี CPE OAuth login, session token และการตรวจ role ใน route ที่แก้ข้อมูล
 - request และ response ใช้ JSON ยกเว้น endpoint ที่ไม่มี body
 
 ## System
@@ -46,8 +45,8 @@ Authorization: Bearer <token จาก /auth/callback>
 |---|---|---|
 | GET | `/buildings` | อ่านอาคารทั้งหมด |
 | GET | `/buildings/:building_id` | อ่านอาคารตาม UUID |
-| POST | `/buildings` | เพิ่มอาคาร |
-| DELETE | `/buildings/:building_id` | ลบอาคาร รวมชั้น สถานที่ และคำค้นด้านล่างตาม foreign key |
+| POST | `/buildings` | Developer เพิ่มอาคาร |
+| DELETE | `/buildings/:building_id` | Developer ลบอาคาร รวมข้อมูลด้านล่างตาม foreign key |
 
 Body สำหรับ `POST /buildings`:
 
@@ -69,9 +68,9 @@ Body สำหรับ `POST /buildings`:
 | GET | `/floors` | อ่านชั้นทั้งหมด |
 | GET | `/floors?building_id=<UUID>` | อ่านชั้นของอาคารหนึ่งแห่ง |
 | GET | `/floors/:building_id/:floor_number` | อ่านชั้นจาก UUID อาคารและเลขชั้น |
-| POST | `/floors` | เพิ่มชั้น |
-| PUT | `/floors/:floor_id` | แก้เลขชั้นหรือ URL รูปผังชั้น |
-| DELETE | `/floors/:floor_id` | ลบชั้น รวมสถานที่และคำค้นด้านล่าง |
+| POST | `/floors` | Developer เพิ่มชั้น |
+| PUT | `/floors/:floor_id` | Developer แก้เลขชั้นหรือ URL รูปผังชั้น |
+| DELETE | `/floors/:floor_id` | Developer ลบชั้น รวมสถานที่และคำค้นด้านล่าง |
 
 Body สำหรับ `POST /floors`:
 
@@ -96,9 +95,9 @@ Body สำหรับ `POST /floors`:
 |---|---|---|
 | GET | `/places` | อ่านสถานที่ พร้อมข้อมูลชั้นและอาคาร |
 | GET | `/places/:place_id` | อ่านสถานที่ตาม UUID |
-| POST | `/places` | เพิ่มสถานที่ |
-| PUT | `/places/:place_id` | แก้ข้อมูลสถานที่แบบ partial update |
-| DELETE | `/places/:place_id` | ลบสถานที่และคำค้นของสถานที่ |
+| POST | `/places` | Developer เพิ่มสถานที่ |
+| PUT | `/places/:place_id` | Admin หรือ Developer แก้ข้อมูลสถานที่ |
+| DELETE | `/places/:place_id` | Developer ลบสถานที่และคำค้นของสถานที่ |
 
 Query ของ `GET /places` ใช้ร่วมกันได้:
 
@@ -135,6 +134,8 @@ Body สำหรับ `POST /places`:
   `elevator_lobby`, `stairs`, `multipurpose_room`, `graduate_room`
 - `room_number` ยาวไม่เกิน 30, `description` และ `image_url` ยาวไม่เกิน 500
 - `PUT` รับฟิลด์เดียวกับ `POST` และต้องส่งอย่างน้อยหนึ่งฟิลด์ที่แก้ไขได้
+- Admin แก้ได้เฉพาะ `place_name`, `description`, `image_url`
+- Developer แก้ข้อมูลสถานที่ได้ทุกฟิลด์ที่ API รองรับ
 - `favCount` ส่งกลับใน JSON แต่ API ปัจจุบันยังไม่รับฟิลด์นี้ใน `POST` หรือ `PUT`
 
 ## Place Keywords
@@ -142,8 +143,8 @@ Body สำหรับ `POST /places`:
 | Method | Endpoint | รายละเอียด |
 |---|---|---|
 | GET | `/places/:place_id/keywords` | อ่านคำค้นของสถานที่ |
-| POST | `/places/:place_id/keywords` | เพิ่มคำค้น |
-| DELETE | `/places/:place_id/keywords/:keyword_id` | ลบคำค้นที่ตรงทั้งสถานที่และ keyword |
+| POST | `/places/:place_id/keywords` | Admin เพิ่มคำค้น |
+| DELETE | `/places/:place_id/keywords/:keyword_id` | Admin ลบคำค้น |
 
 Body สำหรับเพิ่มคำค้น:
 
@@ -180,8 +181,8 @@ API ตัดช่องว่างหัวท้าย แปลงเป็
 
 รายการพวกนี้ยังเรียกใช้ใน `pj-backend` ไม่ได้
 
-route ที่แก้ข้อมูล Buildings, Floors, Places และ Keywords ยังเป็น public จนกว่าทีมจะ
-ตกลง policy แล้วนำ `requireAuth`/`requireRole` ไปผูกกับ route เหล่านั้น
+การอ่านและค้นหาข้อมูลยังเป็น public ส่วนการเพิ่ม แก้ และลบจะตรวจ Bearer token
+และ role ตามที่ระบุในตารางด้านบน
 
 ตอนนี้ `/auth/callback` แสดง token เป็น JSON เพื่อใช้เทส Backend ก่อน
 ตอนเชื่อม Frontend ต้องแก้ให้กลับไปหน้า Frontend หลัง login

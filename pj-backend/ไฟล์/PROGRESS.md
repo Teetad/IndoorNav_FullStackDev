@@ -1,4 +1,4 @@
-# ความคืบหน้า Backend — 29 กันยายน 2026
+# ความคืบหน้า Backend — 3 ตุลาคม 2026
 
 ขอบเขตเอกสารนี้คือโฟลเดอร์ `pj-backend` เท่านั้น ไม่รวม Frontend หรือระบบ A*
 
@@ -13,9 +13,9 @@
 | Place Keywords | อ่าน เพิ่ม ลบ และใช้ค้นหาสถานที่ได้ |
 | ข้อมูลแผนที่ | มีชุดข้อมูลอาคาร 30 ปี ชั้น 4–7 รวม 78 สถานที่ |
 | Map import | preview ได้โดยไม่ต่อ DB และใช้ `--apply` เพื่อนำเข้าแบบ transaction |
-| Bruno | มีคำขอสำหรับ Buildings, Floors, Places, Map Verification และ Place Keywords |
+| Bruno | มีคำขอสำหรับ Buildings, Floors, Places, Map Verification, Keywords และ Role |
 | Authentication | มี CPE OAuth login, callback, Bearer session และ `/auth/me` |
-| Role | มี `USER`/`ADMIN`/`DEVELOPER` และ route ตรวจ role; Guest คือผู้ที่ไม่ login |
+| Role | route เพิ่ม แก้ และลบข้อมูลตรวจ `USER`/`ADMIN`/`DEVELOPER` แล้ว |
 | Navigation / A* | ยังไม่ได้พัฒนาใน `pj-backend` และยังไม่มีพิกัดนำทางใน schema |
 
 ## งานที่มีอยู่ในโค้ดแล้ว
@@ -31,6 +31,8 @@
 - migration `0004` เพิ่มตาราง `users` สำหรับ CPE OAuth และ role
 - `src/auth/` จัดการ config, OAuth state, session token และ middleware
 - `src/routes/auth/Auth.route.ts` มี login, callback, me และ admin-check
+- route ที่แก้ข้อมูลใช้ `requireAuth` และ `requireRole` จำกัดสิทธิ์แล้ว
+- Bruno มีชุด Role Permissions สำหรับเช็ก Guest และ USER
 
 ## ชุดข้อมูลอาคาร 30 ปี
 
@@ -84,6 +86,7 @@ GET http://localhost:3000/auth/login
 2. รายการ 01–08 ควรได้ `200`; รายการ 09 ตั้งใจทดสอบข้อมูลผิดและควรได้ `400`
 3. รัน Place Keywords 01–04 หลัง request 07 กำหนด `mapPlaceId` แล้ว
 4. คำขอ Create, Update และ Delete เขียนข้อมูลจริง ควรใช้ฐานข้อมูลทดสอบ
+5. ใช้ token ของ Developer กับ Buildings/Floors/Places และ token ของ Admin กับ Keywords
 
 `pnpm seed:maps` แสดง preview เท่านั้น ส่วน `pnpm seed` ล้างข้อมูลอาคาร ชั้น
 และสถานที่ก่อนใส่ข้อมูลตัวอย่าง 601–603 จึงไม่ควรใช้กับฐานข้อมูลที่ต้องเก็บไว้
@@ -92,8 +95,6 @@ GET http://localhost:3000/auth/login
 
 ### ทำต่อก่อน
 
-- ใส่ `requireAuth` และ `requireRole` ให้ API ที่เพิ่ม แก้ และลบข้อมูล
-- เพิ่ม Bruno test สำหรับเช็ก token และ role
 - แก้ OAuth ให้กลับไปหน้า Frontend หลัง login ตอนนี้ยังแสดง JSON อยู่
 - ลอง Bruno ให้ครบทุก request
 - เช็กข้อมูลตัวอย่างห้อง 601–603 ว่ายังใช้ไหม ถ้าไม่ใช้ให้ลบ

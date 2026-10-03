@@ -1,0 +1,17 @@
+meta {
+  name: 01 Guest Can Read Places
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/places
+  body: none
+  auth: none
+}
+
+tests {
+  test("Guest อ่านข้อมูลสถานที่ได้", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
