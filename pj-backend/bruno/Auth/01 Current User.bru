@@ -1,0 +1,22 @@
+meta {
+  name: 01 Current User
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/auth/me
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("เข้าสู่ระบบแล้วและเป็นผู้ใช้ทั่วไป", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().role).to.equal("USER");
+  });
+}

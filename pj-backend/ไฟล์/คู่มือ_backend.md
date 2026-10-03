@@ -12,7 +12,7 @@
 |---|---|
 | Backend | โปรแกรมที่รับ request จาก Bruno/เว็บ แล้วอ่านหรือเขียนฐานข้อมูล |
 | API / route | ที่อยู่และวิธีเรียก เช่น `GET /places` เพื่อขอรายการสถานที่ |
-| Database | PostgreSQL ที่เก็บอาคาร ชั้น สถานที่ และคำค้นจริง |
+| Database | PostgreSQL ที่เก็บผู้ใช้ อาคาร ชั้น สถานที่ และคำค้นจริง |
 | Schema | แบบของตารางในโค้ด เช่น มีคอลัมน์อะไร ชนิดอะไร และเชื่อมกันอย่างไร |
 | Migration | ไฟล์ SQL ที่เปลี่ยนโครงสร้างฐานข้อมูลให้ตรงกับ schema |
 | Seed | สคริปต์ใส่ข้อมูลเริ่มต้นลงฐานข้อมูล |
@@ -24,7 +24,7 @@
 
 ## ข้อมูลเดินทางอย่างไร
 
-ตัวอย่างเมื่อ Bruno เรียก `GET http://localhost:3001/places?search=lab`:
+ตัวอย่างเมื่อ Bruno เรียก `GET http://localhost:3000/places?search=lab`:
 
 ```text
 Bruno
@@ -46,7 +46,10 @@ Bruno
 | ไฟล์ | ทำหน้าที่อะไร |
 |---|---|
 | [../package.json](../package.json) | รายชื่อไลบรารีและคำสั่ง `pnpm dev`, `build`, `db:migrate`, `seed:maps` |
-| [../src/index.ts](../src/index.ts) | สร้าง Express app, เปิดพอร์ต, ลงทะเบียน `/buildings`, `/floors`, `/places`, มี `/` และ `/health/database`; health check นับสามตารางหลักและยังไม่นับ keyword |
+| [../src/index.ts](../src/index.ts) | สร้าง Express app, เปิดพอร์ต, ลงทะเบียน `/auth`, `/buildings`, `/floors`, `/places`, มี `/` และ `/health/database` |
+| [../src/routes/auth/Auth.route.ts](../src/routes/auth/Auth.route.ts) | เริ่ม CPE OAuth, รับ callback, บันทึกผู้ใช้ และคืน session token |
+| [../src/auth/middleware.ts](../src/auth/middleware.ts) | ตรวจ Bearer token และ role ก่อนเข้า route ที่กำหนด |
+| [../src/auth/tokens.ts](../src/auth/tokens.ts) | สร้างและตรวจ OAuth state กับ session token |
 | [../src/routes/building/Buildings.route.ts](../src/routes/building/Buildings.route.ts) | API อ่าน เพิ่ม และลบอาคาร |
 | [../src/routes/building/Floors.route.ts](../src/routes/building/Floors.route.ts) | API อ่าน เพิ่ม แก้ และลบชั้นของอาคาร |
 | [../src/routes/building/Places.route.ts](../src/routes/building/Places.route.ts) | API สถานที่ รวมการกรองประเภท การค้นชื่อ/เลขห้อง/keyword และ API เพิ่มหรือลบ keyword |
@@ -56,11 +59,19 @@ Bruno
 ตัวอย่าง `app.use("/places", placeRouter)` ทำให้ route `router.get("/")`
 ใน `Places.route.ts` กลายเป็น `GET /places`
 
+Role ที่เก็บใน `users` มี `USER`, `ADMIN`, `DEVELOPER` ส่วน Guest หมายถึงผู้ที่
+ยังไม่ login จึงไม่มีข้อมูลในตาราง `users` Admin และ Developer กำหนดจากรายชื่อ email
+ใน `.env` ตอน login; route เดิมยังไม่บังคับ role จนกว่าทีมจะตกลง permission ครบ
+
+ของที่ยังไม่ได้ทำมี Review, Like, Favorite, Report, รูปหลายรูป และ Navigation
+ตอนนี้ `places.image_url` เก็บได้รูปเดียว ส่วน `fav_count` ยังไม่ได้บอกว่า User คนไหน
+Favorite ห้องไหน
+
 ## ไฟล์ใน `db/`
 
 | ไฟล์ | ทำหน้าที่อะไร |
 |---|---|
-| [schema.ts](../db/schema.ts) | ประกาศตาราง `buildings`, `floors`, `places`, `place_keywords`, คีย์หลัก และความสัมพันธ์ |
+| [schema.ts](../db/schema.ts) | ประกาศตาราง `users`, `buildings`, `floors`, `places`, `place_keywords`, คีย์หลัก และความสัมพันธ์ |
 | [place-types.ts](../db/place-types.ts) | รายการประเภทสถานที่ที่ API ยอมรับ และ `isPlaceType()` สำหรับตรวจค่า |
 | [utils.ts](../db/utils.ts) | อ่านค่า `POSTGRES_*` จาก `.env` แล้วสร้าง URL สำหรับต่อฐานข้อมูล |
 | [client.ts](../db/client.ts) | สร้างการเชื่อมต่อ PostgreSQL (`dbConn`) และตัวเขียน query ของ Drizzle (`dbClient`) |
@@ -89,6 +100,7 @@ Bruno
 | `0001_align_phase1_design.sql` | ปรับคอลัมน์ให้ตรงกับแบบ Phase 1 |
 | `0002_many_jamie_braddock.sql` | เพิ่ม `places.place_type` |
 | `0003_gorgeous_azazel.sql` | สร้าง `place_keywords` และความสัมพันธ์กับ `places` |
+| `0004_good_nico_minoru.sql` | สร้าง `users` สำหรับ OAuth และ role |
 
 อย่าแก้ SQL migration ที่เคยใช้แล้วเพื่อเปลี่ยนตารางใหม่ ให้แก้ `schema.ts`
 แล้วสร้าง migration ลำดับถัดไปด้วย `pnpm db:generate`
@@ -142,7 +154,7 @@ ID ที่สคริปต์สร้างจาก `key` มีค่า�
 | [../Dockerfile](../Dockerfile) | วิธีสร้าง image ของ backend |
 | [../docker-compose.yml](../docker-compose.yml) | ตั้งค่า backend และ PostgreSQL เมื่อใช้ Docker Compose |
 | [../_entrypoint/init.sh](../_entrypoint/init.sh) | สร้างผู้ใช้ฐานข้อมูลและ schema สำหรับ Drizzle เมื่อ PostgreSQL เริ่มด้วยฐานข้อมูลใหม่ |
-| [../bruno/](../bruno/) | ชุด request สำหรับลอง API; `environments/Local.bru` ตั้ง `baseUrl` เป็น `http://localhost:3001` |
+| [../bruno/](../bruno/) | ชุด request สำหรับลอง API; `environments/Local.bru` ตั้ง `baseUrl` เป็น `http://localhost:3000` |
 | [../bruno/bruno.json](../bruno/bruno.json) | ตั้งค่าชุด request (collection) ของ Bruno |
 | [API_SPECS.md](API_SPECS.md) | สรุป endpoint, body, query และ status code ที่ใช้จริง |
 | [DATABASE_TABLES.md](DATABASE_TABLES.md) | สรุปตาราง migration และความสัมพันธ์ |
@@ -165,7 +177,7 @@ pnpm install                 # ติดตั้งไลบรารี
 pnpm db:migrate              # ปรับตารางจริงตามไฟล์ migration
 pnpm seed:maps               # ดูข้อมูลแผนที่ก่อนนำเข้า
 pnpm seed:maps --apply       # นำเข้าข้อมูลแผนที่จริง
-pnpm dev                     # เปิด API ที่ localhost:3001
+pnpm dev                     # เปิด API ที่ localhost:3000
 pnpm build                   # ตรวจและแปลง TypeScript
 ./node_modules/.bin/tsc --noEmit # ตรวจ TypeScript โดยไม่สร้าง dist
 ```
