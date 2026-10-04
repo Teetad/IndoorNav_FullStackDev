@@ -2,6 +2,7 @@ import { useState } from "react";
 import SearchBar from "../../components/SearchBar";
 import FloorControl from "../../components/FloorControl";
 import ShowRoom from "../../components/ShowRoom";
+import MapSpot from "../../components/MapSpot";
 
 const Floor_4 = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,9 +20,12 @@ const Floor_4 = () => {
     console.log('Search clicked!');
   };
 
+  // 📌 สร้างตัวแปรเช็คสถานะการเปิด Popup (เป็น true เมื่อ selectedLocation มีข้อมูล)
+  const isHidden = Boolean(selectedLocation);
+
   return (
-    // คุมกรอบใหญ่ด้วย fixed หรือ absolute เต็มจอ h-[100dvh] ป้องกันหน้าจอเกิน
-    <div className="absolute inset-0 w-full h-[100dvh] bg-[#F3EFEA] flex flex-col overflow-hidden">
+    // ควบคุมการล็อกหน้าจอฉากหลัง (ถ้าเปิด Popup จะซ่อน Scrollbar ของหน้าแผนที่)
+    <div className={`absolute inset-0 w-full h-[100dvh] bg-[#F3EFEA] flex flex-col ${isHidden ? 'overflow-hidden' : 'overflow-auto'}`}>
       
       {/* SearchBar ด้านบนสุด */}
       <div className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
@@ -35,42 +39,27 @@ const Floor_4 = () => {
         />
       </div>
 
-      {/* พื้นที่แผนที่: ใช้ overflow-auto เพื่อให้เลื่อนดูรอบๆ ได้เต็มที่ */}
-      <div className="w-full h-full overflow-auto relative flex items-center justify-center pt-20 pb-20">
-        
-        {/* 
-          📌 จุดเปลี่ยนสำคัญ: 
-          - ใช้ w-full max-w-[800px] (กำหนดขนาดสูงสุดไม่ให้รูปใหญ่เกินไปบนจอคอม แต่พอมือถือจะยืดเต็ม 100%)
-          - เอา aspect-square ออก เพื่อให้ความสูงปรับตามรูปภาพจริงอัตโน0วัติ พิกัดจะไม่เพี้ยน
-        */}
-        <div className="relative w-full max-w-[800px] flex-shrink-0">
-          
-          {/* รูปภาพแผนที่ชั้น 4 */}
-          <img 
-            src="/Images/floor4.jpg" 
-            alt="Floor 4 Map" 
-            className="w-full h-auto object-contain select-none pointer-events-none block"
-          />
+      {/* พื้นที่แผนที่ */}
 
-          {/* ปุ่ม Hotspot ห้อง 422 (เกาะติดกับรูปภาพ 100%) */}
-          <div 
-            onClick={() => setSelectedLocation({ name: '422', type: 'co-working space' })}
-            className="absolute top-[0%] left-[50%] w-[50%] h-[26%] z-20 bg-white/5 cursor-pointer flex items-center justify-center"
-          >
-          </div>
+      <MapSpot 
+        Top="0%" 
+        Left="50%" 
+        Width="50%" 
+        Height="26%" 
+        onClick={() => setSelectedLocation({ name: '422345', type: 'co-working space' })} 
+        imageSrc="/Images/floor4.jpg" 
+        RoomID="422"
+      />
 
-        </div>
-      </div>
-
-      {/* ShowRoom Popup เมื่อคลิกห้อง */}
+      {/* 📌 ShowRoom Popup (ส่ง isHidden ไปด้วย) */}
       <ShowRoom 
         selectedLocation={selectedLocation} 
         setSelectedLocation={setSelectedLocation} 
       />
 
-      {/* ปุ่มควบคุมชั้นลอยอยู่มุมขวาล่าง */}
+      {/* 📌 ปุ่มควบคุมชั้น (FloorControl) พร้อมส่ง isHidden ไปซ่อนตัวเวลาเปิด Popup */}
       <div className="absolute bottom-6 right-4 z-30">
-        <FloorControl currentFloor={4} />
+        <FloorControl currentFloor={4} isHidden={isHidden} />
       </div>
     </div>
   );

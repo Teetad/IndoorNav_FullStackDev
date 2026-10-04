@@ -11,6 +11,13 @@ const ShowRoom = ({ selectedLocation, setSelectedLocation }: { selectedLocation:
       document.body.classList.remove("showroom-open"); // ลบคลาสออกเมื่อปิด Popup
     }
 
+    // Cleanup function ตอนคอมโพเนนต์ถูกถอดออก
+    return () => {
+      document.body.classList.remove("showroom-open");
+    };
+  }, [selectedLocation]);
+
+  // 📌 ย้ายการเช็คนี้มาไว้หลัง useEffect เสมอ เพื่อป้องกันปฏิกิริยาของ React Hook ผิดเพี้ยน
   if (!selectedLocation) return null;
 
   const minSwipeDistance = 100;
@@ -35,7 +42,7 @@ const ShowRoom = ({ selectedLocation, setSelectedLocation }: { selectedLocation:
 
   return (
     // เพิ่ม overscroll-none และ fixed เต็มจอเพื่อกันฉากหลังเลื่อนตาม
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 backdrop-blur-xs transition-opacity overscroll-none">
+    <div className={`absolute pt-30 inset-0 w-full h-[100dvh] bg-[#F3EFEA] flex flex-col ${selectedLocation ? 'overflow-hidden' : 'overflow-auto'}`}>
       
       {/* กล่อง Bottom Sheet หลัก */}
       <div 

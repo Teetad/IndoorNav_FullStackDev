@@ -14,7 +14,7 @@ function App() {
       <Router>
        <Routes>
         <Route element={<MainLayout />}>
-
+          <Route path="/" element={<Floor_4 />} />
           <Route path="/floor-4" element={<Floor_4 />} />
           <Route path="/floor-5" element={<Floor_5 />} />
           <Route path="/floor-6" element={<Floor_6 />} />
