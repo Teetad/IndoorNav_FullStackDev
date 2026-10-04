@@ -1,4 +1,3 @@
-// 1. Rename to GridNode
 export interface GridNode {
   x: number;
   y: number;

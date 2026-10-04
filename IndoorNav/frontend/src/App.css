@@ -212,19 +212,19 @@ h1 {
   background: rgba(22, 119, 255, 0.42);
 }
 
-.cell.wall {
+/* .cell.wall {
   background: rgba(23, 32, 38, 0.42);
-}
+} */
 
 .cell.stairs {
   background: rgba(255, 145, 0, 0.7);
   font-size: 13px;
 }
 
-.cell.room {
+/* .cell.room {
   background: rgba(124, 58, 237, 0.55);
   font-size: 18px;
-}
+} */
 
 .cell.editable:hover {
   background: rgba(255, 193, 7, 0.36);
