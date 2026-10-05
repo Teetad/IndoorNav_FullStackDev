@@ -46,13 +46,14 @@ Bruno
 | ไฟล์ | ทำหน้าที่อะไร |
 |---|---|
 | [../package.json](../package.json) | รายชื่อไลบรารีและคำสั่ง `pnpm dev`, `build`, `db:migrate`, `seed:maps` |
-| [../src/index.ts](../src/index.ts) | สร้าง Express app, เปิดพอร์ต, ลงทะเบียน `/auth`, `/buildings`, `/floors`, `/places`, มี `/` และ `/health/database` |
+| [../src/index.ts](../src/index.ts) | สร้าง Express app, เปิดพอร์ต และลงทะเบียน route หลักทั้งหมด |
 | [../src/routes/auth/Auth.route.ts](../src/routes/auth/Auth.route.ts) | เริ่ม CPE OAuth, รับ callback, บันทึกผู้ใช้ และคืน session token |
 | [../src/auth/middleware.ts](../src/auth/middleware.ts) | ตรวจ Bearer token และ role ก่อนเข้า route ที่กำหนด |
 | [../src/auth/tokens.ts](../src/auth/tokens.ts) | สร้างและตรวจ OAuth state กับ session token |
 | [../src/routes/building/Buildings.route.ts](../src/routes/building/Buildings.route.ts) | API อ่าน เพิ่ม และลบอาคาร |
 | [../src/routes/building/Floors.route.ts](../src/routes/building/Floors.route.ts) | API อ่าน เพิ่ม แก้ และลบชั้นของอาคาร |
 | [../src/routes/building/Places.route.ts](../src/routes/building/Places.route.ts) | API สถานที่ รวมการกรองประเภท การค้นชื่อ/เลขห้อง/keyword และ API เพิ่มหรือลบ keyword |
+| [../src/routes/user/Favorites.route.ts](../src/routes/user/Favorites.route.ts) | API ให้ผู้ใช้เพิ่ม อ่าน และลบ Favorite ของตัวเอง |
 | [../src/utils/validation.ts](../src/utils/validation.ts) | ตรวจเลขชั้นว่าเป็นจำนวนเต็มในช่วงที่ PostgreSQL เก็บได้ |
 
 `src/index.ts` ไม่ได้เขียนคำสั่งค้นหาสถานที่เอง แต่ส่งต่อให้ route ที่ตรงกับ URL
@@ -67,9 +68,8 @@ Role ที่เก็บใน `users` มี `USER`, `ADMIN`, `DEVELOPER` ส
 - ADMIN แก้ชื่อ รายละเอียด รูป และจัดการ keyword ได้
 - DEVELOPER จัดการข้อมูลโครงสร้าง เช่น อาคาร ชั้น และสถานที่ได้
 
-ของที่ยังไม่ได้ทำมี Review, Like, Favorite, Report, อัปโหลดไฟล์รูป และ Navigation
-รูปหลายรูปเก็บใน `place_images` ส่วน `fav_count` ยังไม่ได้บอกว่า User คนไหน
-Favorite ห้องไหน
+ของที่ยังไม่ได้ทำมี Review, Like, Report, อัปโหลดไฟล์รูป และ Navigation
+รูปหลายรูปเก็บใน `place_images` และรายการ Favorite ของแต่ละ User เก็บใน `favorites`
 
 ## ไฟล์ใน `db/`
 
@@ -91,6 +91,7 @@ Favorite ห้องไหน
 - `places.floor_id` ชี้ไปยังชั้น
 - `place_keywords.place_id` ชี้ไปยังสถานที่
 - `place_images.place_id` ชี้ไปยังสถานที่
+- `favorites.user_id` และ `favorites.place_id` เชื่อมผู้ใช้กับสถานที่ที่กด Favorite
 - หากลบอาคาร ชั้น/สถานที่/keyword ใต้ข้อมูลนั้นจะถูกลบตาม (`ON DELETE CASCADE`)
 
 ตัวอย่าง `place_type` อยู่ในตาราง `places` โดยตรง ส่วน keyword อยู่ในตาราง
@@ -106,6 +107,7 @@ Favorite ห้องไหน
 | `0003_gorgeous_azazel.sql` | สร้าง `place_keywords` และความสัมพันธ์กับ `places` |
 | `0004_good_nico_minoru.sql` | สร้าง `users` สำหรับ OAuth และ role |
 | `0005_woozy_risque.sql` | สร้าง `place_images` สำหรับเก็บ URL รูปหลายรูป |
+| `0006_spicy_medusa.sql` | สร้าง `favorites` สำหรับเก็บสถานที่โปรดของแต่ละผู้ใช้ |
 
 อย่าแก้ SQL migration ที่เคยใช้แล้วเพื่อเปลี่ยนตารางใหม่ ให้แก้ `schema.ts`
 แล้วสร้าง migration ลำดับถัดไปด้วย `pnpm db:generate`
@@ -199,6 +201,7 @@ pnpm build                   # ตรวจและแปลง TypeScript
 | เพิ่มประเภทสถานที่ที่ API ยอมรับ | `db/place-types.ts` |
 | เปลี่ยนข้อมูลแผนที่อาคาร 30 ปี | `db/data/building30.ts` แล้วนำเข้าใหม่ตามกติกาของ `seed-maps.ts` |
 | เปลี่ยนวิธีค้น/เพิ่ม/ลบสถานที่หรือ keyword | `src/routes/building/Places.route.ts` |
+| เปลี่ยนการทำงานของ Favorite | `src/routes/user/Favorites.route.ts` |
 | เปลี่ยน API อาคารหรือชั้น | `Buildings.route.ts` หรือ `Floors.route.ts` |
 | ตรวจผล API ด้วยมือ | `bruno/` และ `ไฟล์/API_SPECS.md` |
 

@@ -54,6 +54,9 @@ pnpm dev
 | `POST` | `/auth/logout` | ออกจากระบบและลบ session cookie |
 | `GET` | `/auth/admin-check` | ตรวจสิทธิ์ ADMIN |
 | `GET` | `/auth/developer-check` | ตรวจสิทธิ์ DEVELOPER |
+| `GET` | `/favorites` | อ่าน Favorite ของผู้ใช้ที่ Login |
+| `POST` | `/favorites/:place_id` | เพิ่ม Favorite |
+| `DELETE` | `/favorites/:place_id` | ลบ Favorite |
 
 API ที่ต้อง Login ใช้ Header:
 
