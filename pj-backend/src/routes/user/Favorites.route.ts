@@ -50,7 +50,8 @@ router.post("/:place_id", requireAuth, async (req, res) => {
       .where(eq(Places.place_id, placeId));
     if (!place) return res.status(404).json({ message: "Place not found" });
 
-    const result = await dbClient.transaction(async tx => {
+    // เพิ่มรายการและเพิ่มตัวนับพร้อมกัน ถ้าขั้นหนึ่งพังจะยกเลิกทั้งคู่
+    const favorite = await dbClient.transaction(async tx => {
       const [favorite] = await tx.insert(Favorites)
         .values({ user_id: userId, place_id: placeId })
         .onConflictDoNothing()
@@ -63,8 +64,8 @@ router.post("/:place_id", requireAuth, async (req, res) => {
       return favorite;
     });
 
-    if (!result) return res.status(200).json({ message: "Place is already in favorites" });
-    return res.status(201).json(result);
+    if (!favorite) return res.status(200).json({ message: "Place is already in favorites" });
+    return res.status(201).json(favorite);
   } catch (error) {
     console.error("POST /favorites/:place_id failed:", error);
     return res.status(500).json({ message: "Unable to add favorite" });
@@ -77,7 +78,8 @@ router.delete("/:place_id", requireAuth, async (req, res) => {
     const userId = res.locals.auth.sub;
     if (!isUUID(placeId)) return res.status(400).json({ message: "place_id must be a valid UUID" });
 
-    const result = await dbClient.transaction(async tx => {
+    // ลบรายการและลดตัวนับพร้อมกัน
+    const favorite = await dbClient.transaction(async tx => {
       const [favorite] = await tx.delete(Favorites).where(and(
         eq(Favorites.user_id, userId),
         eq(Favorites.place_id, placeId),
@@ -90,8 +92,8 @@ router.delete("/:place_id", requireAuth, async (req, res) => {
       return favorite;
     });
 
-    if (!result) return res.status(404).json({ message: "Favorite not found" });
-    return res.status(200).json({ message: "Favorite removed", data: result });
+    if (!favorite) return res.status(404).json({ message: "Favorite not found" });
+    return res.status(200).json({ message: "Favorite removed", data: favorite });
   } catch (error) {
     console.error("DELETE /favorites/:place_id failed:", error);
     return res.status(500).json({ message: "Unable to remove favorite" });

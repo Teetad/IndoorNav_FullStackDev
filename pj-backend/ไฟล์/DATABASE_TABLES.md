@@ -1,7 +1,7 @@
 # Database Tables — สถานะปัจจุบัน
 
 เอกสารนี้อ้างอิง `db/schema.ts` และ migration ล่าสุด
-`db/migration/0006_spicy_medusa.sql` ณ วันที่ 5 ตุลาคม 2026
+`db/migration/0007_optimal_krista_starr.sql` ณ วันที่ 5 ตุลาคม 2026
 
 > Schema ในโค้ดและ schema ในฐานข้อมูลจริงเป็นคนละส่วนกัน ต้องรัน
 > `pnpm db:migrate` จึงจะนำ migration ไปใช้กับฐานข้อมูลที่ระบุใน `.env`
@@ -97,6 +97,16 @@ Unique index `place_images_place_url_unique` ป้องกัน URL รูป
 Unique index `favorites_user_place_unique` ป้องกันผู้ใช้กด Favorite
 สถานที่เดิมซ้ำกันหลายแถว
 
+## `reviews`
+
+เก็บคะแนน 1–5, ข้อความ, จำนวน Like และเวลาสร้าง/แก้ไขรีวิว
+Unique index `(user_id, place_id)` ทำให้ผู้ใช้หนึ่งคนรีวิวสถานที่เดิมได้หนึ่งครั้ง
+
+## `review_likes`
+
+เชื่อม `users` กับ `reviews` เพื่อบอกว่าใครกด Like รีวิวใด
+Unique index `(user_id, review_id)` ป้องกันการกด Like ซ้ำ
+
 ## ความสัมพันธ์และการลบตาม
 
 ```text
@@ -105,7 +115,9 @@ buildings
     └── places
         ├── place_keywords
         ├── place_images
-        └── favorites ── users
+        ├── favorites ── users
+        └── reviews ── users
+            └── review_likes ── users
 ```
 
 Foreign key ทุกระดับใช้ `ON DELETE CASCADE`:
@@ -114,6 +126,7 @@ Foreign key ทุกระดับใช้ `ON DELETE CASCADE`:
 - ลบชั้น → ลบสถานที่และคำค้นภายใน
 - ลบสถานที่ → ลบคำค้นและรูปของสถานที่
 - ลบสถานที่หรือผู้ใช้ → ลบ Favorite ที่เกี่ยวข้อง
+- ลบสถานที่ ผู้ใช้ หรือรีวิว → ลบ Review Like ที่เกี่ยวข้อง
 - ลบคำค้น → ไม่กระทบสถานที่ ชั้น หรืออาคาร
 
 ## ลำดับ Migration
@@ -127,6 +140,7 @@ Foreign key ทุกระดับใช้ `ON DELETE CASCADE`:
 | `0004_good_nico_minoru.sql` | สร้าง `users` สำหรับ CPE OAuth และ role |
 | `0005_woozy_risque.sql` | สร้าง `place_images`, foreign key และ unique index |
 | `0006_spicy_medusa.sql` | สร้าง `favorites` เชื่อมผู้ใช้กับสถานที่ |
+| `0007_optimal_krista_starr.sql` | สร้าง `reviews` และ `review_likes` |
 
 ไม่ควรแก้ migration ที่เคยนำไปใช้แล้ว เมื่อต้องการเปลี่ยนตารางให้แก้
 `db/schema.ts` แล้วสร้าง migration ลำดับใหม่ด้วย `pnpm db:generate`
@@ -135,11 +149,10 @@ Foreign key ทุกระดับใช้ `ON DELETE CASCADE`:
 
 Schema ปัจจุบันยังไม่มีตารางต่อไปนี้:
 
-- Reviews และ Review Likes
 - Reports
 - Navigation Nodes และ Navigation Edges
 
-ตอนนี้จึงยังไม่มีข้อมูล Review, Report และพิกัดสำหรับ A*
+ตอนนี้จึงยังไม่มีข้อมูล Report และพิกัดสำหรับ A*
 
 `places.image_url` ยังเก็บไว้ให้โค้ดเดิมใช้ ส่วนรูปใหม่หลายรูปเก็บใน `place_images`
 ส่วน `favorites` ใช้ดูว่า User คนไหน Favorite สถานที่ใด
