@@ -1,0 +1,27 @@
+meta {
+  name: 07 Invalid Place UUID
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/places/not-a-uuid/reports
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+body:json {
+  {
+    "description": "ข้อมูลทดสอบ"
+  }
+}
+
+tests {
+  test("place_id ไม่ใช่ UUID ได้ 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

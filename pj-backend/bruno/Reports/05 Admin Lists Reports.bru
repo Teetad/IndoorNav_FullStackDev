@@ -1,0 +1,22 @@
+meta {
+  name: 05 Admin Lists Reports
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/reports
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{adminToken}}
+}
+
+tests {
+  test("Admin อ่าน Report ทั้งหมดได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().some(row => row.report_id === bru.getVar("testReportId"))).to.equal(true);
+  });
+}

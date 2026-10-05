@@ -132,6 +132,22 @@ export const ReviewLikes = pgTable(
   ],
 );
 
+// ปัญหาที่ผู้ใช้แจ้งเกี่ยวกับสถานที่
+export const Reports = pgTable("reports", {
+  report_id: uuid("report_id").primaryKey().defaultRandom(),
+  user_id: uuid("user_id")
+    .references(() => Users.user_id, { onDelete: "cascade" })
+    .notNull(),
+  place_id: uuid("place_id")
+    .references(() => Places.place_id, { onDelete: "cascade" })
+    .notNull(),
+  description: varchar("description", { length: 500 }).notNull(),
+  status: varchar("status", { length: 20 }).default("PENDING").notNull(),
+  admin_note: varchar("admin_note", { length: 500 }),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // หนึ่งสถานที่มีได้หลายคำค้น; ลบสถานที่แล้วคำค้นถูกลบตามด้วย
 export const PlaceKeywords = pgTable(
   "place_keywords",

@@ -1,0 +1,30 @@
+meta {
+  name: 07 Update Status
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{baseUrl}}/reports/{{testReportId}}/status
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{adminToken}}
+}
+
+body:json {
+  {
+    "status": "RESOLVED",
+    "admin_note": "แก้ไขป้ายแล้ว"
+  }
+}
+
+tests {
+  test("Admin เปลี่ยนสถานะ Report ได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().status).to.equal("RESOLVED");
+    expect(res.getBody().admin_note).to.equal("แก้ไขป้ายแล้ว");
+  });
+}
