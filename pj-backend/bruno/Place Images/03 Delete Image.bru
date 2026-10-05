@@ -1,0 +1,22 @@
+meta {
+  name: 03 Delete Image
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/places/{{mapPlaceId}}/images/{{testImageId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("ลบรูปสถานที่ได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.image_id).to.equal(bru.getVar("testImageId"));
+  });
+}

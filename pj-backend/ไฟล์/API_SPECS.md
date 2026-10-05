@@ -1,7 +1,7 @@
 # API Specs — สถานะปัจจุบันของ `pj-backend`
 
 เอกสารนี้อ้างอิง route ที่ลงทะเบียนใน `src/index.ts` และโค้ดใน
-`src/routes/` ณ วันที่ 3 ตุลาคม 2026
+`src/routes/` ณ วันที่ 5 ตุลาคม 2026
 
 - Base URL สำหรับพัฒนาในเครื่อง: `http://localhost:3000`
 - Bruno ใช้ตัวแปร `{{baseUrl}}` จาก environment `Local`
@@ -23,8 +23,9 @@
 | Method | Endpoint | รายละเอียด |
 |---|---|---|
 | GET | `/auth/login` | สร้าง OAuth state cookie แล้ว redirect ไปหน้า CPE OAuth |
-| GET | `/auth/callback` | ตรวจ state, แลก code, อ่าน userinfo, บันทึก User และคืน Bearer token |
-| GET | `/auth/me` | อ่านผู้ใช้ปัจจุบัน ต้องส่ง Bearer token |
+| GET | `/auth/callback` | บันทึก User, สร้าง session cookie และกลับไปหน้า Frontend |
+| GET | `/auth/me` | อ่านผู้ใช้ปัจจุบันจาก cookie หรือ Bearer token |
+| POST | `/auth/logout` | ลบ session cookie |
 | GET | `/auth/admin-check` | ตรวจ Bearer token และ role `ADMIN` |
 | GET | `/auth/developer-check` | ตรวจ Bearer token และ role `DEVELOPER` |
 
@@ -38,6 +39,9 @@ Callback ที่ลงทะเบียนคือ `http://localhost:3000/au
 ```http
 Authorization: Bearer <token จาก /auth/callback>
 ```
+
+Frontend ให้เรียก API ด้วย `credentials: "include"` เพื่อส่ง session cookie
+ส่วน Bruno ขอ Bearer token ได้จาก `/auth/login?mode=json`
 
 ## Buildings
 
@@ -155,6 +159,26 @@ Body สำหรับเพิ่มคำค้น:
 API ตัดช่องว่างหัวท้าย แปลงเป็นตัวพิมพ์เล็ก และรับความยาว 1–100 ตัวอักษร
 คำค้นเดียวกันห้ามซ้ำภายในสถานที่เดียวกัน และจะตอบ `409` เมื่อซ้ำ
 
+## Place Images
+
+| Method | Endpoint | รายละเอียด |
+|---|---|---|
+| GET | `/places/:place_id/images` | อ่าน URL รูปทั้งหมด เรียงตาม `display_order` |
+| POST | `/places/:place_id/images` | Admin เพิ่ม URL รูป |
+| DELETE | `/places/:place_id/images/:image_id` | Admin ลบรูป |
+
+Body สำหรับเพิ่มรูป:
+
+```json
+{
+  "image_url": "https://example.com/room-701-1.jpg",
+  "caption": "หน้าห้อง 701",
+  "display_order": 1
+}
+```
+
+API นี้เก็บ URL ของรูป ยังไม่ได้รับไฟล์รูปภาพโดยตรง
+
 ## HTTP Status ที่ใช้อยู่
 
 | Status | ความหมายในโค้ดปัจจุบัน |
@@ -176,7 +200,7 @@ API ตัดช่องว่างหัวท้าย แปลงเป็
 - Favorites ของแต่ละ User ตอนนี้มีแค่ `fav_count` ของเดิม
 - Reports, My Reports และการแก้สถานะ Report
 - Navigation, Navigation Nodes และ Navigation Edges
-- API อัปโหลดและอ่านหลายรูปต่อห้อง
+- API อัปโหลดไฟล์รูปภาพไปยังที่เก็บไฟล์
 - API เวลาเปิด สถานะห้อง และขนาดห้อง
 
 รายการพวกนี้ยังเรียกใช้ใน `pj-backend` ไม่ได้
@@ -184,5 +208,5 @@ API ตัดช่องว่างหัวท้าย แปลงเป็
 การอ่านและค้นหาข้อมูลยังเป็น public ส่วนการเพิ่ม แก้ และลบจะตรวจ Bearer token
 และ role ตามที่ระบุในตารางด้านบน
 
-ตอนนี้ `/auth/callback` แสดง token เป็น JSON เพื่อใช้เทส Backend ก่อน
-ตอนเชื่อม Frontend ต้องแก้ให้กลับไปหน้า Frontend หลัง login
+การ login ปกติจะกลับไป `${FRONTEND_URL}/auth/callback` ส่วน `mode=json`
+ใช้สำหรับทดสอบ Backend และไม่ควรใช้เป็นขั้นตอน login ของ Frontend

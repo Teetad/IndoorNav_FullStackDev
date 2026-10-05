@@ -1,0 +1,18 @@
+meta {
+  name: 06 Missing Session
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/auth/me
+  body: none
+  auth: none
+}
+
+tests {
+  test("ไม่มี session ต้องเข้าไม่ได้", function () {
+    expect(res.getStatus()).to.equal(401);
+    expect(res.getBody().message).to.equal("Session token is required");
+  });
+}

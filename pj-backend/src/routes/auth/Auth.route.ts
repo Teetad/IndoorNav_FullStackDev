@@ -38,6 +38,14 @@ router.get("/login", async (_req, res) => {
       maxAge: 10 * 60 * 1000,
       path: "/auth/callback",
     });
+    // mode=json ใช้ตอนต้องการดู token เพื่อนำไปทดสอบใน Bruno
+    res.cookie("oauth_mode", _req.query.mode === "json" ? "json" : "frontend", {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.OAUTH_COOKIE_SECURE === "true",
+      maxAge: 10 * 60 * 1000,
+      path: "/auth/callback",
+    });
     const params = new URLSearchParams({
       client_id: config.clientId,
       redirect_uri: config.redirectUri,
@@ -64,11 +72,16 @@ router.get("/callback", async (req, res) => {
       .map(value => value.trim())
       .find(value => value.startsWith("oauth_state="))
       ?.slice("oauth_state=".length);
+    const oauthMode = req.header("cookie")?.split(";")
+      .map(value => value.trim())
+      .find(value => value.startsWith("oauth_mode="))
+      ?.slice("oauth_mode=".length);
     if (!stateCookie || decodeURIComponent(stateCookie) !== state) {
       return res.status(400).json({ message: "OAuth state does not match this browser" });
     }
     // state ใช้ครั้งเดียว หลังตรวจแล้วจึงลบ cookie
     res.clearCookie("oauth_state", { path: "/auth/callback" });
+    res.clearCookie("oauth_mode", { path: "/auth/callback" });
 
     const config = getOAuthConfig();
     // ส่ง code ไปแลก access token โดย CLIENT_SECRET อยู่เฉพาะ Backend
@@ -131,20 +144,43 @@ router.get("/callback", async (req, res) => {
 
     // สร้าง token ของระบบเรา ไม่ส่ง access token ของ CPE กลับไป
     const sessionToken = await createSessionToken({ ...user, role: user.role as UserRole });
+    const userResponse = {
+      user_id: user.user_id,
+      email: user.email,
+      display_name: user.display_name,
+      role: user.role,
+    };
+
+    // Browser เก็บ token ใน HttpOnly cookie ทำให้ JavaScript อ่าน token โดยตรงไม่ได้
+    res.cookie("session_token", sessionToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.OAUTH_COOKIE_SECURE === "true",
+      maxAge: 8 * 60 * 60 * 1000,
+      path: "/",
+    });
+
+    // ใช้ JSON เฉพาะตอนทดสอบ Backend; การ login ปกติกลับไปหน้า Frontend
+    if (oauthMode !== "json") {
+      const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
+      return res.redirect(`${frontendUrl}/auth/callback`);
+    }
+
     return res.status(200).json({
       token: sessionToken,
       token_type: "Bearer",
       expires_in: 28_800,
-      user: {
-        user_id: user.user_id,
-        email: user.email,
-        display_name: user.display_name,
-        role: user.role,
-      },
+      user: userResponse,
     });
   } catch (error) {
     return oauthError(res, error);
   }
+});
+
+router.post("/logout", (_req, res) => {
+  // ลบ session cookie ออกจาก browser
+  res.clearCookie("session_token", { path: "/" });
+  return res.status(200).json({ message: "Logged out" });
 });
 
 router.get("/me", requireAuth, async (_req, res) => {
