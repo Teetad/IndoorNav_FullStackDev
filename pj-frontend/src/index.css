@@ -135,3 +135,10 @@ body:has(.showroom-open) nav,
 body:has(.showroom-open) .bottom-nav-class {
   display: none !important;
 }
+
+body.showroom-open {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+}
