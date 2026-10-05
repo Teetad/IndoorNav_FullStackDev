@@ -1,0 +1,18 @@
+meta {
+  name: 02 List Images
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/places/{{mapPlaceId}}/images
+  body: none
+  auth: none
+}
+
+tests {
+  test("อ่านรูปของสถานที่ได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().some(image => image.image_id === bru.getVar("testImageId"))).to.equal(true);
+  });
+}

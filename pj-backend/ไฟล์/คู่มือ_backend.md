@@ -61,32 +61,36 @@ Bruno
 
 Role ที่เก็บใน `users` มี `USER`, `ADMIN`, `DEVELOPER` ส่วน Guest หมายถึงผู้ที่
 ยังไม่ login จึงไม่มีข้อมูลในตาราง `users` Admin และ Developer กำหนดจากรายชื่อ email
-ใน `.env` ตอน login; route เดิมยังไม่บังคับ role จนกว่าทีมจะตกลง permission ครบ
+ใน `.env` ตอน login โดย route ที่เพิ่ม แก้ และลบข้อมูลจะตรวจ role ก่อนทำงาน
 
-ของที่ยังไม่ได้ทำมี Review, Like, Favorite, Report, รูปหลายรูป และ Navigation
-ตอนนี้ `places.image_url` เก็บได้รูปเดียว ส่วน `fav_count` ยังไม่ได้บอกว่า User คนไหน
+- Guest และ USER อ่านหรือค้นหาข้อมูลได้
+- ADMIN แก้ชื่อ รายละเอียด รูป และจัดการ keyword ได้
+- DEVELOPER จัดการข้อมูลโครงสร้าง เช่น อาคาร ชั้น และสถานที่ได้
+
+ของที่ยังไม่ได้ทำมี Review, Like, Favorite, Report, อัปโหลดไฟล์รูป และ Navigation
+รูปหลายรูปเก็บใน `place_images` ส่วน `fav_count` ยังไม่ได้บอกว่า User คนไหน
 Favorite ห้องไหน
 
 ## ไฟล์ใน `db/`
 
 | ไฟล์ | ทำหน้าที่อะไร |
 |---|---|
-| [schema.ts](../db/schema.ts) | ประกาศตาราง `users`, `buildings`, `floors`, `places`, `place_keywords`, คีย์หลัก และความสัมพันธ์ |
+| [schema.ts](../db/schema.ts) | ประกาศตารางทั้งหมด รวม `place_images`, คีย์หลัก และความสัมพันธ์ |
 | [place-types.ts](../db/place-types.ts) | รายการประเภทสถานที่ที่ API ยอมรับ และ `isPlaceType()` สำหรับตรวจค่า |
 | [utils.ts](../db/utils.ts) | อ่านค่า `POSTGRES_*` จาก `.env` แล้วสร้าง URL สำหรับต่อฐานข้อมูล |
 | [client.ts](../db/client.ts) | สร้างการเชื่อมต่อ PostgreSQL (`dbConn`) และตัวเขียน query ของ Drizzle (`dbClient`) |
 | [data/building30.ts](../db/data/building30.ts) | ข้อมูลอาคาร 30 ปี ชั้น 4–7 ที่ถอดจากแผนที่; ยังไม่ใช่ข้อมูลในฐานข้อมูลจนกว่าจะ seed |
 | [data/README.md](../db/data/README.md) | บอกแหล่งข้อมูลแผนที่และส่วนที่ยังไม่ยืนยัน |
 | [seed-maps.ts](../db/seed-maps.ts) | ดูตัวอย่างข้อมูล หรือใช้ `--apply` เพื่อนำอาคาร ชั้น และสถานที่ลงฐานข้อมูล |
-| [seed.ts](../db/seed.ts) | ใส่ข้อมูลตัวอย่างเก่า **โดยลบข้อมูลอาคาร ชั้น และสถานที่เดิมทั้งหมดก่อน** |
 | [prototype.ts](../db/prototype.ts) | สคริปต์อ่านข้อมูลจากฐานข้อมูลแล้วพิมพ์ใน Terminal เพื่อทดลอง query |
 | [migration/](../db/migration/) | ไฟล์ SQL ที่สร้างหรือเปลี่ยนตาราง; `meta/_journal.json` เก็บลำดับ migration |
 
-ความสัมพันธ์ของข้อมูลคือ `Buildings → Floors → Places → PlaceKeywords`:
+ความสัมพันธ์หลักคือ `Buildings → Floors → Places` และ Places เชื่อมกับ Keywords/Images:
 
 - `floors.building_id` ชี้ไปยังอาคาร
 - `places.floor_id` ชี้ไปยังชั้น
 - `place_keywords.place_id` ชี้ไปยังสถานที่
+- `place_images.place_id` ชี้ไปยังสถานที่
 - หากลบอาคาร ชั้น/สถานที่/keyword ใต้ข้อมูลนั้นจะถูกลบตาม (`ON DELETE CASCADE`)
 
 ตัวอย่าง `place_type` อยู่ในตาราง `places` โดยตรง ส่วน keyword อยู่ในตาราง
@@ -101,6 +105,7 @@ Favorite ห้องไหน
 | `0002_many_jamie_braddock.sql` | เพิ่ม `places.place_type` |
 | `0003_gorgeous_azazel.sql` | สร้าง `place_keywords` และความสัมพันธ์กับ `places` |
 | `0004_good_nico_minoru.sql` | สร้าง `users` สำหรับ OAuth และ role |
+| `0005_woozy_risque.sql` | สร้าง `place_images` สำหรับเก็บ URL รูปหลายรูป |
 
 อย่าแก้ SQL migration ที่เคยใช้แล้วเพื่อเปลี่ยนตารางใหม่ ให้แก้ `schema.ts`
 แล้วสร้าง migration ลำดับถัดไปด้วย `pnpm db:generate`
@@ -125,7 +130,7 @@ API จะเก็บเป็น `as lab` และปฏิเสธคำซ
 หากยังไม่มี keyword ในฐานข้อมูล การค้นจาก keyword จะยังไม่พบอะไรเพิ่มเติม
 สคริปต์นำเข้าแผนที่ไม่ได้เดาคำค้นให้ห้องโดยอัตโนมัติ
 
-## การนำข้อมูลเข้า: `seed-maps.ts` กับ `seed.ts`
+## การนำข้อมูลเข้า: `seed-maps.ts`
 
 คำสั่ง `pnpm seed:maps` แสดงข้อมูลแผนที่ก่อน ยังไม่เขียนฐานข้อมูล
 เมื่อเติม `--apply` จึงเริ่ม transaction: หาอาคาร → หา/เพิ่มชั้น → หา/เพิ่มสถานที่
@@ -135,9 +140,8 @@ ID ที่สคริปต์สร้างจาก `key` มีค่า�
 ถ้าแถวนั้นยังไม่มี `place_type` สคริปต์จะเติมให้ แต่ไม่เปลี่ยนประเภทของแถวที่
 คนเพิ่มเอง ข้อมูลคำค้นไม่ได้อยู่ในชุด seed นี้
 
-**อย่าใช้ `pnpm seed` กับฐานข้อมูลที่ต้องเก็บข้อมูลไว้** เพราะ `seed.ts` ลบข้อมูล
-ทั้งสามตารางก่อนใส่ห้องตัวอย่าง 601–603 และ keyword ของสถานที่จะถูกลบตาม
-ให้ใช้ `pnpm seed:maps --apply` สำหรับแผนที่อาคาร 30 ปี
+ข้อมูลตัวอย่างห้อง 601–603 และคำสั่ง `pnpm seed` ถูกลบแล้ว เพราะไม่ตรงกับ
+แผนที่จริง ให้ใช้ `pnpm seed:maps --apply` สำหรับแผนที่อาคาร 30 ปี
 
 ## ไฟล์ตั้งค่าและเครื่องมือรอบนอก
 

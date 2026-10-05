@@ -1,9 +1,10 @@
 import { dbClient } from "@db/client.js";
-import { Buildings, Floors, PlaceKeywords, Places } from "@db/schema.js";
+import { Buildings, Floors, PlaceImages, PlaceKeywords, Places } from "@db/schema.js";
 import { isPlaceType, type PlaceType } from "@db/place-types.js";
 import { and, eq, exists, ilike, or } from "drizzle-orm";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
+import { requireAuth, requireRole } from "../../auth/middleware.js";
 import { parseFloorNumber } from "../../utils/validation.js";
 
 const router = Router();
@@ -81,7 +82,7 @@ router.get("/", async (req, res) => {
 // อ่านคำค้นของสถานที่หนึ่งแห่ง
 router.get("/:place_id/keywords", async (req, res) => {
   try {
-    const { place_id } = req.params;
+    const place_id = typeof req.params.place_id === "string" ? req.params.place_id : "";
     if (!isUUID(place_id)) return res.status(400).json({ message: "place_id must be a valid UUID" });
 
     const [place] = await dbClient.select({ id: Places.place_id }).from(Places)
@@ -97,10 +98,87 @@ router.get("/:place_id/keywords", async (req, res) => {
   }
 });
 
-// เพิ่มคำค้นหนึ่งคำ; ตัดช่องว่างและแปลงเป็นตัวพิมพ์เล็กก่อนบันทึก
-router.post("/:place_id/keywords", async (req, res) => {
+// อ่านรูปทั้งหมดของสถานที่ โดยเรียงตาม display_order
+router.get("/:place_id/images", async (req, res) => {
   try {
-    const { place_id } = req.params;
+    const place_id = typeof req.params.place_id === "string" ? req.params.place_id : "";
+    if (!isUUID(place_id)) return res.status(400).json({ message: "place_id must be a valid UUID" });
+
+    const [place] = await dbClient.select({ id: Places.place_id }).from(Places)
+      .where(eq(Places.place_id, place_id));
+    if (!place) return res.status(404).json({ message: "Place not found" });
+
+    const images = await dbClient.select().from(PlaceImages)
+      .where(eq(PlaceImages.place_id, place_id))
+      .orderBy(PlaceImages.display_order);
+    return res.status(200).json(images);
+  } catch (error) {
+    console.error("GET /places/:place_id/images failed:", error);
+    return res.status(500).json({ message: "Unable to get place images" });
+  }
+});
+
+// Admin เพิ่ม URL รูปและกำหนดลำดับที่ Frontend จะแสดง
+router.post("/:place_id/images", requireAuth, requireRole("ADMIN"), async (req, res) => {
+  try {
+    const place_id = typeof req.params.place_id === "string" ? req.params.place_id : "";
+    const { image_url, caption, display_order } = req.body ?? {};
+    if (!isUUID(place_id)) return res.status(400).json({ message: "place_id must be a valid UUID" });
+    if (typeof image_url !== "string" || !image_url.trim() || image_url.trim().length > 500) {
+      return res.status(400).json({ message: "image_url must be 1-500 characters" });
+    }
+    if (caption !== undefined && caption !== null &&
+        (typeof caption !== "string" || caption.trim().length > 200)) {
+      return res.status(400).json({ message: "caption must not exceed 200 characters" });
+    }
+    if (display_order !== undefined && (!Number.isInteger(display_order) || display_order < 0)) {
+      return res.status(400).json({ message: "display_order must be a non-negative integer" });
+    }
+
+    const [place] = await dbClient.select({ id: Places.place_id }).from(Places)
+      .where(eq(Places.place_id, place_id));
+    if (!place) return res.status(404).json({ message: "Place not found" });
+
+    const [image] = await dbClient.insert(PlaceImages).values({
+      place_id,
+      image_url: image_url.trim(),
+      caption: typeof caption === "string" ? caption.trim() || null : null,
+      display_order: display_order ?? 0,
+    }).returning();
+    return res.status(201).json(image);
+  } catch (error: any) {
+    if (error?.code === "23505" || error?.cause?.code === "23505") {
+      return res.status(409).json({ message: "This image already exists for the place" });
+    }
+    console.error("POST /places/:place_id/images failed:", error);
+    return res.status(500).json({ message: "Unable to add place image" });
+  }
+});
+
+router.delete("/:place_id/images/:image_id", requireAuth, requireRole("ADMIN"), async (req, res) => {
+  try {
+    const place_id = typeof req.params.place_id === "string" ? req.params.place_id : "";
+    const image_id = typeof req.params.image_id === "string" ? req.params.image_id : "";
+    if (!isUUID(place_id) || !isUUID(image_id)) {
+      return res.status(400).json({ message: "place_id and image_id must be valid UUIDs" });
+    }
+
+    const [image] = await dbClient.delete(PlaceImages).where(and(
+      eq(PlaceImages.place_id, place_id),
+      eq(PlaceImages.image_id, image_id),
+    )).returning();
+    if (!image) return res.status(404).json({ message: "Place image not found" });
+    return res.status(200).json({ message: "Place image deleted", data: image });
+  } catch (error) {
+    console.error("DELETE /places/:place_id/images/:image_id failed:", error);
+    return res.status(500).json({ message: "Unable to delete place image" });
+  }
+});
+
+// เพิ่มคำค้นหนึ่งคำ; ตัดช่องว่างและแปลงเป็นตัวพิมพ์เล็กก่อนบันทึก
+router.post("/:place_id/keywords", requireAuth, requireRole("ADMIN"), async (req, res) => {
+  try {
+    const place_id = typeof req.params.place_id === "string" ? req.params.place_id : "";
     const { keyword } = req.body ?? {};
     if (!isUUID(place_id)) return res.status(400).json({ message: "place_id must be a valid UUID" });
     if (typeof keyword !== "string" || !keyword.trim() || keyword.trim().length > 100) {
@@ -124,9 +202,10 @@ router.post("/:place_id/keywords", async (req, res) => {
 });
 
 // ต้องตรงทั้ง place_id และ keyword_id จึงลบได้
-router.delete("/:place_id/keywords/:keyword_id", async (req, res) => {
+router.delete("/:place_id/keywords/:keyword_id", requireAuth, requireRole("ADMIN"), async (req, res) => {
   try {
-    const { place_id, keyword_id } = req.params;
+    const place_id = typeof req.params.place_id === "string" ? req.params.place_id : "";
+    const keyword_id = typeof req.params.keyword_id === "string" ? req.params.keyword_id : "";
     if (!isUUID(place_id) || !isUUID(keyword_id)) {
       return res.status(400).json({ message: "place_id and keyword_id must be valid UUIDs" });
     }
@@ -144,7 +223,7 @@ router.delete("/:place_id/keywords/:keyword_id", async (req, res) => {
 
 router.get("/:place_id", async (req, res) => {
   try {
-    const { place_id } = req.params;
+    const place_id = typeof req.params.place_id === "string" ? req.params.place_id : "";
 
     // ตรวจสอบว่า place_id เป็น UUID ที่ถูกต้อง
     if (!isUUID(place_id)) {
@@ -165,7 +244,8 @@ router.get("/:place_id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+// Developer เป็นผู้เพิ่มข้อมูลสถานที่เริ่มต้น
+router.post("/", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
   try {
     const { floor_id, place_name, place_type, room_number, description, image_url } = req.body;
 
@@ -221,13 +301,20 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:place_id", async (req, res) => {
+router.put("/:place_id", requireAuth, requireRole("ADMIN", "DEVELOPER"), async (req, res) => {
   try {
-    const { place_id } = req.params;
+    const place_id = typeof req.params.place_id === "string" ? req.params.place_id : "";
     const { floor_id, place_name, place_type, room_number, description, image_url } = req.body;
 
     if (!isUUID(place_id)) {
       return res.status(400).json({ message: "place_id must be a valid UUID" });
+    }
+    // Admin แก้ข้อมูลที่ผู้ใช้เห็นได้ แต่ข้อมูลโครงสร้างให้ Developer แก้
+    if (res.locals.auth.role === "ADMIN" &&
+        (floor_id !== undefined || place_type !== undefined || room_number !== undefined)) {
+      return res.status(403).json({
+        message: "Admin can only update place_name, description, and image_url",
+      });
     }
     if (floor_id === undefined && place_name === undefined && place_type === undefined && room_number === undefined &&
         description === undefined && image_url === undefined) {
@@ -305,9 +392,9 @@ router.put("/:place_id", async (req, res) => {
   }
 });
 
-router.delete("/:place_id", async (req, res) => {
+router.delete("/:place_id", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
   try {
-    const { place_id } = req.params;
+    const place_id = typeof req.params.place_id === "string" ? req.params.place_id : "";
     if (!isUUID(place_id)) {
       return res.status(400).json({ message: "place_id must be a valid UUID" });
     }

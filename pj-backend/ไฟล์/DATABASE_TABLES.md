@@ -1,7 +1,7 @@
 # Database Tables — สถานะปัจจุบัน
 
 เอกสารนี้อ้างอิง `db/schema.ts` และ migration ล่าสุด
-`db/migration/0004_good_nico_minoru.sql` ณ วันที่ 29 กันยายน 2026
+`db/migration/0005_woozy_risque.sql` ณ วันที่ 5 ตุลาคม 2026
 
 > Schema ในโค้ดและ schema ในฐานข้อมูลจริงเป็นคนละส่วนกัน ต้องรัน
 > `pnpm db:migrate` จึงจะนำ migration ไปใช้กับฐานข้อมูลที่ระบุใน `.env`
@@ -73,20 +73,33 @@ Unique index `place_keywords_place_keyword_unique` ครอบคลุม
 `(place_id, keyword)` คำค้นเดียวกันจึงซ้ำในสถานที่เดียวกันไม่ได้
 API เป็นส่วนที่แปลง keyword เป็นตัวพิมพ์เล็กและตัดช่องว่างก่อนบันทึก
 
+## `place_images`
+
+| คอลัมน์ | ชนิด | ข้อบังคับ |
+|---|---|---|
+| `image_id` | UUID | Primary Key, สร้างอัตโนมัติ |
+| `place_id` | UUID | NOT NULL, Foreign Key → `places.place_id` |
+| `image_url` | VARCHAR(500) | NOT NULL |
+| `caption` | VARCHAR(200) | NULL ได้ |
+| `display_order` | INTEGER | NOT NULL, DEFAULT 0 |
+
+Unique index `place_images_place_url_unique` ป้องกัน URL รูปเดียวกันซ้ำในสถานที่เดียวกัน
+
 ## ความสัมพันธ์และการลบตาม
 
 ```text
 buildings
 └── floors
     └── places
-        └── place_keywords
+        ├── place_keywords
+        └── place_images
 ```
 
 Foreign key ทุกระดับใช้ `ON DELETE CASCADE`:
 
 - ลบอาคาร → ลบชั้น สถานที่ และคำค้นภายใน
 - ลบชั้น → ลบสถานที่และคำค้นภายใน
-- ลบสถานที่ → ลบคำค้นของสถานที่
+- ลบสถานที่ → ลบคำค้นและรูปของสถานที่
 - ลบคำค้น → ไม่กระทบสถานที่ ชั้น หรืออาคาร
 
 ## ลำดับ Migration
@@ -98,6 +111,7 @@ Foreign key ทุกระดับใช้ `ON DELETE CASCADE`:
 | `0002_many_jamie_braddock.sql` | เพิ่ม `places.place_type` กลับมาเป็น VARCHAR(40) |
 | `0003_gorgeous_azazel.sql` | สร้าง `place_keywords`, foreign key และ unique index |
 | `0004_good_nico_minoru.sql` | สร้าง `users` สำหรับ CPE OAuth และ role |
+| `0005_woozy_risque.sql` | สร้าง `place_images`, foreign key และ unique index |
 
 ไม่ควรแก้ migration ที่เคยนำไปใช้แล้ว เมื่อต้องการเปลี่ยนตารางให้แก้
 `db/schema.ts` แล้วสร้าง migration ลำดับใหม่ด้วย `pnpm db:generate`
@@ -109,14 +123,12 @@ Schema ปัจจุบันยังไม่มีตารางต่อ�
 - Reviews และ Review Likes
 - Favorites
 - Reports
-- Place Images สำหรับเก็บหลายรูปต่อห้อง
 - Navigation Nodes และ Navigation Edges
 
-ตอนนี้จึงยังไม่มีข้อมูล Review, Favorite ของแต่ละ User, Report, รูปหลายรูป
-และพิกัดสำหรับ A*
+ตอนนี้จึงยังไม่มีข้อมูล Review, Favorite ของแต่ละ User, Report และพิกัดสำหรับ A*
 
-ใน `places` มีแค่ `image_url` หนึ่งช่อง ถ้าจะใส่ 2–3 รูปต่อห้องต้องเพิ่ม
-ตาราง `place_images` ส่วน `fav_count` เป็นของเดิมและยังบอกไม่ได้ว่าใคร Favorite ห้องไหน
+`places.image_url` ยังเก็บไว้ให้โค้ดเดิมใช้ ส่วนรูปใหม่หลายรูปเก็บใน `place_images`
+และ `fav_count` ยังบอกไม่ได้ว่าใคร Favorite ห้องไหน
 ตอนทำ Favorite ควรเพิ่มตารางเชื่อม User กับ Place และไม่ต้องส่งจำนวน Favorite ให้หน้าแอป
 
 เวลาเปิด สถานะห้อง และขนาดห้องก็ยังไม่มีใน schema

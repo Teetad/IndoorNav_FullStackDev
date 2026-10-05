@@ -21,8 +21,8 @@
 ## Test
 
 - Health check: `GET http://localhost:3000/health/database`
-- OAuth login: open `http://localhost:3000/auth/login` in a browser.
-- The callback returns a Bearer token; send it as `Authorization: Bearer <token>` to `GET /auth/me`.
+- OAuth login for Frontend: open `http://localhost:3000/auth/login` in a browser.
+- OAuth login for Bruno: open `http://localhost:3000/auth/login?mode=json` to receive a Bearer token.
 - Add CMU emails to `ADMIN_EMAILS` or `DEVELOPER_EMAILS` before their first login.
 - Open `bruno/` in Bruno and select the `Local` environment.
 - Run `Map Verification` requests in order from 01 to 09.

@@ -1,0 +1,27 @@
+meta {
+  name: 04 User Cannot Add Keyword
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/places/{{seedPlaceId}}/keywords
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+body:json {
+  {
+    "keyword": "permission-test"
+  }
+}
+
+tests {
+  test("USER เพิ่ม keyword ไม่ได้", function () {
+    expect(res.getStatus()).to.equal(403);
+  });
+}

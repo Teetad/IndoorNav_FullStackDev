@@ -5,10 +5,10 @@
 1. เปิด `GET http://localhost:3000/auth/login`
 2. ระบบพาไป Login กับ CPE OAuth
 3. OAuth ส่งกลับมาที่ `/auth/callback`
-4. Backend บันทึกผู้ใช้และคืน token
+4. Backend บันทึกผู้ใช้ เก็บ session ใน cookie แล้วกลับไปหน้า Frontend
 5. ผู้ใช้ทั่วไปจะมี role เป็น `USER`
 
-ตอนนี้ callback แสดง token เป็น JSON เพื่อใช้ทดสอบ Backend ก่อน
+ถ้าจะดู token เพื่อเทส Bruno ให้เปิด `http://localhost:3000/auth/login?mode=json`
 
 ## เปิด Backend
 
@@ -18,7 +18,7 @@ docker compose up -d postgres
 pnpm dev
 ```
 
-จากนั้นเปิด `http://localhost:3000/auth/login` ใน Browser และ Login ด้วยบัญชี CMU
+จากนั้นเปิด `http://localhost:3000/auth/login?mode=json` ใน Browser และ Login ด้วยบัญชี CMU
 
 ## ทดสอบใน Bruno
 
@@ -33,6 +33,14 @@ pnpm dev
 | `01 Current User` | `200 OK` และ role `USER` |
 | `02 User Cannot Access Admin` | `403 Forbidden` |
 | `03 User Cannot Access Developer` | `403 Forbidden` |
+| `04 Current User With Cookie` | `200 OK` และมีข้อมูล User |
+| `05 Logout` | `200 OK` |
+| `06 Missing Session` | `401 Unauthorized` |
+
+ถ้าทดสอบ API ที่แก้ข้อมูล ให้ใส่ token ตามงานที่ทดสอบ:
+
+- Developer: เพิ่มหรือลบอาคาร และเพิ่ม แก้ หรือลบชั้น/สถานที่
+- Admin: แก้ชื่อ รายละเอียด รูปของสถานที่ และเพิ่มหรือลบ keyword
 
 หลังทดสอบให้เปลี่ยน Header กลับเป็น `Bearer {{sessionToken}}` และอย่า commit token
 
@@ -41,8 +49,9 @@ pnpm dev
 | Method | Path | หน้าที่ |
 | --- | --- | --- |
 | `GET` | `/auth/login` | เริ่ม Login |
-| `GET` | `/auth/callback` | รับผลจาก OAuth และสร้าง token |
+| `GET` | `/auth/callback` | สร้าง session และกลับหน้า Frontend |
 | `GET` | `/auth/me` | อ่านข้อมูลผู้ใช้ที่ Login |
+| `POST` | `/auth/logout` | ออกจากระบบและลบ session cookie |
 | `GET` | `/auth/admin-check` | ตรวจสิทธิ์ ADMIN |
 | `GET` | `/auth/developer-check` | ตรวจสิทธิ์ DEVELOPER |
 
@@ -58,11 +67,19 @@ Frontend เริ่ม Login ได้ด้วย:
 window.location.href = "http://localhost:3000/auth/login";
 ```
 
-ก่อนเชื่อม Frontend จริง ต้องปรับ Backend ให้ส่งผู้ใช้กลับหน้า Frontend หลัง Login แทนการแสดง JSON
+Frontend เรียก API โดยใส่ `credentials: "include"` เพื่อส่ง cookie มาด้วย:
 
-ตอนนี้มี `requireAuth` และ `requireRole` แล้ว แต่ยังใช้แค่ route สำหรับเทส role
-API เพิ่ม แก้ และลบข้อมูลยังเป็น public อยู่ งานต่อไปคือต้องใส่สิทธิ์ให้ Admin
-และ Developer ส่วน Guest ให้ดูและค้นหาข้อมูลได้เหมือนเดิม
+```ts
+const response = await fetch("http://localhost:3000/auth/me", {
+  credentials: "include",
+});
+```
+
+หน้า `/auth/callback` ของ Frontend ให้เรียก `/auth/me` แล้วพาผู้ใช้กลับหน้าแรก
+
+ตอนนี้ API ที่เพิ่ม แก้ และลบข้อมูลตรวจ `requireAuth` และ `requireRole` แล้ว
+Guest และ USER ยังดูหรือค้นหาข้อมูลได้ ส่วน ADMIN จัดการข้อมูลที่แสดงและ keyword
+และ DEVELOPER จัดการโครงสร้างอาคาร ชั้น และสถานที่
 
 ## Role
 

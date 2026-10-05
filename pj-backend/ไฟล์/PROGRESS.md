@@ -1,4 +1,4 @@
-# ความคืบหน้า Backend — 29 กันยายน 2026
+# ความคืบหน้า Backend — 5 ตุลาคม 2026
 
 ขอบเขตเอกสารนี้คือโฟลเดอร์ `pj-backend` เท่านั้น ไม่รวม Frontend หรือระบบ A*
 
@@ -7,15 +7,15 @@
 | ส่วน | สถานะ |
 |---|---|
 | Express API | มี route ระบบ, Auth, Buildings, Floors, Places และ Place Keywords |
-| Database schema | มี 5 ตาราง: `users`, `buildings`, `floors`, `places`, `place_keywords` |
+| Database schema | มี 6 ตาราง รวม `place_images` สำหรับรูปหลายรูปต่อสถานที่ |
 | Places | อ่าน เพิ่ม แก้ ลบ ค้นชื่อ/เลขห้อง/keyword และกรองอาคาร ชั้น ประเภทได้ |
 | Place Types | มีรายการค่าที่ API ยอมรับ 11 ประเภท; ใช้ `null` ได้เมื่อยังไม่ทราบ |
 | Place Keywords | อ่าน เพิ่ม ลบ และใช้ค้นหาสถานที่ได้ |
 | ข้อมูลแผนที่ | มีชุดข้อมูลอาคาร 30 ปี ชั้น 4–7 รวม 78 สถานที่ |
 | Map import | preview ได้โดยไม่ต่อ DB และใช้ `--apply` เพื่อนำเข้าแบบ transaction |
-| Bruno | มีคำขอสำหรับ Buildings, Floors, Places, Map Verification และ Place Keywords |
-| Authentication | มี CPE OAuth login, callback, Bearer session และ `/auth/me` |
-| Role | มี `USER`/`ADMIN`/`DEVELOPER` และ route ตรวจ role; Guest คือผู้ที่ไม่ login |
+| Bruno | มีคำขอสำหรับ Buildings, Floors, Places, Map Verification, Keywords และ Role |
+| Authentication | มี CPE OAuth, HttpOnly session cookie, Bearer token, `/auth/me` และ logout |
+| Role | route เพิ่ม แก้ และลบข้อมูลตรวจ `USER`/`ADMIN`/`DEVELOPER` แล้ว |
 | Navigation / A* | ยังไม่ได้พัฒนาใน `pj-backend` และยังไม่มีพิกัดนำทางใน schema |
 
 ## งานที่มีอยู่ในโค้ดแล้ว
@@ -31,6 +31,11 @@
 - migration `0004` เพิ่มตาราง `users` สำหรับ CPE OAuth และ role
 - `src/auth/` จัดการ config, OAuth state, session token และ middleware
 - `src/routes/auth/Auth.route.ts` มี login, callback, me และ admin-check
+- route ที่แก้ข้อมูลใช้ `requireAuth` และ `requireRole` จำกัดสิทธิ์แล้ว
+- Bruno มีชุด Role Permissions สำหรับเช็ก Guest และ USER
+- OAuth callback เก็บ session cookie และกลับไปหน้า Frontend แล้ว
+- ใช้ `/auth/login?mode=json` เมื่อต้องการ Bearer token สำหรับ Bruno
+- migration `0005` เพิ่มตาราง `place_images` และมี API เพิ่ม อ่าน ลบ URL รูป
 
 ## ชุดข้อมูลอาคาร 30 ปี
 
@@ -49,13 +54,14 @@
 
 ## ผลตรวจล่าสุด
 
-- `./node_modules/.bin/tsc --noEmit` ผ่านเมื่อวันที่ 23 กันยายน 2026
+- `pnpm build` ผ่านเมื่อวันที่ 4 ตุลาคม 2026
 - โค้ด route, schema, migration และเอกสารทั้ง 4 ไฟล์ถูกเทียบกันแล้ว
-- การตรวจฐานข้อมูลจริงต้องให้ PostgreSQL ทำงานและใช้ `.env` ที่ถูกต้อง
-- การทดสอบก่อนหน้าพบว่าสามารถ migrate, นำเข้า 1 อาคาร 4 ชั้น 78 สถานที่
-  และเรียก `/health/database` ได้
-- เคยทดสอบการเพิ่ม ค้น และลบ keyword ชั่วคราวสำเร็จ แต่ยังไม่ได้ยืนยันว่า
-  Bruno ทุกคำขอผ่านพร้อมกันในฐานข้อมูลปัจจุบัน
+- รัน Bruno ครบ 55 คำขอแล้ว ทั้ง Auth, Role, Buildings, Floors, Places,
+  Map Verification และ Place Keywords
+- ทดสอบ session cookie, logout และกรณีไม่มี session ผ่านครบ 3 คำขอ
+- ทดสอบเพิ่ม อ่าน และลบ URL รูปสถานที่ผ่านครบ 3 คำขอ
+- หลังจบการทดสอบ `/health/database` ยังมี 2 อาคาร 4 ชั้น 78 สถานที่ และ 1 ผู้ใช้
+- แก้ `seedFloorId` และ `seedPlaceId` ใน environment `Local` ให้ตรงกับข้อมูลแผนที่
 
 ## วิธีเปิดระบบและตรวจงาน
 
@@ -84,25 +90,22 @@ GET http://localhost:3000/auth/login
 2. รายการ 01–08 ควรได้ `200`; รายการ 09 ตั้งใจทดสอบข้อมูลผิดและควรได้ `400`
 3. รัน Place Keywords 01–04 หลัง request 07 กำหนด `mapPlaceId` แล้ว
 4. คำขอ Create, Update และ Delete เขียนข้อมูลจริง ควรใช้ฐานข้อมูลทดสอบ
+5. ใช้ token ของ Developer กับ Buildings/Floors/Places และ token ของ Admin กับ Keywords
 
-`pnpm seed:maps` แสดง preview เท่านั้น ส่วน `pnpm seed` ล้างข้อมูลอาคาร ชั้น
-และสถานที่ก่อนใส่ข้อมูลตัวอย่าง 601–603 จึงไม่ควรใช้กับฐานข้อมูลที่ต้องเก็บไว้
+`pnpm seed:maps` แสดง preview เท่านั้น และ `pnpm seed:maps --apply` ใช้นำข้อมูลลงฐานข้อมูล
+คำสั่ง `pnpm seed` และข้อมูลตัวอย่าง 601–603 ถูกลบแล้ว เพราะไม่ตรงกับแผนที่จริง
 
 ## งานถัดไป
 
 ### ทำต่อก่อน
 
-- ใส่ `requireAuth` และ `requireRole` ให้ API ที่เพิ่ม แก้ และลบข้อมูล
-- เพิ่ม Bruno test สำหรับเช็ก token และ role
-- แก้ OAuth ให้กลับไปหน้า Frontend หลัง login ตอนนี้ยังแสดง JSON อยู่
-- ลอง Bruno ให้ครบทุก request
-- เช็กข้อมูลตัวอย่างห้อง 601–603 ว่ายังใช้ไหม ถ้าไม่ใช้ให้ลบ
+- ทำหน้า `/auth/callback` ฝั่ง Frontendให้เรียก `/auth/me` และเก็บข้อมูล User ใน state
 
 ### ข้อมูลห้อง
 
 - เช็กห้องที่ยังไม่รู้ชื่อหรือประเภท เช่น ห้อง 712 และห้องอาจารย์บางห้อง
 - หารูปหรือถ่ายรูปห้องชั้น 4–7
-- เพิ่ม `place_images` เพราะตอนนี้หนึ่งห้องเก็บรูปได้รูปเดียว
+- นำรูปจริงไปเก็บในที่ที่ Frontend เปิดได้ แล้วเพิ่ม URL ผ่าน Place Images API
 - เพิ่มเวลาเปิด สถานะห้อง และขนาดห้อง
 
 ### ฟีเจอร์ที่ยังไม่ได้ทำ

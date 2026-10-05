@@ -3,6 +3,7 @@ import { Buildings, Floors } from "@db/schema.js";
 import { and, eq } from "drizzle-orm";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
+import { requireAuth, requireRole } from "../../auth/middleware.js";
 import { parseFloorNumber } from "../../utils/validation.js";
 
 const router = Router();
@@ -42,7 +43,8 @@ router.get("/:building_id/:floor_number", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+// ข้อมูลชั้นและ Floor Plan เป็นข้อมูลโครงสร้าง ให้ Developer จัดการ
+router.post("/", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
   try {
     const { building_id, floor_number, floor_plan_image } = req.body;
     const floorNumber = parseFloorNumber(floor_number);
@@ -74,9 +76,9 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:floor_id", async (req, res) => {
+router.put("/:floor_id", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
   try {
-    const { floor_id } = req.params;
+    const floor_id = typeof req.params.floor_id === "string" ? req.params.floor_id : "";
     const { floor_number, floor_plan_image } = req.body;
     if (!isUUID(floor_id)) return res.status(400).json({ message: "floor_id must be a valid UUID" });
     const values: { floor_number?: number; floor_plan_image?: string | null } = {};
@@ -107,9 +109,9 @@ router.put("/:floor_id", async (req, res) => {
   }
 });
 
-router.delete("/:floor_id", async (req, res) => {
+router.delete("/:floor_id", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
   try {
-    const { floor_id } = req.params;
+    const floor_id = typeof req.params.floor_id === "string" ? req.params.floor_id : "";
     if (!isUUID(floor_id)) return res.status(400).json({ message: "floor_id must be a valid UUID" });
     const [floor] = await dbClient.delete(Floors).where(eq(Floors.floor_id, floor_id)).returning();
     if (!floor) return res.status(404).json({ message: "Floor not found" });
