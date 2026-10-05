@@ -63,13 +63,15 @@
 
 - `pnpm build` ผ่านเมื่อวันที่ 5 ตุลาคม 2026
 - โค้ด route, schema, migration และเอกสารทั้ง 4 ไฟล์ถูกเทียบกันแล้ว
-- รัน Bruno ครบ 79 คำขอแล้ว ทั้ง Auth, Role, Buildings, Floors, Places,
+- รัน Bruno ครบ 90 คำขอแล้ว ทั้ง Auth, Role, Buildings, Floors, Places,
   Map Verification และ Place Keywords
 - ทดสอบ session cookie, logout และกรณีไม่มี session ผ่านครบ 3 คำขอ
 - ทดสอบเพิ่ม อ่าน และลบ URL รูปสถานที่ผ่านครบ 3 คำขอ
 - ทดสอบ Favorites ผ่านครบ 6 คำขอ รวมกรณีไม่ login, กดซ้ำ และไม่พบข้อมูล
 - ทดสอบ Reviews และ Review Likes ผ่านครบ 10 คำขอ
 - ทดสอบ Reports และสิทธิ์ USER/ADMIN ผ่านครบ 8 คำขอ
+- ทดสอบสิทธิ์แบบละเอียดผ่านครบ 11 คำขอ รวมเจ้าของ Review, ADMIN,
+  DEVELOPER, UUID/body ผิด และ token ไม่ถูกต้อง
 - หลังจบการทดสอบ `/health/database` ยังมี 2 อาคาร 4 ชั้น 78 สถานที่ และ 1 ผู้ใช้
 - แก้ `seedFloorId` และ `seedPlaceId` ใน environment `Local` ให้ตรงกับข้อมูลแผนที่
 

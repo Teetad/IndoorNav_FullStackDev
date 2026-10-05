@@ -1,0 +1,25 @@
+meta {
+  name: 08 Missing Report Description
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/places/{{seedPlaceId}}/reports
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+body:json {
+  {}
+}
+
+tests {
+  test("ไม่ส่ง description ได้ 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

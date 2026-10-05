@@ -1,0 +1,28 @@
+meta {
+  name: 04 Create Report As User
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/places/{{seedPlaceId}}/reports
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+body:json {
+  {
+    "description": "Report สำหรับทดสอบสิทธิ์"
+  }
+}
+
+tests {
+  test("User สร้าง Report สำหรับทดสอบได้", function () {
+    expect(res.getStatus()).to.equal(201);
+    bru.setVar("permissionReportId", res.getBody().report_id);
+  });
+}

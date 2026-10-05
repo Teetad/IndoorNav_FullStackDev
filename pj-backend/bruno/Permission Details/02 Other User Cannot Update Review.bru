@@ -1,0 +1,27 @@
+meta {
+  name: 02 Other User Cannot Update Review
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/reviews/{{permissionReviewId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{otherUserToken}}
+}
+
+body:json {
+  {
+    "rating": 1
+  }
+}
+
+tests {
+  test("User แก้ Review ของคนอื่นไม่ได้", function () {
+    expect(res.getStatus()).to.equal(403);
+  });
+}

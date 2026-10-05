@@ -44,6 +44,14 @@ pnpm dev
 
 หลังทดสอบให้เปลี่ยน Header กลับเป็น `Bearer {{sessionToken}}` และอย่า commit token
 
+ชุด `Permission Details` ใช้ token เพิ่มอีก 3 ค่าใน Environment `Local`:
+
+- `otherUserToken` คือ token ของ User คนที่สอง ใช้ทดสอบการแก้ Review ของคนอื่น
+- `adminToken` คือ token ที่มี role `ADMIN`
+- `developerToken` คือ token ที่มี role `DEVELOPER`
+
+ค่าเหล่านี้เป็น secret variable และต้องไม่ใส่ token จริงลง Git
+
 ## API สำหรับ Frontend
 
 | Method | Path | หน้าที่ |

@@ -1,0 +1,21 @@
+meta {
+  name: 11 Admin Deletes Report
+  type: http
+  seq: 11
+}
+
+delete {
+  url: {{baseUrl}}/reports/{{permissionReportId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{adminToken}}
+}
+
+tests {
+  test("Admin ลบ Report ทดสอบได้", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

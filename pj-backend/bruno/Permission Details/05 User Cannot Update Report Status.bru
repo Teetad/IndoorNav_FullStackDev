@@ -1,0 +1,27 @@
+meta {
+  name: 05 User Cannot Update Report Status
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/reports/{{permissionReportId}}/status
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+body:json {
+  {
+    "status": "RESOLVED"
+  }
+}
+
+tests {
+  test("USER เปลี่ยนสถานะ Report ไม่ได้", function () {
+    expect(res.getStatus()).to.equal(403);
+  });
+}
