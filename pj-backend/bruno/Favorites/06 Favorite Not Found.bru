@@ -1,0 +1,21 @@
+meta {
+  name: 06 Favorite Not Found
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/favorites/{{seedPlaceId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("ลบ Favorite ที่ไม่มีแล้วได้ 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

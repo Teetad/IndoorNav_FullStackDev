@@ -1,0 +1,22 @@
+meta {
+  name: 03 Add Duplicate Favorite
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/favorites/{{seedPlaceId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("กด Favorite ห้องเดิมซ้ำแล้วไม่เพิ่มแถวใหม่", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().message).to.equal("Place is already in favorites");
+  });
+}

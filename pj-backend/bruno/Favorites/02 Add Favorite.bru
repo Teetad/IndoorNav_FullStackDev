@@ -1,0 +1,22 @@
+meta {
+  name: 02 Add Favorite
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/favorites/{{seedPlaceId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("เพิ่ม Favorite ได้", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().place_id).to.equal(bru.getEnvVar("seedPlaceId"));
+  });
+}

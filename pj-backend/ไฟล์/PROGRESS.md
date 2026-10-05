@@ -6,14 +6,15 @@
 
 | ส่วน | สถานะ |
 |---|---|
-| Express API | มี route ระบบ, Auth, Buildings, Floors, Places และ Place Keywords |
-| Database schema | มี 6 ตาราง รวม `place_images` สำหรับรูปหลายรูปต่อสถานที่ |
+| Express API | มี route ระบบ, Auth, Buildings, Floors, Places, Keywords, Images และ Favorites |
+| Database schema | มี 7 ตาราง รวม `place_images` และ `favorites` |
 | Places | อ่าน เพิ่ม แก้ ลบ ค้นชื่อ/เลขห้อง/keyword และกรองอาคาร ชั้น ประเภทได้ |
 | Place Types | มีรายการค่าที่ API ยอมรับ 11 ประเภท; ใช้ `null` ได้เมื่อยังไม่ทราบ |
 | Place Keywords | อ่าน เพิ่ม ลบ และใช้ค้นหาสถานที่ได้ |
+| Favorites | ผู้ใช้ที่ login เพิ่ม อ่าน และลบ Favorite ของตัวเองได้ |
 | ข้อมูลแผนที่ | มีชุดข้อมูลอาคาร 30 ปี ชั้น 4–7 รวม 78 สถานที่ |
 | Map import | preview ได้โดยไม่ต่อ DB และใช้ `--apply` เพื่อนำเข้าแบบ transaction |
-| Bruno | มีคำขอสำหรับ Buildings, Floors, Places, Map Verification, Keywords และ Role |
+| Bruno | มีคำขอสำหรับ Buildings, Floors, Places, Map Verification, Keywords, Images, Role และ Favorites |
 | Authentication | มี CPE OAuth, HttpOnly session cookie, Bearer token, `/auth/me` และ logout |
 | Role | route เพิ่ม แก้ และลบข้อมูลตรวจ `USER`/`ADMIN`/`DEVELOPER` แล้ว |
 | Navigation / A* | ยังไม่ได้พัฒนาใน `pj-backend` และยังไม่มีพิกัดนำทางใน schema |
@@ -36,6 +37,7 @@
 - OAuth callback เก็บ session cookie และกลับไปหน้า Frontend แล้ว
 - ใช้ `/auth/login?mode=json` เมื่อต้องการ Bearer token สำหรับ Bruno
 - migration `0005` เพิ่มตาราง `place_images` และมี API เพิ่ม อ่าน ลบ URL รูป
+- migration `0006` เพิ่มตาราง `favorites` และมี API เพิ่ม อ่าน ลบ Favorite ของผู้ใช้
 
 ## ชุดข้อมูลอาคาร 30 ปี
 
@@ -54,12 +56,13 @@
 
 ## ผลตรวจล่าสุด
 
-- `pnpm build` ผ่านเมื่อวันที่ 4 ตุลาคม 2026
+- `pnpm build` ผ่านเมื่อวันที่ 5 ตุลาคม 2026
 - โค้ด route, schema, migration และเอกสารทั้ง 4 ไฟล์ถูกเทียบกันแล้ว
-- รัน Bruno ครบ 55 คำขอแล้ว ทั้ง Auth, Role, Buildings, Floors, Places,
+- รัน Bruno ครบ 61 คำขอแล้ว ทั้ง Auth, Role, Buildings, Floors, Places,
   Map Verification และ Place Keywords
 - ทดสอบ session cookie, logout และกรณีไม่มี session ผ่านครบ 3 คำขอ
 - ทดสอบเพิ่ม อ่าน และลบ URL รูปสถานที่ผ่านครบ 3 คำขอ
+- ทดสอบ Favorites ผ่านครบ 6 คำขอ รวมกรณีไม่ login, กดซ้ำ และไม่พบข้อมูล
 - หลังจบการทดสอบ `/health/database` ยังมี 2 อาคาร 4 ชั้น 78 สถานที่ และ 1 ผู้ใช้
 - แก้ `seedFloorId` และ `seedPlaceId` ใน environment `Local` ให้ตรงกับข้อมูลแผนที่
 
@@ -111,7 +114,6 @@ GET http://localhost:3000/auth/login
 ### ฟีเจอร์ที่ยังไม่ได้ทำ
 
 - Review และ Like Review
-- Favorite ของแต่ละ User
 - Report และการเปลี่ยนสถานะโดย Admin
 
 ### Navigation ทำทีหลัง

@@ -13,7 +13,7 @@
 | Method | Endpoint | ผลลัพธ์เมื่อสำเร็จ |
 |---|---|---|
 | GET | `/` | ข้อความยืนยันว่า Backend ทำงาน (`200`) |
-| GET | `/health/database` | จำนวนข้อมูลใน `buildings`, `floors`, `places`, `users` (`200`) |
+| GET | `/health/database` | จำนวนข้อมูลใน `buildings`, `floors`, `places`, `users`, `favorites` (`200`) |
 
 `/health/database` ตอบ `500` เมื่ออ่านฐานข้อมูลไม่ได้ และยังไม่นับ
 `place_keywords` ใน `tableCounts`
@@ -179,6 +179,19 @@ Body สำหรับเพิ่มรูป:
 
 API นี้เก็บ URL ของรูป ยังไม่ได้รับไฟล์รูปภาพโดยตรง
 
+## Favorites
+
+ทุก endpoint ในส่วนนี้ต้อง login ก่อน ระบบจะใช้ User จาก session token โดยตรง
+
+| Method | Endpoint | รายละเอียด |
+|---|---|---|
+| GET | `/favorites` | อ่าน Favorite ของผู้ใช้ที่ login พร้อมข้อมูลสถานที่ ชั้น และอาคาร |
+| POST | `/favorites/:place_id` | เพิ่มสถานที่เป็น Favorite และเพิ่ม `favCount` |
+| DELETE | `/favorites/:place_id` | ลบ Favorite และลด `favCount` |
+
+ผู้ใช้หนึ่งคนกดสถานที่เดิมซ้ำไม่ได้ ถ้ากดซ้ำ API จะตอบ `200`
+และไม่เพิ่มจำนวน Favorite ซ้ำ
+
 ## HTTP Status ที่ใช้อยู่
 
 | Status | ความหมายในโค้ดปัจจุบัน |
@@ -197,7 +210,6 @@ API นี้เก็บ URL ของรูป ยังไม่ได้ร�
 ## API ที่ยังไม่มี
 
 - Reviews และ Review Likes
-- Favorites ของแต่ละ User ตอนนี้มีแค่ `fav_count` ของเดิม
 - Reports, My Reports และการแก้สถานะ Report
 - Navigation, Navigation Nodes และ Navigation Edges
 - API อัปโหลดไฟล์รูปภาพไปยังที่เก็บไฟล์

@@ -74,6 +74,24 @@ export const PlaceImages = pgTable(
   ],
 );
 
+// ตารางเชื่อม User กับสถานที่ที่กด Favorite
+export const Favorites = pgTable(
+  "favorites",
+  {
+    favorite_id: uuid("favorite_id").primaryKey().defaultRandom(),
+    user_id: uuid("user_id")
+      .references(() => Users.user_id, { onDelete: "cascade" })
+      .notNull(),
+    place_id: uuid("place_id")
+      .references(() => Places.place_id, { onDelete: "cascade" })
+      .notNull(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("favorites_user_place_unique").on(table.user_id, table.place_id),
+  ],
+);
+
 // หนึ่งสถานที่มีได้หลายคำค้น; ลบสถานที่แล้วคำค้นถูกลบตามด้วย
 export const PlaceKeywords = pgTable(
   "place_keywords",
