@@ -1,0 +1,30 @@
+meta {
+  name: 02 Create Review
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/places/{{seedPlaceId}}/reviews
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+body:json {
+  {
+    "rating": 4,
+    "comment": "รีวิวสำหรับทดสอบ Bruno"
+  }
+}
+
+tests {
+  test("เพิ่มรีวิวได้", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().rating).to.equal(4);
+    bru.setVar("testReviewId", res.getBody().review_id);
+  });
+}

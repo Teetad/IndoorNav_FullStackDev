@@ -1,0 +1,30 @@
+meta {
+  name: 05 Update Review
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/reviews/{{testReviewId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+body:json {
+  {
+    "rating": 5,
+    "comment": "แก้ไขรีวิวแล้ว"
+  }
+}
+
+tests {
+  test("เจ้าของแก้รีวิวตัวเองได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().rating).to.equal(5);
+    expect(res.getBody().comment).to.equal("แก้ไขรีวิวแล้ว");
+  });
+}

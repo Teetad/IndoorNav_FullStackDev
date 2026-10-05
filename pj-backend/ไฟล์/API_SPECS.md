@@ -13,7 +13,7 @@
 | Method | Endpoint | ผลลัพธ์เมื่อสำเร็จ |
 |---|---|---|
 | GET | `/` | ข้อความยืนยันว่า Backend ทำงาน (`200`) |
-| GET | `/health/database` | จำนวนข้อมูลใน `buildings`, `floors`, `places`, `users`, `favorites` (`200`) |
+| GET | `/health/database` | จำนวนข้อมูลหลัก รวม Reviews และ Review Likes (`200`) |
 
 `/health/database` ตอบ `500` เมื่ออ่านฐานข้อมูลไม่ได้ และยังไม่นับ
 `place_keywords` ใน `tableCounts`
@@ -192,6 +192,20 @@ API นี้เก็บ URL ของรูป ยังไม่ได้ร�
 ผู้ใช้หนึ่งคนกดสถานที่เดิมซ้ำไม่ได้ ถ้ากดซ้ำ API จะตอบ `200`
 และไม่เพิ่มจำนวน Favorite ซ้ำ
 
+## Reviews และ Review Likes
+
+| Method | Endpoint | รายละเอียด |
+|---|---|---|
+| GET | `/places/:place_id/reviews` | อ่านรีวิวของสถานที่ ทุกคนเรียกได้ |
+| POST | `/places/:place_id/reviews` | User ที่ login เพิ่มรีวิว |
+| PUT | `/reviews/:review_id` | เจ้าของแก้รีวิวของตัวเอง |
+| DELETE | `/reviews/:review_id` | เจ้าของหรือ Admin ลบรีวิว |
+| POST | `/reviews/:review_id/likes` | กด Like รีวิว |
+| DELETE | `/reviews/:review_id/likes` | ยกเลิก Like รีวิว |
+
+คะแนนต้องเป็นจำนวนเต็ม 1–5 และข้อความยาวได้ไม่เกิน 500 ตัวอักษร
+ผู้ใช้หนึ่งคนเขียนได้หนึ่งรีวิวต่อสถานที่ และกด Like รีวิวเดิมได้หนึ่งครั้ง
+
 ## HTTP Status ที่ใช้อยู่
 
 | Status | ความหมายในโค้ดปัจจุบัน |
@@ -209,7 +223,6 @@ API นี้เก็บ URL ของรูป ยังไม่ได้ร�
 
 ## API ที่ยังไม่มี
 
-- Reviews และ Review Likes
 - Reports, My Reports และการแก้สถานะ Report
 - Navigation, Navigation Nodes และ Navigation Edges
 - API อัปโหลดไฟล์รูปภาพไปยังที่เก็บไฟล์

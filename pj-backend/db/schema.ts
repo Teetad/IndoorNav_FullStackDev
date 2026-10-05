@@ -92,6 +92,46 @@ export const Favorites = pgTable(
   ],
 );
 
+// รีวิวสถานที่ ผู้ใช้หนึ่งคนเขียนได้หนึ่งรีวิวต่อสถานที่
+export const Reviews = pgTable(
+  "reviews",
+  {
+    review_id: uuid("review_id").primaryKey().defaultRandom(),
+    user_id: uuid("user_id")
+      .references(() => Users.user_id, { onDelete: "cascade" })
+      .notNull(),
+    place_id: uuid("place_id")
+      .references(() => Places.place_id, { onDelete: "cascade" })
+      .notNull(),
+    rating: integer("rating").notNull(),
+    comment: varchar("comment", { length: 500 }),
+    like_count: integer("like_count").default(0).notNull(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("reviews_user_place_unique").on(table.user_id, table.place_id),
+  ],
+);
+
+// เก็บว่า User คนไหนกด Like รีวิวใด
+export const ReviewLikes = pgTable(
+  "review_likes",
+  {
+    review_like_id: uuid("review_like_id").primaryKey().defaultRandom(),
+    user_id: uuid("user_id")
+      .references(() => Users.user_id, { onDelete: "cascade" })
+      .notNull(),
+    review_id: uuid("review_id")
+      .references(() => Reviews.review_id, { onDelete: "cascade" })
+      .notNull(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("review_likes_user_review_unique").on(table.user_id, table.review_id),
+  ],
+);
+
 // หนึ่งสถานที่มีได้หลายคำค้น; ลบสถานที่แล้วคำค้นถูกลบตามด้วย
 export const PlaceKeywords = pgTable(
   "place_keywords",

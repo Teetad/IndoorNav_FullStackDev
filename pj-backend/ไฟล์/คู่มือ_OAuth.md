@@ -57,6 +57,11 @@ pnpm dev
 | `GET` | `/favorites` | อ่าน Favorite ของผู้ใช้ที่ Login |
 | `POST` | `/favorites/:place_id` | เพิ่ม Favorite |
 | `DELETE` | `/favorites/:place_id` | ลบ Favorite |
+| `POST` | `/places/:place_id/reviews` | เพิ่ม Review |
+| `PUT` | `/reviews/:review_id` | แก้ Review ของตัวเอง |
+| `DELETE` | `/reviews/:review_id` | ลบ Review ของตัวเอง |
+| `POST` | `/reviews/:review_id/likes` | กด Like Review |
+| `DELETE` | `/reviews/:review_id/likes` | ยกเลิก Like Review |
 
 API ที่ต้อง Login ใช้ Header:
 
