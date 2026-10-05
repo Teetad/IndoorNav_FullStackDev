@@ -3,10 +3,15 @@ import { type UserRole } from "./config.js";
 import { verifySessionToken } from "./tokens.js";
 
 export const requireAuth: RequestHandler = async (req, res, next) => {
-  // อ่าน token จาก header รูปแบบ Authorization: Bearer <token>
+  // Bruno ใช้ Bearer token ส่วน Frontend ใช้ session cookie
   const authorization = req.header("authorization");
-  const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : null;
-  if (!token) return res.status(401).json({ message: "Bearer token is required" });
+  const bearerToken = authorization?.startsWith("Bearer ") ? authorization.slice(7) : null;
+  const cookieToken = req.header("cookie")?.split(";")
+    .map(value => value.trim())
+    .find(value => value.startsWith("session_token="))
+    ?.slice("session_token=".length);
+  const token = bearerToken || (cookieToken ? decodeURIComponent(cookieToken) : null);
+  if (!token) return res.status(401).json({ message: "Session token is required" });
 
   try {
     // ถ้า token ถูกต้อง เก็บข้อมูลผู้ใช้ไว้ให้ route ถัดไปใช้

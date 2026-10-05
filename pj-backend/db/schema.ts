@@ -57,6 +57,41 @@ export const Places = pgTable("places", {
   favCount: integer("fav_count").default(0).notNull(),
 });
 
+// หนึ่งสถานที่มีรูปได้หลายรูป เรียงด้วย display_order
+export const PlaceImages = pgTable(
+  "place_images",
+  {
+    image_id: uuid("image_id").primaryKey().defaultRandom(),
+    place_id: uuid("place_id")
+      .references(() => Places.place_id, { onDelete: "cascade" })
+      .notNull(),
+    image_url: varchar("image_url", { length: 500 }).notNull(),
+    caption: varchar("caption", { length: 200 }),
+    display_order: integer("display_order").default(0).notNull(),
+  },
+  (table) => [
+    uniqueIndex("place_images_place_url_unique").on(table.place_id, table.image_url),
+  ],
+);
+
+// ตารางเชื่อม User กับสถานที่ที่กด Favorite
+export const Favorites = pgTable(
+  "favorites",
+  {
+    favorite_id: uuid("favorite_id").primaryKey().defaultRandom(),
+    user_id: uuid("user_id")
+      .references(() => Users.user_id, { onDelete: "cascade" })
+      .notNull(),
+    place_id: uuid("place_id")
+      .references(() => Places.place_id, { onDelete: "cascade" })
+      .notNull(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("favorites_user_place_unique").on(table.user_id, table.place_id),
+  ],
+);
+
 // หนึ่งสถานที่มีได้หลายคำค้น; ลบสถานที่แล้วคำค้นถูกลบตามด้วย
 export const PlaceKeywords = pgTable(
   "place_keywords",

@@ -1,0 +1,35 @@
+meta {
+  name: 01 Add Image
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/places/{{mapPlaceId}}/images
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+script:pre-request {
+  bru.setVar("testImageUrl", "https://example.com/place-" + Date.now() + ".jpg");
+}
+
+body:json {
+  {
+    "image_url": "{{testImageUrl}}",
+    "caption": "รูปสำหรับทดสอบ Bruno",
+    "display_order": 1
+  }
+}
+
+tests {
+  test("เพิ่มรูปสถานที่ได้", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().image_url).to.equal(bru.getVar("testImageUrl"));
+    bru.setVar("testImageId", res.getBody().image_id);
+  });
+}

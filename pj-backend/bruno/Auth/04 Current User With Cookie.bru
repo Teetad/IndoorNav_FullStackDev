@@ -1,0 +1,24 @@
+meta {
+  name: 04 Current User With Cookie
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/auth/me
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: session_token={{sessionToken}}
+}
+
+tests {
+  test("อ่านข้อมูลผู้ใช้จาก cookie ได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("user_id");
+    expect(res.getBody()).to.have.property("email");
+    expect(res.getBody()).to.have.property("role");
+  });
+}

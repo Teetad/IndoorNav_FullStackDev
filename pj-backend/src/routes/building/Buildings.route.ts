@@ -3,6 +3,7 @@ import { Buildings } from "@db/schema.js";
 import { eq } from "drizzle-orm";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
+import { requireAuth, requireRole } from "../../auth/middleware.js";
 
 const router = Router();
 
@@ -17,7 +18,7 @@ router.get("/", async (_req, res) => {
 
 router.get("/:building_id", async (req, res) => {
   try {
-    const { building_id } = req.params;
+    const building_id = typeof req.params.building_id === "string" ? req.params.building_id : "";
 
     // ตรวจสอบว่า building_id เป็น UUID ที่ถูกต้อง
     if (!isUUID(building_id)) {
@@ -33,7 +34,8 @@ router.get("/:building_id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+// การเพิ่มและลบอาคารเป็นงานของ Developer
+router.post("/", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
   try {
     const { building_name, description } = req.body;
 
@@ -65,9 +67,9 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/:building_id", async (req, res) => {
+router.delete("/:building_id", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
   try {
-    const { building_id } = req.params;
+    const building_id = typeof req.params.building_id === "string" ? req.params.building_id : "";
     if (!isUUID(building_id)) {
       return res.status(400).json({ message: "building_id must be a valid UUID" });
     }

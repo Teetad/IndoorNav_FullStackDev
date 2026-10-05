@@ -36,6 +36,20 @@
       "when": 1790661730497,
       "tag": "0004_good_nico_minoru",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791174593598,
+      "tag": "0005_woozy_risque",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791175773990,
+      "tag": "0006_spicy_medusa",
+      "breakpoints": true
     }
   ]
 }

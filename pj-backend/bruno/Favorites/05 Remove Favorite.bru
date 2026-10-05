@@ -1,0 +1,22 @@
+meta {
+  name: 05 Remove Favorite
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/favorites/{{seedPlaceId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("ลบ Favorite ได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.place_id).to.equal(bru.getEnvVar("seedPlaceId"));
+  });
+}
