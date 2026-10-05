@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Info, Navigation, Bookmark } from "lucide-react"; // 📌 นำเข้าไอคอนจาก lucide-react
+import { Info, Navigation, Bookmark } from "lucide-react";
+import { useNavigate } from "react-router-dom"; // 📌 1. นำเข้า useNavigate สำหรับเปลี่ยนหน้า
 
 interface ShowRoomProps {
   placeId: string | null; 
@@ -7,6 +8,7 @@ interface ShowRoomProps {
 }
 
 const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
+  const navigate = useNavigate(); // 📌 2. ประกาศตัวแปรใช้งาน
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   
@@ -66,8 +68,9 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
 
   return (
     <div 
-    onTouchMove={(e) => e.preventDefault()}
-    className="fixed inset-0 z-50 flex items-center justify-center pt-8 bg-black/30 backdrop-blur-xs transition-opacity overscroll-none">
+      onTouchMove={(e) => e.preventDefault()}
+      className="fixed inset-0 z-50 flex items-center justify-center pt-8 bg-black/30 backdrop-blur-xs transition-opacity overscroll-none"
+    >
       
       {/* กล่อง Bottom Sheet หลัก */}
       <div 
@@ -95,14 +98,23 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
             <div className="text-center py-8 text-stone-600 text-xs">Loading room details...</div>
           ) : (
             <>
-              {/* 📌 ปุ่ม Action เปลี่ยนมาใช้ Lucide Icons แทนอีโมจิ */}
+              {/* ปุ่ม Action */}
               <div className="flex gap-2 flex-wrap">
                 <button className="flex items-center gap-1.5 px-3.5 py-2 bg-[#8E796E] text-white rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer">
                   <Info className="w-4 h-4" /> Information
                 </button>
-                <button className="flex items-center gap-1.5 px-3.5 py-2 bg-[#E6DFD5] text-stone-800 rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer">
+
+                {/* 📌 3. ผูกปุ่ม Start ให้สั่ง navigate ไปหน้า StartNavigation พร้อมแนบชื่อห้องผ่าน Query Parameter */}
+                <button 
+                  onClick={() => {
+                    const roomName = roomDetail?.place_name || "Unknown";
+                    navigate(`/start-navigation?room=${encodeURIComponent(roomName)}`);
+                  }}
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-[#E6DFD5] text-stone-800 rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer"
+                >
                   <Navigation className="w-4 h-4" /> Start
                 </button>
+
                 <button className="flex items-center gap-1.5 px-3.5 py-2 bg-[#E6DFD5] text-stone-800 rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer">
                   <Bookmark className="w-4 h-4" /> Save
                 </button>
