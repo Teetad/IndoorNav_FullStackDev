@@ -1,0 +1,27 @@
+meta {
+  name: 09 Invalid Report UUID
+  type: http
+  seq: 9
+}
+
+put {
+  url: {{baseUrl}}/reports/not-a-uuid/status
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{adminToken}}
+}
+
+body:json {
+  {
+    "status": "RESOLVED"
+  }
+}
+
+tests {
+  test("report_id ไม่ใช่ UUID ได้ 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

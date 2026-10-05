@@ -2,7 +2,7 @@ import { dbClient } from "@db/client.js";
 import { Users } from "@db/schema.js";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
-import { Router, type Response } from "express";
+import { Router, type Request, type Response } from "express";
 import { getAssignedRole, getOAuthConfig, type UserRole } from "../../auth/config.js";
 import { requireAuth, requireRole } from "../../auth/middleware.js";
 import { createSessionToken } from "../../auth/tokens.js";
@@ -15,6 +15,17 @@ type OAuthUserInfo = {
   name?: unknown;
   preferred_username?: unknown;
 };
+
+// อ่านค่า cookie ตามชื่อ เช่น oauth_state หรือ oauth_mode
+function readCookie(req: Request, name: string): string | null {
+  const cookie = req.header("cookie")
+    ?.split(";")
+    .map(value => value.trim())
+    .find(value => value.startsWith(`${name}=`));
+
+  if (!cookie) return null;
+  return decodeURIComponent(cookie.slice(name.length + 1));
+}
 
 // ส่งข้อความกลางเมื่อ OAuth หรือการตั้งค่ามีปัญหา โดยไม่ส่ง secret กลับไป
 function oauthError(res: Response, error: unknown) {
@@ -68,15 +79,9 @@ router.get("/callback", async (req, res) => {
     if (!code || !state) return res.status(400).json({ message: "code and state are required" });
 
     // อ่าน state ที่เราเคยเก็บใน cookie ตอนเริ่ม login
-    const stateCookie = req.header("cookie")?.split(";")
-      .map(value => value.trim())
-      .find(value => value.startsWith("oauth_state="))
-      ?.slice("oauth_state=".length);
-    const oauthMode = req.header("cookie")?.split(";")
-      .map(value => value.trim())
-      .find(value => value.startsWith("oauth_mode="))
-      ?.slice("oauth_mode=".length);
-    if (!stateCookie || decodeURIComponent(stateCookie) !== state) {
+    const stateCookie = readCookie(req, "oauth_state");
+    const oauthMode = readCookie(req, "oauth_mode");
+    if (stateCookie !== state) {
       return res.status(400).json({ message: "OAuth state does not match this browser" });
     }
     // state ใช้ครั้งเดียว หลังตรวจแล้วจึงลบ cookie
@@ -112,11 +117,12 @@ router.get("/callback", async (req, res) => {
 
     // ทำ email เป็นตัวพิมพ์เล็กเพื่อป้องกันข้อมูลคนเดียวกันซ้ำเพราะตัวพิมพ์
     const email = userInfo.email.trim().toLowerCase();
-    const displayName = typeof userInfo.name === "string"
-      ? userInfo.name.trim()
-      : typeof userInfo.preferred_username === "string"
-        ? userInfo.preferred_username.trim()
-        : null;
+    let displayName: string | null = null;
+    if (typeof userInfo.name === "string") {
+      displayName = userInfo.name.trim();
+    } else if (typeof userInfo.preferred_username === "string") {
+      displayName = userInfo.preferred_username.trim();
+    }
     // ค้นว่าผู้ใช้ OAuth คนนี้เคย login และมีข้อมูลในฐานข้อมูลหรือยัง
     const [existing] = await dbClient.select().from(Users)
       .where(eq(Users.oauth_subject, userInfo.sub));
@@ -124,20 +130,23 @@ router.get("/callback", async (req, res) => {
     const savedRole = existing?.role as UserRole | undefined;
     const role = getAssignedRole(email) ?? savedRole ?? "USER";
     // เคย login แล้วให้อัปเดตข้อมูล ถ้ายังไม่เคยให้สร้าง User ใหม่
-    const [user] = existing
-      ? await dbClient.update(Users).set({
-          oauth_subject: userInfo.sub,
-          email,
-          display_name: displayName || null,
-          role,
-          updated_at: new Date(),
-        }).where(eq(Users.user_id, existing.user_id)).returning()
-      : await dbClient.insert(Users).values({
-          oauth_subject: userInfo.sub,
-          email,
-          display_name: displayName || null,
-          role,
-        }).returning();
+    let user;
+    if (existing) {
+      [user] = await dbClient.update(Users).set({
+        oauth_subject: userInfo.sub,
+        email,
+        display_name: displayName || null,
+        role,
+        updated_at: new Date(),
+      }).where(eq(Users.user_id, existing.user_id)).returning();
+    } else {
+      [user] = await dbClient.insert(Users).values({
+        oauth_subject: userInfo.sub,
+        email,
+        display_name: displayName || null,
+        role,
+      }).returning();
+    }
     if (!user || !["USER", "ADMIN", "DEVELOPER"].includes(user.role)) {
       throw new Error("Unable to resolve user role");
     }

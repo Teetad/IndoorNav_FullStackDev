@@ -1,5 +1,5 @@
 // นำเข้าข้อมูลแผนที่: ใช้ --apply เพื่อบันทึกจริง
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { v5 as uuidv5 } from "uuid";
 import { building30, mapFloors } from "./data/building30.js";
 import { Buildings, Floors, Places } from "./schema.js";
@@ -17,8 +17,6 @@ if (args.includes("--apply")) {
   try {
     // บันทึกทั้งชุด ถ้าผิดพลาดให้ยกเลิกทั้งหมด
     const result = await dbClient.transaction(async tx => {
-      // ให้การนำเข้าที่ใช้ล็อกเดียวกันรอคิว
-      await tx.execute(sql`select pg_advisory_xact_lock(302028)`);
       // ค้นหาอาคารเดิม 🏢
       const candidates = await tx.select().from(Buildings).where(or(
         eq(Buildings.building_name, building30.name),

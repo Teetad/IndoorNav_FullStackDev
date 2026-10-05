@@ -1,0 +1,19 @@
+meta {
+  name: 08 Check Like Count
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/places/{{seedPlaceId}}/reviews
+  body: none
+  auth: none
+}
+
+tests {
+  test("จำนวน Like เพิ่มเพียงหนึ่งครั้ง", function () {
+    expect(res.getStatus()).to.equal(200);
+    const review = res.getBody().find(row => row.review_id === bru.getVar("testReviewId"));
+    expect(review.like_count).to.equal(1);
+  });
+}

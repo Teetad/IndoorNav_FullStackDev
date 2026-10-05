@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { dbClient } from "@db/client.js";
-import { Buildings, Favorites, Floors, Places, Users } from "@db/schema.js";
+import { Buildings, Favorites, Floors, Places, Reports, ReviewLikes, Reviews, Users } from "@db/schema.js";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
@@ -10,6 +10,8 @@ import buildingRouter from "./routes/building/Buildings.route.js";
 import floorRouter from "./routes/building/Floors.route.js";
 import placeRouter from "./routes/building/Places.route.js";
 import favoriteRouter from "./routes/user/Favorites.route.js";
+import reviewRouter from "./routes/user/Reviews.route.js";
+import reportRouter from "./routes/user/Reports.route.js";
 
 // app คือจุดรับ HTTP request ก่อนส่งต่อให้ route ของแต่ละหมวด
 const app = express();
@@ -26,12 +28,15 @@ app.get("/", (_req, res) => res.status(200).json({ message: "Indoor Navigation B
 
 app.get("/health/database", async (_req, res) => {
   try {
-    const [buildings, floors, places, users, favorites] = await Promise.all([
+    const [buildings, floors, places, users, favorites, reviews, reviewLikes, reports] = await Promise.all([
       dbClient.select().from(Buildings),
       dbClient.select().from(Floors),
       dbClient.select().from(Places),
       dbClient.select().from(Users),
       dbClient.select().from(Favorites),
+      dbClient.select().from(Reviews),
+      dbClient.select().from(ReviewLikes),
+      dbClient.select().from(Reports),
     ]);
     return res.status(200).json({
       message: "Database connection is working",
@@ -41,6 +46,9 @@ app.get("/health/database", async (_req, res) => {
         places: places.length,
         users: users.length,
         favorites: favorites.length,
+        reviews: reviews.length,
+        reviewLikes: reviewLikes.length,
+        reports: reports.length,
       },
     });
   } catch (error) {
@@ -54,6 +62,8 @@ app.use("/buildings", buildingRouter);
 app.use("/floors", floorRouter);
 app.use("/places", placeRouter);
 app.use("/favorites", favoriteRouter);
+app.use(reviewRouter);
+app.use(reportRouter);
 // เช่น GET /auth/login และ GET /auth/me จะถูกส่งไป Auth.route.ts
 app.use("/auth", authRouter);
 

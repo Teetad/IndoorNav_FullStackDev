@@ -44,6 +44,14 @@ pnpm dev
 
 หลังทดสอบให้เปลี่ยน Header กลับเป็น `Bearer {{sessionToken}}` และอย่า commit token
 
+ชุด `Permission Details` ใช้ token เพิ่มอีก 3 ค่าใน Environment `Local`:
+
+- `otherUserToken` คือ token ของ User คนที่สอง ใช้ทดสอบการแก้ Review ของคนอื่น
+- `adminToken` คือ token ที่มี role `ADMIN`
+- `developerToken` คือ token ที่มี role `DEVELOPER`
+
+ค่าเหล่านี้เป็น secret variable และต้องไม่ใส่ token จริงลง Git
+
 ## API สำหรับ Frontend
 
 | Method | Path | หน้าที่ |
@@ -57,6 +65,15 @@ pnpm dev
 | `GET` | `/favorites` | อ่าน Favorite ของผู้ใช้ที่ Login |
 | `POST` | `/favorites/:place_id` | เพิ่ม Favorite |
 | `DELETE` | `/favorites/:place_id` | ลบ Favorite |
+| `POST` | `/places/:place_id/reviews` | เพิ่ม Review |
+| `PUT` | `/reviews/:review_id` | แก้ Review ของตัวเอง |
+| `DELETE` | `/reviews/:review_id` | ลบ Review ของตัวเอง |
+| `POST` | `/reviews/:review_id/likes` | กด Like Review |
+| `DELETE` | `/reviews/:review_id/likes` | ยกเลิก Like Review |
+| `POST` | `/places/:place_id/reports` | User แจ้งปัญหาสถานที่ |
+| `GET` | `/reports/me` | User ดู Report ของตัวเอง |
+| `GET` | `/reports` | Admin ดู Report ทั้งหมด |
+| `PUT` | `/reports/:report_id/status` | Admin เปลี่ยนสถานะ |
 
 API ที่ต้อง Login ใช้ Header:
 

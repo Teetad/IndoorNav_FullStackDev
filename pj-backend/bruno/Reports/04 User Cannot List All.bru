@@ -1,0 +1,21 @@
+meta {
+  name: 04 User Cannot List All
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/reports
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("USER ดู Report ทั้งหมดไม่ได้", function () {
+    expect(res.getStatus()).to.equal(403);
+  });
+}

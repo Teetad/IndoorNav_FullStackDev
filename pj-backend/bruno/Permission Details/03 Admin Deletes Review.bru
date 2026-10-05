@@ -1,0 +1,21 @@
+meta {
+  name: 03 Admin Deletes Review
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/reviews/{{permissionReviewId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{adminToken}}
+}
+
+tests {
+  test("Admin ลบ Review ของคนอื่นได้", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
