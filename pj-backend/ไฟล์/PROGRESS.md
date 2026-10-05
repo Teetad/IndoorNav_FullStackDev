@@ -6,14 +6,15 @@
 
 | ส่วน | สถานะ |
 |---|---|
-| Express API | มี route ระบบ, Auth, Places, Favorites, Reviews และ Review Likes |
-| Database schema | มี 9 ตาราง รวม `reviews` และ `review_likes` |
+| Express API | มี route ระบบ, Auth, Places, Favorites, Reviews, Likes และ Reports |
+| Database schema | มี 10 ตาราง รวม `reviews`, `review_likes` และ `reports` |
 | Places | อ่าน เพิ่ม แก้ ลบ ค้นชื่อ/เลขห้อง/keyword และกรองอาคาร ชั้น ประเภทได้ |
 | Place Types | มีรายการค่าที่ API ยอมรับ 11 ประเภท; ใช้ `null` ได้เมื่อยังไม่ทราบ |
 | Place Keywords | อ่าน เพิ่ม ลบ และใช้ค้นหาสถานที่ได้ |
 | Favorites | ผู้ใช้ที่ login เพิ่ม อ่าน และลบ Favorite ของตัวเองได้ |
 | Reviews | อ่าน เพิ่ม แก้ ลบ และตรวจเจ้าของรีวิวได้ |
 | Review Likes | กด Like และยกเลิก Like โดยป้องกันการกดซ้ำได้ |
+| Reports | User แจ้งและดูปัญหาของตัวเอง ส่วน Admin ดูทั้งหมดและเปลี่ยนสถานะได้ |
 | ข้อมูลแผนที่ | มีชุดข้อมูลอาคาร 30 ปี ชั้น 4–7 รวม 78 สถานที่ |
 | Map import | preview ได้โดยไม่ต่อ DB และใช้ `--apply` เพื่อนำเข้าแบบ transaction |
 | Bruno | มีคำขอสำหรับ Buildings, Floors, Places, Map Verification, Keywords, Images, Role และ Favorites |
@@ -41,6 +42,7 @@
 - migration `0005` เพิ่มตาราง `place_images` และมี API เพิ่ม อ่าน ลบ URL รูป
 - migration `0006` เพิ่มตาราง `favorites` และมี API เพิ่ม อ่าน ลบ Favorite ของผู้ใช้
 - migration `0007` เพิ่มตาราง `reviews` และ `review_likes`
+- migration `0008` เพิ่มตาราง `reports`
 
 ## ชุดข้อมูลอาคาร 30 ปี
 
@@ -61,12 +63,13 @@
 
 - `pnpm build` ผ่านเมื่อวันที่ 5 ตุลาคม 2026
 - โค้ด route, schema, migration และเอกสารทั้ง 4 ไฟล์ถูกเทียบกันแล้ว
-- รัน Bruno ครบ 71 คำขอแล้ว ทั้ง Auth, Role, Buildings, Floors, Places,
+- รัน Bruno ครบ 79 คำขอแล้ว ทั้ง Auth, Role, Buildings, Floors, Places,
   Map Verification และ Place Keywords
 - ทดสอบ session cookie, logout และกรณีไม่มี session ผ่านครบ 3 คำขอ
 - ทดสอบเพิ่ม อ่าน และลบ URL รูปสถานที่ผ่านครบ 3 คำขอ
 - ทดสอบ Favorites ผ่านครบ 6 คำขอ รวมกรณีไม่ login, กดซ้ำ และไม่พบข้อมูล
 - ทดสอบ Reviews และ Review Likes ผ่านครบ 10 คำขอ
+- ทดสอบ Reports และสิทธิ์ USER/ADMIN ผ่านครบ 8 คำขอ
 - หลังจบการทดสอบ `/health/database` ยังมี 2 อาคาร 4 ชั้น 78 สถานที่ และ 1 ผู้ใช้
 - แก้ `seedFloorId` และ `seedPlaceId` ใน environment `Local` ให้ตรงกับข้อมูลแผนที่
 
@@ -114,10 +117,6 @@ GET http://localhost:3000/auth/login
 - หารูปหรือถ่ายรูปห้องชั้น 4–7
 - นำรูปจริงไปเก็บในที่ที่ Frontend เปิดได้ แล้วเพิ่ม URL ผ่าน Place Images API
 - เพิ่มเวลาเปิด สถานะห้อง และขนาดห้อง
-
-### ฟีเจอร์ที่ยังไม่ได้ทำ
-
-- Report และการเปลี่ยนสถานะโดย Admin
 
 ### Navigation ทำทีหลัง
 

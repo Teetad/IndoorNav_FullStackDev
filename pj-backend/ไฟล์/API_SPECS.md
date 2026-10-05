@@ -206,6 +206,19 @@ API นี้เก็บ URL ของรูป ยังไม่ได้ร�
 คะแนนต้องเป็นจำนวนเต็ม 1–5 และข้อความยาวได้ไม่เกิน 500 ตัวอักษร
 ผู้ใช้หนึ่งคนเขียนได้หนึ่งรีวิวต่อสถานที่ และกด Like รีวิวเดิมได้หนึ่งครั้ง
 
+## Reports
+
+| Method | Endpoint | รายละเอียด |
+|---|---|---|
+| POST | `/places/:place_id/reports` | User แจ้งปัญหาของสถานที่ |
+| GET | `/reports/me` | User อ่าน Report ของตัวเอง |
+| GET | `/reports` | Admin อ่าน Report ทั้งหมด |
+| PUT | `/reports/:report_id/status` | Admin เปลี่ยนสถานะและใส่หมายเหตุ |
+| DELETE | `/reports/:report_id` | Admin ลบ Report |
+
+สถานะที่รับคือ `PENDING`, `IN_PROGRESS` และ `RESOLVED`
+ข้อความปัญหาและหมายเหตุ Admin ยาวได้ไม่เกิน 500 ตัวอักษร
+
 ## HTTP Status ที่ใช้อยู่
 
 | Status | ความหมายในโค้ดปัจจุบัน |
@@ -223,7 +236,6 @@ API นี้เก็บ URL ของรูป ยังไม่ได้ร�
 
 ## API ที่ยังไม่มี
 
-- Reports, My Reports และการแก้สถานะ Report
 - Navigation, Navigation Nodes และ Navigation Edges
 - API อัปโหลดไฟล์รูปภาพไปยังที่เก็บไฟล์
 - API เวลาเปิด สถานะห้อง และขนาดห้อง

@@ -62,6 +62,10 @@ pnpm dev
 | `DELETE` | `/reviews/:review_id` | ลบ Review ของตัวเอง |
 | `POST` | `/reviews/:review_id/likes` | กด Like Review |
 | `DELETE` | `/reviews/:review_id/likes` | ยกเลิก Like Review |
+| `POST` | `/places/:place_id/reports` | User แจ้งปัญหาสถานที่ |
+| `GET` | `/reports/me` | User ดู Report ของตัวเอง |
+| `GET` | `/reports` | Admin ดู Report ทั้งหมด |
+| `PUT` | `/reports/:report_id/status` | Admin เปลี่ยนสถานะ |
 
 API ที่ต้อง Login ใช้ Header:
 
