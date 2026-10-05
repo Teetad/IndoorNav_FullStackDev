@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { Info, Navigation, Bookmark } from "lucide-react"; // 📌 นำเข้าไอคอนจาก lucide-react
 
 interface ShowRoomProps {
-  placeId: string | null; // 📌 เปลี่ยนมารับเป็น place_id โดยตรง
-  onClose: () => void; // ฟังก์ชันสำหรับปิด Popup (เซ็ตค่าเป็น null)
+  placeId: string | null; 
+  onClose: () => void; 
 }
 
 const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
@@ -25,7 +26,6 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
     };
   }, [placeId]);
 
-  // 📌 ยิง API ไปที่ http://localhost:3001/places/{placeId} ทันทีเมื่อมี placeId ส่งเข้ามา
   useEffect(() => {
     if (!placeId) return;
 
@@ -60,7 +60,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
     const distance = touchEnd - touchStart;
     
     if (distance > minSwipeDistance) {
-      onClose(); // ปิด Popup เมื่อปัดลง
+      onClose(); 
     }
   };
 
@@ -80,7 +80,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
         {/* ขีดจับด้านบน (Grab bar) */}
         <div className="w-12 h-1.5 bg-stone-400 rounded-full mx-auto mb-4 flex-shrink-0 cursor-grab"></div>
 
-        {/* 📌 ส่วนหัว (แสดงชื่อสถานที่จาก place_name) */}
+        {/* ส่วนหัว (แสดงชื่อสถานที่จาก place_name) */}
         <div className="flex-shrink-0 mb-4 pb-2 border-b border-stone-300/40">
           <h2 className="text-2xl font-bold text-stone-800">
             {loading ? "Loading..." : roomDetail?.place_name || "Unknown Location"}
@@ -88,27 +88,27 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
           <p className="text-sm text-stone-600">{roomDetail?.place_type}</p>
         </div>
 
-        {/* 📌 ส่วนเนื้อหา: แสดงเฉพาะรูปภาพและคำอธิบาย */}
+        {/* ส่วนเนื้อหา: แสดงเฉพาะรูปภาพและคำอธิบาย */}
         <div className="flex-1 overflow-y-auto min-h-0 pr-1 space-y-4 scrollbar-none">
           
           {loading ? (
             <div className="text-center py-8 text-stone-600 text-xs">Loading room details...</div>
           ) : (
             <>
-              {/* ปุ่ม Action พื้นฐาน */}
+              {/* 📌 ปุ่ม Action เปลี่ยนมาใช้ Lucide Icons แทนอีโมจิ */}
               <div className="flex gap-2 flex-wrap">
-                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[#8E796E] text-white rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer">
-                  ℹ️ Information
+                <button className="flex items-center gap-1.5 px-3.5 py-2 bg-[#8E796E] text-white rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer">
+                  <Info className="w-4 h-4" /> Information
                 </button>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E6DFD5] text-stone-800 rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer">
-                  🧭 Start
+                <button className="flex items-center gap-1.5 px-3.5 py-2 bg-[#E6DFD5] text-stone-800 rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer">
+                  <Navigation className="w-4 h-4" /> Start
                 </button>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E6DFD5] text-stone-800 rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer">
-                  🔖 Save
+                <button className="flex items-center gap-1.5 px-3.5 py-2 bg-[#E6DFD5] text-stone-800 rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer">
+                  <Bookmark className="w-4 h-4" /> Save
                 </button>
               </div>
 
-              {/* กล่องรูปภาพ (ดึงจาก image_url ถ้าไม่มีให้แสดงกล่องจำลองแทน) */}
+              {/* กล่องรูปภาพ */}
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
                 {roomDetail?.image_url ? (
                   <img 
@@ -123,7 +123,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
                 )}
               </div>
 
-              {/* คำอธิบาย (ดึงจาก description) */}
+              {/* คำอธิบาย */}
               <p className="text-xs text-stone-600 leading-relaxed pt-2">
                 {roomDetail?.description || "No description available for this place."}
               </p>

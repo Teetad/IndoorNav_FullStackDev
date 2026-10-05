@@ -78,9 +78,9 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
 
                 {/* ชื่อและคำอธิบาย */}
                 <div>
-                  <h3 className="font-bold text-stone-800 text-base">{place.name}</h3>
-                  <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                    {place.description || "Descriptions ... bla bla (รายละเอียดเพิ่มเติมของสถานที่)"}
+                  <h3 className="font-bold text-stone-800 text-base">{place.place_name}</h3>
+                  <p className="text-[10px] text-stone-600 mt-0.5 leading-relaxed">
+                    {place.description || ""}
                   </p>
                 </div>
               </div>

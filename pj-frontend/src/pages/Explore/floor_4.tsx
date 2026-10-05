@@ -5,11 +5,13 @@ import ShowRoom from "../../components/ShowRoom";
 import ShowAllRoom from "../../components/ShowAllRoom";
 import MapSpot from "../../components/MapSpot";
 import CategoryChips from "../../components/CategoryChips";
+import { useNavigate } from 'react-router-dom';
 
 const Floor_4 = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<any>(null); // เก็บทั้ง Object หรือ Place ID
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   interface RoomSpot {
   placeId: string;
@@ -138,7 +140,9 @@ const Floor_4 = () => {
     <div className={`absolute inset-0 w-full h-[100dvh] bg-[#F3EFEA] flex flex-col ${isHidden ? 'overflow-hidden' : 'overflow-auto'}`}>
       
       {/* SearchBar และ CategoryChips ด้านบน */}
-      <div className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
+      <div 
+      onClick={() => navigate('/search')}
+      className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
         <SearchBar
           value={searchQuery}
           onChange={handleSearchChange}
