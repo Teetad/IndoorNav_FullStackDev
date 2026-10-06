@@ -15,7 +15,7 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
     if (!selectedType) return;
 
     setLoading(true);
-    fetch(`http://localhost:3001/places?place_type=${encodeURIComponent(selectedType)}`)
+    fetch(`http://localhost:3000/places?place_type=${encodeURIComponent(selectedType)}`)
       .then((res) => res.json())
       .then((data) => {
         // รองรับทั้งกรณีที่ API ส่งกลับมาเป็น Array ตรงๆ หรืออยู่ใน Object (เช่น { places: [...] })
@@ -78,9 +78,9 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
 
                 {/* ชื่อและคำอธิบาย */}
                 <div>
-                  <h3 className="font-bold text-stone-800 text-base">{place.name}</h3>
-                  <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                    {place.description || "Descriptions ... bla bla (รายละเอียดเพิ่มเติมของสถานที่)"}
+                  <h3 className="font-bold text-stone-800 text-base">{place.place_name}</h3>
+                  <p className="text-[10px] text-stone-600 mt-0.5 leading-relaxed">
+                    {place.description || ""}
                   </p>
                 </div>
               </div>

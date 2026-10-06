@@ -5,24 +5,27 @@ import ShowRoom from "../../components/ShowRoom";
 import ShowAllRoom from "../../components/ShowAllRoom";
 import MapSpot from "../../components/MapSpot";
 import CategoryChips from "../../components/CategoryChips";
+import { useNavigate } from 'react-router-dom';
+import BottomNav from "../../components/BottomNav";
 
 const Floor_6 = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<any>(null); // เก็บทั้ง Object หรือ Place ID
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const floor6Rooms = [
-    //601
+    //lab3
     {
-      placeId: "11111111-1111-4111-8111-111111110001", 
+      placeId: "dd96ffed-8af7-5917-a4bb-b1ded378f462", 
       top: "0%",
       left: "50%",
       width: "8.5%",
       height: "17%",
     },
-    //602
+    //lab4
     {
-      placeId: "11111111-1111-4111-8111-111111110002", 
+      placeId: "1bf424d8-52c6-5fa2-bf9f-55ed70955502", 
       top: "0%",
       left: "58.5%",
       width: "8.5%",
@@ -70,28 +73,37 @@ const Floor_6 = () => {
     },
     //professor room
     {
-      placeId: "f3054c72-3120-5d03-8184-b0ead14af751", 
+      placeId: "8cf3929d-9e11-5681-b171-5785a511f4fa", 
       top: "0%",
       left: "71%",
       width: "20.5%",
       height: "8.5%",
     },
     {
-      placeId: "f3054c72-3120-5d03-8184-b0ead14af751", 
+      placeId: "8cf3929d-9e11-5681-b171-5785a511f4fa", 
       top: "25%",
       left: "66.5%",
       width: "17.5%",
       height: "8.5%",
     },
+    //8
     {
-      placeId: "f3054c72-3120-5d03-8184-b0ead14af751", 
+      placeId: "648a1b8b-8a13-5b76-b540-1d8b9630366f", 
       top: "58%",
       left: "25.5%",
       width: "9%",
-      height: "17%",
+      height: "8.5%",
+    },
+    //9
+    {
+      placeId: "4b5e1ec5-0c58-5dfd-befe-8e823bcd4e20", 
+      top: "66.5%",
+      left: "25.5%",
+      width: "9%",
+      height: "8.5%",
     },
     {
-      placeId: "f3054c72-3120-5d03-8184-b0ead14af751", 
+      placeId: "da537344-a094-5508-b972-0a8278e2aa48", 
       top: "82%",
       left: "58%",
       width: "9.5%",
@@ -107,11 +119,11 @@ const Floor_6 = () => {
   };
 
   const handleProfileClick = () => {
-    console.log('Profile icon clicked!');
+    navigate('/login');
   };
 
-  const handleSearch = () => {
-    console.log('Search clicked!');
+    const handleSearch = () => {
+    navigate('/search')
   };
 
   const isHidden = Boolean(selectedLocation) || Boolean(selectedCategory);
@@ -125,7 +137,8 @@ const Floor_6 = () => {
     <div className={`absolute inset-0 w-full h-[100dvh] bg-[#F3EFEA] flex flex-col ${isHidden ? 'overflow-hidden' : 'overflow-auto'}`}>
       
       {/* SearchBar และ CategoryChips ด้านบน */}
-      <div className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
+      <div 
+      className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
         <SearchBar
           value={searchQuery}
           onChange={handleSearchChange}
@@ -189,6 +202,8 @@ const Floor_6 = () => {
       <div className="absolute bottom-6 right-4 z-30">
         <FloorControl currentFloor={6} isHidden={isHidden} />
       </div>
+
+      <BottomNav/>
 
     </div>
   );

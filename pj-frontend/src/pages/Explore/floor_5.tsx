@@ -5,11 +5,14 @@ import ShowRoom from "../../components/ShowRoom";
 import ShowAllRoom from "../../components/ShowAllRoom";
 import MapSpot from "../../components/MapSpot";
 import CategoryChips from "../../components/CategoryChips";
+import { useNavigate } from 'react-router-dom';
+import BottomNav from "../../components/BottomNav";
 
 const Floor_5 = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<any>(null); // เก็บทั้ง Object หรือ Place ID
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const floor5Rooms = [
     //501
@@ -60,7 +63,7 @@ const Floor_5 = () => {
       width: "34%",
       height: "18%",
     },
-    //ห้องอาจารย์
+    //ห้องอาจารย์ 558
     {
       placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
       top: "26%",
@@ -68,40 +71,93 @@ const Floor_5 = () => {
       width: "14%",
       height: "7%",
     },
+    //ห้องอาจารย์ 559
     {
-      placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
-      top: "58%",
-      left: "26%",
+      placeId: "3ccd574c-4ca6-5ae1-b1ef-220df54709d0", 
+      top: "26%",
+      left: "91%",
       width: "8.5%",
-      height: "17%",
+      height: "7%",
     },
+    //ห้องอาจารย์ 503
     {
       placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
       top: "33%",
-      left: "62.5%",
-      width: "9%",
-      height: "18%",
-    },
-    {
-      placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
-      top: "43.5%",
-      left: "75%",
-      width: "29%",
-      height: "14%",
-    },
-    {
-      placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
-      top: "73%",
-      left: "66%",
-      width: "18%",
-      height: "10.5%",
-    },
-    {
-      placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
-      top: "26%",
       left: "89%",
       width: "11%",
-      height: "15%",
+      height: "8%",
+    },
+    //ห้องอาจารย์ 504
+    {
+      placeId: "5124fde5-d8e5-5416-82cc-6029bf3081b2", 
+      top: "43.5%",
+      left: "82.5%",
+      width: "9%",
+      height: "7%",
+    },
+    //ห้องอาจารย์ 505
+    {
+      placeId: "529dd120-3c13-5ec3-918c-305d73e2fc61", 
+      top: "43.5%",
+      left: "91.5%",
+      width: "9%",
+      height: "7%",
+    },
+    //ห้องอาจารย์ 508
+    {
+      placeId: "359f2bb1-e7f0-548c-8e7e-36b3fb3939dd", 
+      top: "33%",
+      left: "62.5%",
+      width: "9%",
+      height: "9%",
+    },
+    //ห้องอาจารย์ 509
+    {
+      placeId: "69c869e7-1545-5b09-994b-5aff29636513", 
+      top: "42%",
+      left: "62.5%",
+      width: "9%",
+      height: "9%",
+    },
+    //ห้องอาจารย์ 510
+    {
+      placeId: "c523c466-d5e4-51cb-a053-1f2c89e36baa", 
+      top: "49%",
+      left: "75%",
+      width: "9%",
+      height: "8.5%",
+    },
+    //ห้องอาจารย์ 514
+    {
+      placeId: "e6023be6-643e-550e-9bd7-28ae7bd8a67d", 
+      top: "73%",
+      left: "75%",
+      width: "9%",
+      height: "10.5%",
+    },
+    //ห้องอาจารย์ 515
+    {
+      placeId: "e6023be6-643e-550e-9bd7-28ae7bd8a67d", 
+      top: "73%",
+      left: "66%",
+      width: "9%",
+      height: "10.5%",
+    },
+    //ห้องอาจารย์ 519
+    {
+      placeId: "38cb93a4-4a98-5a34-b1e7-94f8f10a65eb", 
+      top: "58%",
+      left: "25.5%",
+      width: "9%",
+      height: "8.5%",
+    },
+    //ห้องอาจารย์ 520
+    {
+      placeId: "71c4795d-64c3-56c9-99de-31df574f72e1", 
+      top: "66%",
+      left: "25.5%",
+      width: "9%",
+      height: "8.5%",
     },
     
   ];
@@ -111,11 +167,11 @@ const Floor_5 = () => {
   };
 
   const handleProfileClick = () => {
-    console.log('Profile icon clicked!');
+    navigate('/login');
   };
 
-  const handleSearch = () => {
-    console.log('Search clicked!');
+    const handleSearch = () => {
+    navigate('/search')
   };
 
   const isHidden = Boolean(selectedLocation) || Boolean(selectedCategory);
@@ -129,7 +185,8 @@ const Floor_5 = () => {
     <div className={`absolute inset-0 w-full h-[100dvh] bg-[#F3EFEA] flex flex-col ${isHidden ? 'overflow-hidden' : 'overflow-auto'}`}>
       
       {/* SearchBar และ CategoryChips ด้านบน */}
-      <div className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
+      <div 
+      className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
         <SearchBar
           value={searchQuery}
           onChange={handleSearchChange}
@@ -193,6 +250,8 @@ const Floor_5 = () => {
       <div className="absolute bottom-6 right-4 z-30">
         <FloorControl currentFloor={5} isHidden={isHidden} />
       </div>
+
+      <BottomNav/>
 
     </div>
   );

@@ -17,7 +17,7 @@ const MapSpot: React.FC<MapSpotProps> = ({ Top, Left, Width, Height, onClick, pl
         width: Width,
         height: Height,
       }}
-      className="absolute z-20 bg-white-500/5 hover:bg-red-500/40 cursor-pointer rounded-lg transition-colors flex items-center justify-center"
+      className="absolute z-20 bg-red-500/65 hover:bg-red-500/40 cursor-pointer rounded-lg transition-colors flex items-center justify-center"
     >
     </div>
     );
