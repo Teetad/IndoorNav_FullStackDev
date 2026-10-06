@@ -4,21 +4,24 @@ import { useNavigate } from 'react-router-dom';
 
 interface FloorControlProps {
   currentFloor: number; // ชั้นปัจจุบัน เช่น 4, 5, 6, 7
+  isHidden?: boolean;   // 📌 เพิ่ม prop นี้เพื่อรับค่าสั่งซ่อนปุ่มเมื่อ Popup เปิด
 }
 
-const FloorControl: React.FC<FloorControlProps> = ({ currentFloor }) => {
+const Floor: React.FC<FloorControlProps> = ({ currentFloor, isHidden = false }) => {
   const navigate = useNavigate();
   const minFloor = 4;
   const maxFloor = 7;
 
+  // 📌 ถ้า isHidden เป็นจริง ให้ซ่อนคอมโพเนนต์นี้ไปเลยทันที
+  if (isHidden) return null;
+
   const handleIncrement = () => {
     if (currentFloor < maxFloor) {
       const nextFloor = currentFloor + 1;
-      navigate(`/floor-${nextFloor}`); // เปลี่ยน Path เป็น /floor-5, /floor-6, ฯลฯ
+      navigate(`/floor-${nextFloor}`);
     }
   };
 
-  // ฟังก์ชันลดชั้น (กดปุ่มลง)
   const handleDecrement = () => {
     if (currentFloor > minFloor) {
       const prevFloor = currentFloor - 1;
@@ -27,7 +30,7 @@ const FloorControl: React.FC<FloorControlProps> = ({ currentFloor }) => {
   };
 
   return (
-    <div className="fixed bottom-20 right-4 z-40 flex-col items-center justify-between w-20 h-25 bg-[#8E796E] rounded-3xl shadow-lg select-none">
+    <div className="fixed bottom-20 right-4 z-40 flex flex-col items-center justify-between w-20 h-25 bg-[#8E796E] rounded-3xl shadow-lg select-none overflow-hidden animate-fade-in">
       {/* ปุ่มเลื่อนขึ้น */}
       <button
         onClick={handleIncrement}
@@ -63,4 +66,4 @@ const FloorControl: React.FC<FloorControlProps> = ({ currentFloor }) => {
   );
 };
 
-export default FloorControl;
+export default Floor;
