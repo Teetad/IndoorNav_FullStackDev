@@ -1,7 +1,7 @@
 # Database Tables — สถานะปัจจุบัน
 
 เอกสารนี้อ้างอิง `db/schema.ts` และ migration ล่าสุด
-`db/migration/0008_clumsy_longshot.sql` ณ วันที่ 5 ตุลาคม 2026
+`db/migration/0009_living_peter_parker.sql` ณ วันที่ 5 ตุลาคม 2026
 
 > Schema ในโค้ดและ schema ในฐานข้อมูลจริงเป็นคนละส่วนกัน ต้องรัน
 > `pnpm db:migrate` จึงจะนำ migration ไปใช้กับฐานข้อมูลที่ระบุใน `.env`
@@ -51,12 +51,18 @@ Unique index `floors_building_floor_number_unique` ครอบคลุม
 | `place_name` | VARCHAR(120) | NOT NULL |
 | `place_type` | VARCHAR(40) | NULL ได้เมื่อยังไม่ทราบประเภท |
 | `room_number` | VARCHAR(30) | NULL ได้ |
+| `room_status` | VARCHAR(20) | NOT NULL, DEFAULT `UNKNOWN` |
+| `capacity` | INTEGER | NULL ได้; จำนวนคนที่ห้องรองรับ |
+| `opening_time` | VARCHAR(5) | NULL ได้; เวลาแบบ `HH:MM` |
+| `closing_time` | VARCHAR(5) | NULL ได้; เวลาแบบ `HH:MM` |
 | `description` | VARCHAR(500) | NULL ได้ |
 | `image_url` | VARCHAR(500) | NULL ได้ |
 | `fav_count` | INTEGER | NOT NULL, DEFAULT 0 |
 
 - `fav_count` ในฐานข้อมูลถูก map เป็น `favCount` ใน TypeScript และ JSON
 - `place_type` เป็นข้อความในฐานข้อมูล ส่วน API จำกัดค่าด้วย `db/place-types.ts`
+- `room_status` รับ `OPEN`, `CLOSED`, `MAINTENANCE` และ `UNKNOWN`
+- `capacity` และเวลาใช้ `null` เมื่อยังไม่มีข้อมูลจริง
 - ฐานข้อมูลยังไม่มี CHECK constraint สำหรับ `place_type`
 - ไม่มี unique constraint บน `place_name` หรือ `room_number`
 - `fav_count` จะเพิ่มหรือลดเมื่อเรียก Favorites API
@@ -156,6 +162,7 @@ Foreign key ทุกระดับใช้ `ON DELETE CASCADE`:
 | `0006_spicy_medusa.sql` | สร้าง `favorites` เชื่อมผู้ใช้กับสถานที่ |
 | `0007_optimal_krista_starr.sql` | สร้าง `reviews` และ `review_likes` |
 | `0008_clumsy_longshot.sql` | สร้าง `reports` เชื่อมผู้ใช้กับสถานที่ |
+| `0009_living_peter_parker.sql` | เพิ่มสถานะ ความจุ และเวลาเปิดปิดใน `places` |
 
 ไม่ควรแก้ migration ที่เคยนำไปใช้แล้ว เมื่อต้องการเปลี่ยนตารางให้แก้
 `db/schema.ts` แล้วสร้าง migration ลำดับใหม่ด้วย `pnpm db:generate`
@@ -170,5 +177,3 @@ Schema ปัจจุบันยังไม่มีตารางต่อ�
 
 `places.image_url` ยังเก็บไว้ให้โค้ดเดิมใช้ ส่วนรูปใหม่หลายรูปเก็บใน `place_images`
 ส่วน `favorites` ใช้ดูว่า User คนไหน Favorite สถานที่ใด
-
-เวลาเปิด สถานะห้อง และขนาดห้องก็ยังไม่มีใน schema

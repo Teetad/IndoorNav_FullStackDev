@@ -13,6 +13,7 @@ import favoriteRouter from "./routes/user/Favorites.route.js";
 import reviewRouter from "./routes/user/Reviews.route.js";
 import reportRouter from "./routes/user/Reports.route.js";
 
+// ลำดับทำงานโดยย่อ: request → middleware → route → database → response
 // app คือจุดรับ HTTP request ก่อนส่งต่อให้ route ของแต่ละหมวด
 const app = express();
 app.use(morgan("dev"));
@@ -23,11 +24,14 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+// เปิดไฟล์รูปใน public/images ให้ Frontend เรียกผ่าน /images ได้
+app.use("/images", express.static("public/images"));
 
 app.get("/", (_req, res) => res.status(200).json({ message: "Indoor Navigation Backend is running" }));
 
 app.get("/health/database", async (_req, res) => {
   try {
+    // Promise.all เริ่มอ่านหลายตารางพร้อมกัน เพราะแต่ละ query ไม่ต้องรอผลของอีก query
     const [buildings, floors, places, users, favorites, reviews, reviewLikes, reports] = await Promise.all([
       dbClient.select().from(Buildings),
       dbClient.select().from(Floors),
@@ -67,6 +71,7 @@ app.use(reportRouter);
 // เช่น GET /auth/login และ GET /auth/me จะถูกส่งไป Auth.route.ts
 app.use("/auth", authRouter);
 
+// ต้องวางหลัง route ทั้งหมด ถ้า request หลุดมาถึงตรงนี้แปลว่าไม่มี endpoint ที่ตรงกัน
 app.use((_req, res) => res.status(404).json({ message: "Route not found" }));
 
 const PORT = process.env.PORT || 3000;

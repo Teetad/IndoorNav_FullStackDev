@@ -1,5 +1,5 @@
 import { jwtVerify, SignJWT } from "jose";
-import { getJwtSecret, type UserRole } from "./config.js";
+import { getJwtSecret, isUserRole, type UserRole } from "./config.js";
 
 const issuer = "indoor-navigation-backend";
 const audience = "indoor-navigation-client";
@@ -38,7 +38,7 @@ export async function verifySessionToken(token: string): Promise<SessionPayload>
   const { payload } = await jwtVerify(token, getJwtSecret(), { issuer, audience });
   // ตรวจว่าข้อมูลสำคัญใน token มีชนิดและค่าที่ระบบรู้จัก
   if (typeof payload.sub !== "string" || typeof payload.email !== "string" ||
-      (payload.role !== "USER" && payload.role !== "ADMIN" && payload.role !== "DEVELOPER")) {
+      !isUserRole(payload.role)) {
     throw new Error("Invalid session token payload");
   }
   return payload as SessionPayload;

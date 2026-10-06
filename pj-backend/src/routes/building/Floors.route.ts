@@ -8,14 +8,17 @@ import { parseFloorNumber } from "../../utils/validation.js";
 
 const router = Router();
 
+// ชั้นต้องอ้างถึงอาคารผ่าน building_id และเลขชั้นซ้ำในอาคารเดียวกันไม่ได้
+
 router.get("/", async (req, res) => {
   try {
-    const buildingId = req.query.building_id;
-    if (buildingId !== undefined && (typeof buildingId !== "string" || !isUUID(buildingId))) {
+    const queryBuildingId = req.query.building_id;
+    const buildingId = typeof queryBuildingId === "string" ? queryBuildingId : null;
+    if (queryBuildingId !== undefined && (!buildingId || !isUUID(buildingId))) {
       return res.status(400).json({ message: "building_id must be a valid UUID" });
     }
     const query = dbClient.select().from(Floors);
-    const floors = buildingId ? await query.where(eq(Floors.building_id, buildingId as string)) : await query;
+    const floors = buildingId ? await query.where(eq(Floors.building_id, buildingId)) : await query;
     return res.status(200).json(floors);
   } catch (error) {
     console.error("GET /floors failed:", error);
@@ -32,6 +35,7 @@ router.get("/:building_id/:floor_number", async (req, res) => {
     if (!isUUID(building_id) || floorNumber === null) {
       return res.status(400).json({ message: "building_id must be a UUID and floor_number an integer" });
     }
+    // and() บังคับให้ตรงทั้งอาคารและเลขชั้น
     const [floor] = await dbClient.select().from(Floors).where(and(
       eq(Floors.building_id, building_id), eq(Floors.floor_number, floorNumber),
     ));

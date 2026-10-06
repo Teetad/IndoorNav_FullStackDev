@@ -21,6 +21,7 @@
 `place_type` คือ **ประเภทที่ระบบกำหนดไว้** เช่น `classroom` หรือ `laboratory`
 `place_keywords` คือ **คำค้นที่เพิ่มให้แต่ละสถานที่** เช่น ชื่อย่อหรือคำที่คนใช้เรียก
 สถานที่หนึ่งแห่งมี `place_type` ได้หนึ่งค่า แต่มี keyword ได้หลายคำ
+`room_status` คือสถานะใช้งานของห้อง ส่วน `capacity` คือจำนวนคนที่ห้องรองรับ
 
 ## ข้อมูลเดินทางอย่างไร
 
@@ -56,7 +57,7 @@ Bruno
 | [../src/routes/user/Favorites.route.ts](../src/routes/user/Favorites.route.ts) | API ให้ผู้ใช้เพิ่ม อ่าน และลบ Favorite ของตัวเอง |
 | [../src/routes/user/Reviews.route.ts](../src/routes/user/Reviews.route.ts) | API รีวิวและการกด Like รีวิว |
 | [../src/routes/user/Reports.route.ts](../src/routes/user/Reports.route.ts) | API แจ้งปัญหาและเปลี่ยนสถานะโดย Admin |
-| [../src/utils/validation.ts](../src/utils/validation.ts) | ตรวจเลขชั้นว่าเป็นจำนวนเต็มในช่วงที่ PostgreSQL เก็บได้ |
+| [../src/utils/validation.ts](../src/utils/validation.ts) | ตรวจเลขชั้น ความจุ และเวลา `HH:MM` ก่อนบันทึก |
 
 `src/index.ts` ไม่ได้เขียนคำสั่งค้นหาสถานที่เอง แต่ส่งต่อให้ route ที่ตรงกับ URL
 ตัวอย่าง `app.use("/places", placeRouter)` ทำให้ route `router.get("/")`
@@ -67,11 +68,13 @@ Role ที่เก็บใน `users` มี `USER`, `ADMIN`, `DEVELOPER` ส
 ใน `.env` ตอน login โดย route ที่เพิ่ม แก้ และลบข้อมูลจะตรวจ role ก่อนทำงาน
 
 - Guest และ USER อ่านหรือค้นหาข้อมูลได้
-- ADMIN แก้ชื่อ รายละเอียด รูป และจัดการ keyword ได้
+- ADMIN แก้ชื่อ รายละเอียด รูป สถานะ ความจุ เวลา และจัดการ keyword ได้
 - DEVELOPER จัดการข้อมูลโครงสร้าง เช่น อาคาร ชั้น และสถานที่ได้
 
 ของที่ยังไม่ได้ทำมีอัปโหลดไฟล์รูปและ Navigation
 รูปหลายรูปเก็บใน `place_images` และรายการ Favorite ของแต่ละ User เก็บใน `favorites`
+ไฟล์รูปที่วางใน `public/images` เปิดผ่าน URL `/images/...` ได้ แต่ยังไม่มี API รับไฟล์อัปโหลด
+ทีมเลือกไม่เก็บรูปโถงลิฟต์ ห้องน้ำ และบันได เพราะดูตำแหน่งจาก Floor Plan ได้
 
 ## ไฟล์ใน `db/`
 
@@ -79,11 +82,13 @@ Role ที่เก็บใน `users` มี `USER`, `ADMIN`, `DEVELOPER` ส
 |---|---|
 | [schema.ts](../db/schema.ts) | ประกาศตารางทั้งหมด รวม `place_images`, คีย์หลัก และความสัมพันธ์ |
 | [place-types.ts](../db/place-types.ts) | รายการประเภทสถานที่ที่ API ยอมรับ และ `isPlaceType()` สำหรับตรวจค่า |
+| [room-statuses.ts](../db/room-statuses.ts) | รายการสถานะห้องและฟังก์ชันตรวจค่าที่ API รับ |
 | [utils.ts](../db/utils.ts) | อ่านค่า `POSTGRES_*` จาก `.env` แล้วสร้าง URL สำหรับต่อฐานข้อมูล |
 | [client.ts](../db/client.ts) | สร้างการเชื่อมต่อ PostgreSQL (`dbConn`) และตัวเขียน query ของ Drizzle (`dbClient`) |
 | [data/building30.ts](../db/data/building30.ts) | ข้อมูลอาคาร 30 ปี ชั้น 4–7 ที่ถอดจากแผนที่; ยังไม่ใช่ข้อมูลในฐานข้อมูลจนกว่าจะ seed |
 | [data/README.md](../db/data/README.md) | บอกแหล่งข้อมูลแผนที่และส่วนที่ยังไม่ยืนยัน |
-| [seed-maps.ts](../db/seed-maps.ts) | ดูตัวอย่างข้อมูล หรือใช้ `--apply` เพื่อนำอาคาร ชั้น และสถานที่ลงฐานข้อมูล |
+| [data/ที่มา/](../db/data/ที่มา/) | เก็บไฟล์ PDF และภาพแผนที่ต้นฉบับที่ใช้ถอดข้อมูล |
+| [seed-maps.ts](../db/seed-maps.ts) | ดูตัวอย่างข้อมูล หรือใช้ `--apply` เพื่อนำอาคาร ชั้น สถานที่ และ URL รูปห้องชั้น 7 ลงฐานข้อมูล |
 | [prototype.ts](../db/prototype.ts) | สคริปต์อ่านข้อมูลจากฐานข้อมูลแล้วพิมพ์ใน Terminal เพื่อทดลอง query |
 | [migration/](../db/migration/) | ไฟล์ SQL ที่สร้างหรือเปลี่ยนตาราง; `meta/_journal.json` เก็บลำดับ migration |
 
@@ -114,6 +119,7 @@ Role ที่เก็บใน `users` มี `USER`, `ADMIN`, `DEVELOPER` ส
 | `0006_spicy_medusa.sql` | สร้าง `favorites` สำหรับเก็บสถานที่โปรดของแต่ละผู้ใช้ |
 | `0007_optimal_krista_starr.sql` | สร้าง `reviews` และ `review_likes` |
 | `0008_clumsy_longshot.sql` | สร้าง `reports` สำหรับแจ้งปัญหาสถานที่ |
+| `0009_living_peter_parker.sql` | เพิ่มสถานะ ความจุ และเวลาเปิดปิดของสถานที่ |
 
 อย่าแก้ SQL migration ที่เคยใช้แล้วเพื่อเปลี่ยนตารางใหม่ ให้แก้ `schema.ts`
 แล้วสร้าง migration ลำดับถัดไปด้วย `pnpm db:generate`
@@ -148,6 +154,10 @@ ID ที่สคริปต์สร้างจาก `key` มีค่า�
 ถ้าแถวนั้นยังไม่มี `place_type` สคริปต์จะเติมให้ แต่ไม่เปลี่ยนประเภทของแถวที่
 คนเพิ่มเอง ข้อมูลคำค้นไม่ได้อยู่ในชุด seed นี้
 
+ห้องเรียนชั้น 7 จำนวน 9 ห้องมี `image_urls` ห้องละ 5 รูปใน `building30.ts`
+เมื่อใช้ `--apply` สคริปต์จะเพิ่ม URL เหล่านี้ลง `place_images` หากยังไม่มี
+จึงรันซ้ำได้โดยรูปเดิมไม่ถูกเพิ่มซ้ำ
+
 ข้อมูลตัวอย่างห้อง 601–603 และคำสั่ง `pnpm seed` ถูกลบแล้ว เพราะไม่ตรงกับ
 แผนที่จริง ให้ใช้ `pnpm seed:maps --apply` สำหรับแผนที่อาคาร 30 ปี
 
@@ -171,6 +181,7 @@ ID ที่สคริปต์สร้างจาก `key` มีค่า�
 | [API_SPECS.md](API_SPECS.md) | สรุป endpoint, body, query และ status code ที่ใช้จริง |
 | [DATABASE_TABLES.md](DATABASE_TABLES.md) | สรุปตาราง migration และความสัมพันธ์ |
 | [PROGRESS.md](PROGRESS.md) | สถานะงานและสิ่งที่ยังต้องตรวจ |
+| [แนวตอบ_Code_Review.md](แนวตอบ_Code_Review.md) | สรุป flow จุดยาก และแนวตอบคำถามอาจารย์ |
 | `node_modules/`, `dist/` | ไฟล์ที่เครื่องสร้างจากการติดตั้งและ build; ปกติไม่แก้ด้วยมือ |
 | `pnpm-lock.yaml` | ล็อกเวอร์ชันไลบรารีให้ติดตั้งซ้ำได้ตรงกัน |
 
@@ -181,6 +192,7 @@ ID ที่สคริปต์สร้างจาก `key` มีค่า�
 บาง request เพิ่ม แก้ หรือลบข้อมูลจริง จึงควรเลือกฐานข้อมูลทดสอบก่อนกดส่ง
 โฟลเดอร์ `Permission Details` ใช้ตรวจสิทธิ์เจ้าของ Review, ADMIN, DEVELOPER
 และข้อมูล Report ที่ไม่ถูกต้อง
+โฟลเดอร์ `Room Details` ทดสอบเพิ่ม แก้ กรอง และตรวจข้อมูลห้อง แล้วลบข้อมูลทดสอบท้ายชุด
 
 ## คำสั่งที่ใช้บ่อย
 
@@ -207,6 +219,7 @@ pnpm build                   # ตรวจและแปลง TypeScript
 |---|---|
 | เพิ่มคอลัมน์ของสถานที่ | `db/schema.ts` แล้วสร้าง migration ใหม่ |
 | เพิ่มประเภทสถานที่ที่ API ยอมรับ | `db/place-types.ts` |
+| เพิ่มสถานะห้องที่ API ยอมรับ | `db/room-statuses.ts` |
 | เปลี่ยนข้อมูลแผนที่อาคาร 30 ปี | `db/data/building30.ts` แล้วนำเข้าใหม่ตามกติกาของ `seed-maps.ts` |
 | เปลี่ยนวิธีค้น/เพิ่ม/ลบสถานที่หรือ keyword | `src/routes/building/Places.route.ts` |
 | เปลี่ยนการทำงานของ Favorite | `src/routes/user/Favorites.route.ts` |

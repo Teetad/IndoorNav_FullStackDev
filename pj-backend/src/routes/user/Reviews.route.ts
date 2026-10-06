@@ -7,6 +7,8 @@ import { requireAuth } from "../../auth/middleware.js";
 
 const router = Router();
 
+// Review เก็บคะแนน/ข้อความ ส่วน ReviewLikes เก็บว่า User คนใดกด Like รีวิวใด
+
 // อ่านรีวิวของสถานที่ ทุกคนอ่านได้โดยไม่ต้อง login
 router.get("/places/:place_id/reviews", async (req, res) => {
   try {
@@ -17,6 +19,7 @@ router.get("/places/:place_id/reviews", async (req, res) => {
       .where(eq(Places.place_id, placeId));
     if (!place) return res.status(404).json({ message: "Place not found" });
 
+    // JOIN Users เพื่อส่งชื่อผู้รีวิวกลับไปพร้อมรีวิว
     const reviews = await dbClient.select({
       review_id: Reviews.review_id,
       user_id: Reviews.user_id,
@@ -148,6 +151,7 @@ router.post("/reviews/:review_id/likes", requireAuth, async (req, res) => {
       .where(eq(Reviews.review_id, reviewId));
     if (!review) return res.status(404).json({ message: "Review not found" });
 
+    // transaction ทำให้การเพิ่ม Like และเพิ่มตัวนับสำเร็จหรือยกเลิกพร้อมกัน
     const like = await dbClient.transaction(async tx => {
       const [created] = await tx.insert(ReviewLikes).values({
         user_id: res.locals.auth.sub,
