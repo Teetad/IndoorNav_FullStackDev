@@ -1,0 +1,34 @@
+meta {
+  name: 06 Clear Optional Details
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/places/{{roomDetailPlaceId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{adminToken}}
+}
+
+body:json {
+  {
+    "room_status": "UNKNOWN",
+    "capacity": null,
+    "opening_time": null,
+    "closing_time": null
+  }
+}
+
+tests {
+  test("ข้อมูลที่ยังไม่รู้ใช้ UNKNOWN และ null ได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().room_status).to.equal("UNKNOWN");
+    expect(res.getBody().capacity).to.equal(null);
+    expect(res.getBody().opening_time).to.equal(null);
+    expect(res.getBody().closing_time).to.equal(null);
+  });
+}

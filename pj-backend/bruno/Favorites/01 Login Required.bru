@@ -1,0 +1,17 @@
+meta {
+  name: 01 Login Required
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/favorites
+  body: none
+  auth: none
+}
+
+tests {
+  test("ต้อง login ก่อนดู Favorite", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

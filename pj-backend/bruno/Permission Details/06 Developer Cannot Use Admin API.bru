@@ -1,0 +1,21 @@
+meta {
+  name: 06 Developer Cannot Use Admin API
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/reports
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{developerToken}}
+}
+
+tests {
+  test("DEVELOPER ใช้ API ของ Admin ไม่ได้", function () {
+    expect(res.getStatus()).to.equal(403);
+  });
+}

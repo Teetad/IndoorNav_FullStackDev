@@ -1,0 +1,27 @@
+meta {
+  name: 06 Invalid Status
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/reports/{{testReportId}}/status
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{adminToken}}
+}
+
+body:json {
+  {
+    "status": "DONE"
+  }
+}
+
+tests {
+  test("สถานะที่ระบบไม่รู้จักได้ 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

@@ -10,6 +10,10 @@ get {
   auth: none
 }
 
+vars:pre-request {
+  seedBuildingId: 29359a72-7a7d-4cfa-8e2a-e78fdaa2af2f
+}
+
 tests {
   test("returns a building", function () {
     expect(res.getStatus()).to.equal(200);

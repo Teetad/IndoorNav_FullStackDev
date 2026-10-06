@@ -1,0 +1,22 @@
+meta {
+  name: 06 Like Review
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/reviews/{{testReviewId}}/likes
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("กด Like รีวิวได้", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().review_id).to.equal(bru.getVar("testReviewId"));
+  });
+}

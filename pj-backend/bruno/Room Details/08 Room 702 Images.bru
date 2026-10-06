@@ -1,0 +1,21 @@
+meta {
+  name: 08 Room 702 Images
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/places/e1f7fea5-6fcb-52bc-a3b6-f5ff35242b6b/images
+  body: none
+  auth: none
+}
+
+tests {
+  test("ห้อง 702 มีรูปจาก seed ครบ 5 รูป", function () {
+    const images = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+    expect(images.length).to.equal(5);
+    expect(images[0].image_url).to.equal("/images/places/floor-7/702/702-1.jpg");
+    expect(images[4].image_url).to.equal("/images/places/floor-7/702/702-5.jpg");
+  });
+}

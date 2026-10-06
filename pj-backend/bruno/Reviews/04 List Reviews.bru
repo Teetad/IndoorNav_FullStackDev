@@ -1,0 +1,18 @@
+meta {
+  name: 04 List Reviews
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/places/{{seedPlaceId}}/reviews
+  body: none
+  auth: none
+}
+
+tests {
+  test("อ่านรีวิวของสถานที่ได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().some(row => row.review_id === bru.getVar("testReviewId"))).to.equal(true);
+  });
+}

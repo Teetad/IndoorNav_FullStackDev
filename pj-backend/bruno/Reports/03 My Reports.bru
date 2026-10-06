@@ -1,0 +1,26 @@
+meta {
+  name: 03 My Reports
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/reports/me
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+vars:pre-request {
+  sessionToken: ba038ae4-dbb2-43d1-aa71-c613f7a9a1b9
+}
+
+tests {
+  test("User อ่าน Report ของตัวเองได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().some(row => row.report_id === bru.getVar("testReportId"))).to.equal(true);
+  });
+}

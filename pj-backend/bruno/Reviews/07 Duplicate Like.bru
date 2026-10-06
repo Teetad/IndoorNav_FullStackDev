@@ -1,0 +1,22 @@
+meta {
+  name: 07 Duplicate Like
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/reviews/{{testReviewId}}/likes
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("กด Like รีวิวเดิมซ้ำแล้วไม่เพิ่มจำนวน", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().message).to.equal("Review is already liked");
+  });
+}

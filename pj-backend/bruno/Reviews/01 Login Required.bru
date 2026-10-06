@@ -1,0 +1,28 @@
+meta {
+  name: 01 Login Required
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/places/{{seedPlaceId}}/reviews
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "rating": 5,
+    "comment": "ห้องสะอาด"
+  }
+}
+
+vars:pre-request {
+  seedPlaceId: cfd82f59-72fd-5c2c-9509-1e0a5870b00a
+}
+
+tests {
+  test("ต้อง login ก่อนเพิ่มรีวิว", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

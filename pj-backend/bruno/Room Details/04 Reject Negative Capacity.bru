@@ -1,0 +1,27 @@
+meta {
+  name: 04 Reject Negative Capacity
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/places/{{roomDetailPlaceId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{adminToken}}
+}
+
+body:json {
+  {
+    "capacity": -1
+  }
+}
+
+tests {
+  test("ไม่รับ capacity ที่ติดลบ", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

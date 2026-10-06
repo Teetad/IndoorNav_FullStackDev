@@ -10,6 +10,10 @@ post {
   auth: none
 }
 
+headers {
+  Authorization: Bearer {{developerToken}}
+}
+
 body:json {
   {
     "building_id": "{{seedBuildingId}}",

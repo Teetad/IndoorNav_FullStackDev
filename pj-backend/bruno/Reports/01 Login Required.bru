@@ -1,0 +1,23 @@
+meta {
+  name: 01 Login Required
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/places/{{seedPlaceId}}/reports
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "description": "ป้ายชื่อห้องไม่ชัดเจน"
+  }
+}
+
+tests {
+  test("ต้อง login ก่อนส่ง Report", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

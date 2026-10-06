@@ -1,0 +1,33 @@
+meta {
+  name: 02 Create Report
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/places/{{seedPlaceId}}/reports
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+body:json {
+  {
+    "description": "ป้ายชื่อห้องไม่ชัดเจน"
+  }
+}
+
+vars:pre-request {
+  seedPlaceId: cfd82f59-72fd-5c2c-9509-1e0a5870b00a
+}
+
+tests {
+  test("User ส่ง Report ได้", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().status).to.equal("PENDING");
+    bru.setVar("testReportId", res.getBody().report_id);
+  });
+}

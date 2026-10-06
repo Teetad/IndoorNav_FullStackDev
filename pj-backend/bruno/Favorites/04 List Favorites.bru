@@ -1,0 +1,22 @@
+meta {
+  name: 04 List Favorites
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/favorites
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{sessionToken}}
+}
+
+tests {
+  test("อ่าน Favorite ของผู้ใช้ได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().some(row => row.place_id === bru.getEnvVar("seedPlaceId"))).to.equal(true);
+  });
+}

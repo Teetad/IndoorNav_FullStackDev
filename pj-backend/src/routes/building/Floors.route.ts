@@ -3,18 +3,22 @@ import { Buildings, Floors } from "@db/schema.js";
 import { and, eq } from "drizzle-orm";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
+import { requireAuth, requireRole } from "../../auth/middleware.js";
 import { parseFloorNumber } from "../../utils/validation.js";
 
 const router = Router();
 
+// ชั้นต้องอ้างถึงอาคารผ่าน building_id และเลขชั้นซ้ำในอาคารเดียวกันไม่ได้
+
 router.get("/", async (req, res) => {
   try {
-    const buildingId = req.query.building_id;
-    if (buildingId !== undefined && (typeof buildingId !== "string" || !isUUID(buildingId))) {
+    const queryBuildingId = req.query.building_id;
+    const buildingId = typeof queryBuildingId === "string" ? queryBuildingId : null;
+    if (queryBuildingId !== undefined && (!buildingId || !isUUID(buildingId))) {
       return res.status(400).json({ message: "building_id must be a valid UUID" });
     }
     const query = dbClient.select().from(Floors);
-    const floors = buildingId ? await query.where(eq(Floors.building_id, buildingId as string)) : await query;
+    const floors = buildingId ? await query.where(eq(Floors.building_id, buildingId)) : await query;
     return res.status(200).json(floors);
   } catch (error) {
     console.error("GET /floors failed:", error);
@@ -31,6 +35,7 @@ router.get("/:building_id/:floor_number", async (req, res) => {
     if (!isUUID(building_id) || floorNumber === null) {
       return res.status(400).json({ message: "building_id must be a UUID and floor_number an integer" });
     }
+    // and() บังคับให้ตรงทั้งอาคารและเลขชั้น
     const [floor] = await dbClient.select().from(Floors).where(and(
       eq(Floors.building_id, building_id), eq(Floors.floor_number, floorNumber),
     ));
@@ -42,7 +47,8 @@ router.get("/:building_id/:floor_number", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+// ข้อมูลชั้นและ Floor Plan เป็นข้อมูลโครงสร้าง ให้ Developer จัดการ
+router.post("/", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
   try {
     const { building_id, floor_number, floor_plan_image } = req.body;
     const floorNumber = parseFloorNumber(floor_number);
@@ -74,9 +80,9 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:floor_id", async (req, res) => {
+router.put("/:floor_id", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
   try {
-    const { floor_id } = req.params;
+    const floor_id = typeof req.params.floor_id === "string" ? req.params.floor_id : "";
     const { floor_number, floor_plan_image } = req.body;
     if (!isUUID(floor_id)) return res.status(400).json({ message: "floor_id must be a valid UUID" });
     const values: { floor_number?: number; floor_plan_image?: string | null } = {};
@@ -107,9 +113,9 @@ router.put("/:floor_id", async (req, res) => {
   }
 });
 
-router.delete("/:floor_id", async (req, res) => {
+router.delete("/:floor_id", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
   try {
-    const { floor_id } = req.params;
+    const floor_id = typeof req.params.floor_id === "string" ? req.params.floor_id : "";
     if (!isUUID(floor_id)) return res.status(400).json({ message: "floor_id must be a valid UUID" });
     const [floor] = await dbClient.delete(Floors).where(eq(Floors.floor_id, floor_id)).returning();
     if (!floor) return res.status(404).json({ message: "Floor not found" });
