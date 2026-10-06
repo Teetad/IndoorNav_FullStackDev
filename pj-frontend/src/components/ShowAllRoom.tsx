@@ -15,7 +15,7 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
     if (!selectedType) return;
 
     setLoading(true);
-    fetch(`http://localhost:3001/places?place_type=${encodeURIComponent(selectedType)}`)
+    fetch(`http://localhost:3000/places?place_type=${encodeURIComponent(selectedType)}`)
       .then((res) => res.json())
       .then((data) => {
         // รองรับทั้งกรณีที่ API ส่งกลับมาเป็น Array ตรงๆ หรืออยู่ใน Object (เช่น { places: [...] })

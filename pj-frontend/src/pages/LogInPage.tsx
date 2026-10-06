@@ -8,6 +8,10 @@ const LogInPage = () => {
     navigate(-1); // กลับไปหน้าก่อนหน้า
   };
 
+  const handleLogIn = () => {
+    window.location.href = 'http://localhost:3000/auth/login';
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-map-background backdrop-blur-xs">
       
@@ -48,7 +52,9 @@ const LogInPage = () => {
         </div>
 
         {/* ปุ่ม Log in ตรงกลาง */}
-        <div className="w-full mt-10 ">
+        <div 
+        onClick={handleLogIn}
+        className="w-full mt-10 ">
           <button className="w-full py-3.5 bg-primary-light text-grey-700 text-xl font-medium rounded-[12px] shadow-sm transition-all cursor-pointer">
             Log in
           </button>

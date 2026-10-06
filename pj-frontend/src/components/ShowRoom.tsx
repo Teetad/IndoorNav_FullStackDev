@@ -32,7 +32,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
     if (!placeId) return;
 
     setLoading(true);
-    fetch(`http://localhost:3001/places/${placeId}`)
+    fetch(`http://localhost:3000/places/${placeId}`)
       .then((res) => res.json())
       .then((data) => {
         setRoomDetail(data);
@@ -69,7 +69,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
   return (
     <div 
       onTouchMove={(e) => e.preventDefault()}
-      className="fixed inset-0 z-50 flex items-center justify-center pt-8 bg-black/30 backdrop-blur-xs transition-opacity overscroll-none"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 backdrop-blur-xs transition-opacity overscroll-none"
     >
       
       {/* กล่อง Bottom Sheet หลัก */}
@@ -107,8 +107,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
                 {/* 📌 3. ผูกปุ่ม Start ให้สั่ง navigate ไปหน้า StartNavigation พร้อมแนบชื่อห้องผ่าน Query Parameter */}
                 <button 
                   onClick={() => {
-                    const roomName = roomDetail?.place_name || "Unknown";
-                    navigate(`/start-navigation?room=${encodeURIComponent(roomName)}`);
+                    navigate(`/start-navigation?room=${roomDetail.place_name}`);
                   }}
                   className="flex items-center gap-1.5 px-3.5 py-2 bg-[#E6DFD5] text-stone-800 rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer"
                 >

@@ -6,6 +6,7 @@ import ShowAllRoom from "../../components/ShowAllRoom";
 import MapSpot from "../../components/MapSpot";
 import CategoryChips from "../../components/CategoryChips";
 import { useNavigate } from 'react-router-dom';
+import BottomNav from "../../components/BottomNav";
 
 const Floor_7 = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -80,11 +81,11 @@ const Floor_7 = () => {
   };
 
   const handleProfileClick = () => {
-    console.log('Profile icon clicked!');
+    navigate('/login');
   };
 
   const handleSearch = () => {
-    console.log('Search clicked!');
+    navigate('/search')
   };
 
   const isHidden = Boolean(selectedLocation) || Boolean(selectedCategory);
@@ -99,7 +100,6 @@ const Floor_7 = () => {
       
       {/* SearchBar และ CategoryChips ด้านบน */}
       <div 
-      onClick={() => navigate('/search')}
       className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
         <SearchBar
           value={searchQuery}
@@ -164,6 +164,8 @@ const Floor_7 = () => {
       <div className="absolute bottom-6 right-4 z-30">
         <FloorControl currentFloor={7} isHidden={isHidden} />
       </div>
+
+      <BottomNav/>
 
     </div>
   );

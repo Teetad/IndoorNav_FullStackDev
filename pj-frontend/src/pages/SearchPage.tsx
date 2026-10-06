@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import SearchBar from "../components/SearchBar"; 
-import ShowRoom from "../components/ShowRoom"; // 📌 1. นำเข้า ShowRoom เข้ามาใช้งาน
+import ShowRoom from "../components/ShowRoom"; 
 import { useNavigate } from 'react-router-dom';
 
 const SearchPage = () => {
@@ -8,7 +8,6 @@ const SearchPage = () => {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   
-  // 📌 2. เพิ่ม State สำหรับเก็บ placeId ที่ผู้ใช้คลิกเลือกจากผลการค้นหา
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
 
   const navigate = useNavigate();
@@ -22,7 +21,7 @@ const SearchPage = () => {
 
     const timer = setTimeout(() => {
       setLoading(true);
-      fetch(`http://localhost:3001/places?search=${encodeURIComponent(searchText)}`)
+      fetch(`http://localhost:3000/places?search=${encodeURIComponent(searchText)}`)
         .then((res) => res.json())
         .then((data) => {
           const list = Array.isArray(data) ? data : data.places || [];
@@ -41,8 +40,9 @@ const SearchPage = () => {
   return (
     <div className="absolute inset-0 z-50 bg-[#F3EFEA] flex flex-col p-4 animate-fade-in">
       
+      {/* 📌 เปลี่ยนจาก navigate('/') เป็น navigate(-1) เพื่อย้อนกลับไปหน้าก่อนหน้า */}
       <button 
-          onClick={() => navigate('/')}
+          onClick={() => navigate(-1)}
           className="mt-3 text-xs font-semibold text-dark-accent hover:text-stone-900 cursor-pointer flex items-center gap-1"
         >
           &lt; Back to map
@@ -70,7 +70,6 @@ const SearchPage = () => {
               <div key={place.place_id || index}>
                 <div
                   onClick={() => {
-                    // 📌 3. เมื่อคลิกที่ชื่อสถานที่ ให้เซ็ตค่า placeId เพื่อเปิด ShowRoom ทันที
                     setSelectedPlaceId(place.place_id);
                   }}
                   className="py-4 px-2 text-grey-500 font-medium text-base hover:bg-stone-200/50 rounded-xl cursor-pointer transition-colors"
@@ -89,10 +88,10 @@ const SearchPage = () => {
         )}
       </div>
 
-      {/* 📌 4. เรียกใช้งาน ShowRoom Component ในหน้า SearchPage */}
+      {/* เรียกใช้งาน ShowRoom Component ในหน้า SearchPage */}
       <ShowRoom 
         placeId={selectedPlaceId}
-        onClose={() => setSelectedPlaceId(null)} // เคลียร์ค่าเมื่อปิด Popup เพื่อซ่อน ShowRoom
+        onClose={() => setSelectedPlaceId(null)} 
       />
 
     </div>

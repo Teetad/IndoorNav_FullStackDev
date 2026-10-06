@@ -8,13 +8,14 @@ import MainLayout from './layouts/MainLayout.tsx';
 import ReportPage from './pages/UserReportPage.tsx';
 import LogInPage from './pages/LogInPage.tsx';
 import SearchPage from './pages/SearchPage.tsx';
+import StartNavigation from './pages/StartNavigation.tsx';
+import AuthCallback from './pages/AuthCallback.tsx';
 
 function App() {
   return (
     <>
       <Router>
        <Routes>
-        <Route element={<MainLayout />}>
           <Route path="/" element={<Floor_4 />} />
           <Route path="/floor-4" element={<Floor_4 />} />
           <Route path="/floor-5" element={<Floor_5 />} />
@@ -23,7 +24,8 @@ function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/login" element={<LogInPage />} /> 
           <Route path="/report" element={<ReportPage />} />
-        </Route>
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/start-navigation" element={<StartNavigation />} />
       </Routes>
     </Router>
     </>
