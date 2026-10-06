@@ -111,11 +111,12 @@ Query ของ `GET /places` ใช้ร่วมกันได้:
 | `floor` | เลขชั้น เช่น `7` ไม่ใช่ `floor_id` |
 | `building_id` | UUID ของอาคาร |
 | `place_type` | ประเภทที่อยู่ใน `db/place-types.ts` |
+| `room_status` | สถานะ `OPEN`, `CLOSED`, `MAINTENANCE` หรือ `UNKNOWN` |
 
 ตัวอย่าง:
 
 ```http
-GET {{baseUrl}}/places?building_id=<UUID>&floor=7&place_type=classroom&search=701
+GET {{baseUrl}}/places?building_id=<UUID>&floor=7&place_type=classroom&room_status=OPEN&search=701
 ```
 
 Body สำหรับ `POST /places`:
@@ -126,6 +127,10 @@ Body สำหรับ `POST /places`:
   "place_name": "ห้องเรียน 701",
   "place_type": "classroom",
   "room_number": "701",
+  "room_status": "OPEN",
+  "capacity": 60,
+  "opening_time": "08:00",
+  "closing_time": "17:00",
   "description": "ห้องเรียนชั้น 7",
   "image_url": "https://example.com/room-701.jpg"
 }
@@ -135,10 +140,15 @@ Body สำหรับ `POST /places`:
 - `place_type` ไม่จำเป็น ใช้ `null` ได้เมื่อยังไม่ทราบประเภท
 - ค่าประเภทที่รับ: `classroom`, `coworking_space`, `administrative_office`,
   `laboratory`, `meeting_room`, `faculty_office`, `restroom`,
-  `elevator_lobby`, `stairs`, `multipurpose_room`, `graduate_room`
+  `elevator_lobby`, `stairs`, `multipurpose_room`, `graduate_room`, `shop`
 - `room_number` ยาวไม่เกิน 30, `description` และ `image_url` ยาวไม่เกิน 500
+- `room_status` ไม่จำเป็น ถ้าไม่ส่งจะเก็บเป็น `UNKNOWN`
+- `capacity` ต้องเป็นจำนวนเต็มตั้งแต่ 0 หรือใช้ `null` เมื่อยังไม่ทราบ
+- `opening_time` และ `closing_time` ใช้รูปแบบ 24 ชั่วโมง `HH:MM` หรือ `null`
+- คอลัมน์เวลายังไม่เก็บวันทำการ ข้อมูลธุรการและห้องอาจารย์จึงระบุจันทร์–ศุกร์ใน `description`
 - `PUT` รับฟิลด์เดียวกับ `POST` และต้องส่งอย่างน้อยหนึ่งฟิลด์ที่แก้ไขได้
-- Admin แก้ได้เฉพาะ `place_name`, `description`, `image_url`
+- Admin แก้ชื่อ รายละเอียด รูป สถานะ ความจุ และเวลาเปิดปิดได้
+- Admin แก้ `floor_id`, `place_type` และ `room_number` ไม่ได้
 - Developer แก้ข้อมูลสถานที่ได้ทุกฟิลด์ที่ API รองรับ
 - `favCount` ส่งกลับใน JSON แต่ API ปัจจุบันยังไม่รับฟิลด์นี้ใน `POST` หรือ `PUT`
 
@@ -161,6 +171,9 @@ API ตัดช่องว่างหัวท้าย แปลงเป็
 
 ## Place Images
 
+ไฟล์รูปที่เก็บใน `public/images` เปิดผ่าน `/images/<path>` ได้ เช่น
+`GET /images/places/floor-7/702/702-1.jpg`
+
 | Method | Endpoint | รายละเอียด |
 |---|---|---|
 | GET | `/places/:place_id/images` | อ่าน URL รูปทั้งหมด เรียงตาม `display_order` |
@@ -178,6 +191,10 @@ Body สำหรับเพิ่มรูป:
 ```
 
 API นี้เก็บ URL ของรูป ยังไม่ได้รับไฟล์รูปภาพโดยตรง
+URL ที่เป็นไฟล์ใน Backend จะขึ้นต้นด้วย `/images/...` เช่น
+`/images/places/floor-7/702/702-1.jpg` ฝั่ง Frontend ให้นำ Base URL ของ Backend
+มาต่อข้างหน้า รูปห้องเรียนชั้น 7 จำนวน 45 รูปถูกเพิ่มผ่าน `pnpm seed:maps --apply`
+และ unique index ป้องกัน URL เดิมซ้ำในห้องเดียวกัน
 
 ## Favorites
 
@@ -238,9 +255,8 @@ API นี้เก็บ URL ของรูป ยังไม่ได้ร�
 
 - Navigation, Navigation Nodes และ Navigation Edges
 - API อัปโหลดไฟล์รูปภาพไปยังที่เก็บไฟล์
-- API เวลาเปิด สถานะห้อง และขนาดห้อง
 
-รายการพวกนี้ยังเรียกใช้ใน `pj-backend` ไม่ได้
+รายการข้างต้นยังเรียกใช้ใน `pj-backend` ไม่ได้
 
 การอ่านและค้นหาข้อมูลยังเป็น public ส่วนการเพิ่ม แก้ และลบจะตรวจ Bearer token
 และ role ตามที่ระบุในตารางด้านบน

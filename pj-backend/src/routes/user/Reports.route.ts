@@ -6,10 +6,11 @@ import { validate as isUUID } from "uuid";
 import { requireAuth, requireRole } from "../../auth/middleware.js";
 
 const router = Router();
+// User สร้างและดู Report ของตัวเอง ส่วน Admin ดูทั้งหมด แก้สถานะ และลบได้
 const reportStatuses = ["PENDING", "IN_PROGRESS", "RESOLVED"] as const;
 
 function isReportStatus(value: unknown): value is typeof reportStatuses[number] {
-  return typeof value === "string" && reportStatuses.includes(value as typeof reportStatuses[number]);
+  return typeof value === "string" && reportStatuses.some(status => status === value);
 }
 
 // User แจ้งปัญหาของสถานที่

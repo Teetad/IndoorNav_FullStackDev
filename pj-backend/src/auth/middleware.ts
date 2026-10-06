@@ -15,6 +15,7 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
 
   try {
     // ถ้า token ถูกต้อง เก็บข้อมูลผู้ใช้ไว้ให้ route ถัดไปใช้
+    // res.locals ใช้ฝากข้อมูลผู้ใช้ให้ route ถัดไปใน request เดียวกัน
     res.locals.auth = await verifySessionToken(token);
     next();
   } catch {
@@ -23,6 +24,7 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
 };
 
 export function requireRole(...roles: UserRole[]): RequestHandler {
+  // รับได้หลาย role เช่น requireRole("ADMIN", "DEVELOPER")
   return (_req, res, next) => {
     // ผู้ใช้ login แล้ว แต่ role ไม่ตรงกับที่ route อนุญาต ให้ตอบ 403
     if (!res.locals.auth || !roles.includes(res.locals.auth.role)) {

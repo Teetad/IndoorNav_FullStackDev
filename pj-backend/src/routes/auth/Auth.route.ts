@@ -3,7 +3,7 @@ import { Users } from "@db/schema.js";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { Router, type Request, type Response } from "express";
-import { getAssignedRole, getOAuthConfig, type UserRole } from "../../auth/config.js";
+import { getAssignedRole, getOAuthConfig, isUserRole } from "../../auth/config.js";
 import { requireAuth, requireRole } from "../../auth/middleware.js";
 import { createSessionToken } from "../../auth/tokens.js";
 
@@ -127,7 +127,7 @@ router.get("/callback", async (req, res) => {
     const [existing] = await dbClient.select().from(Users)
       .where(eq(Users.oauth_subject, userInfo.sub));
     // รายชื่อใน .env มีสิทธิ์ก่อน ถ้าไม่กำหนดให้ใช้ role เดิมหรือ USER
-    const savedRole = existing?.role as UserRole | undefined;
+    const savedRole = isUserRole(existing?.role) ? existing.role : undefined;
     const role = getAssignedRole(email) ?? savedRole ?? "USER";
     // เคย login แล้วให้อัปเดตข้อมูล ถ้ายังไม่เคยให้สร้าง User ใหม่
     let user;
@@ -147,12 +147,12 @@ router.get("/callback", async (req, res) => {
         role,
       }).returning();
     }
-    if (!user || !["USER", "ADMIN", "DEVELOPER"].includes(user.role)) {
+    if (!user || !isUserRole(user.role)) {
       throw new Error("Unable to resolve user role");
     }
 
     // สร้าง token ของระบบเรา ไม่ส่ง access token ของ CPE กลับไป
-    const sessionToken = await createSessionToken({ ...user, role: user.role as UserRole });
+    const sessionToken = await createSessionToken({ ...user, role: user.role });
     const userResponse = {
       user_id: user.user_id,
       email: user.email,
@@ -210,7 +210,7 @@ router.get("/me", requireAuth, async (_req, res) => {
   }
 });
 
-// ใช้ตรวจว่า session ปัจจุบันมีสิทธิ์ ADMIN; route ข้อมูลเดิมยังไม่ได้บังคับ role
+// endpoint สั้น ๆ สำหรับทดสอบว่า middleware ยอมให้ ADMIN ผ่านหรือไม่
 router.get("/admin-check", requireAuth, requireRole("ADMIN"), (_req, res) => {
   return res.status(200).json({ message: "Admin access granted" });
 });

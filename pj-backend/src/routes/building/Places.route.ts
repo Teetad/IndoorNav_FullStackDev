@@ -1,19 +1,25 @@
 import { dbClient } from "@db/client.js";
 import { Buildings, Floors, PlaceImages, PlaceKeywords, Places } from "@db/schema.js";
 import { isPlaceType, type PlaceType } from "@db/place-types.js";
+import { isRoomStatus, type RoomStatus } from "@db/room-statuses.js";
 import { and, eq, exists, ilike, or } from "drizzle-orm";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
 import { requireAuth, requireRole } from "../../auth/middleware.js";
-import { parseFloorNumber } from "../../utils/validation.js";
+import { isValidCapacity, isValidTime, parseFloorNumber } from "../../utils/validation.js";
 
 const router = Router();
+// ไฟล์นี้รวม API สถานที่ คำค้น และรูป เพราะทั้งหมดเริ่มจาก place_id เดียวกัน
 // ฟิลด์ที่จะส่งกลับจาก GET /places และ GET /places/:place_id
 const placeColumns = {
   place_id: Places.place_id,
   place_name: Places.place_name,
   place_type: Places.place_type,
   room_number: Places.room_number,
+  room_status: Places.room_status,
+  capacity: Places.capacity,
+  opening_time: Places.opening_time,
+  closing_time: Places.closing_time,
   description: Places.description,
   image_url: Places.image_url,
   favCount: Places.favCount,
@@ -24,7 +30,7 @@ const placeColumns = {
   building_name: Buildings.building_name,
 };
 
-// JOIN เพื่อให้แต่ละสถานที่มีเลขชั้นและชื่ออาคารในผลลัพธ์เดียวกัน
+// JOIN เชื่อม places → floors → buildings เพื่อให้ Frontend ไม่ต้องเรียก API สามรอบ
 const selectPlaces = () => dbClient
   .select(placeColumns)
   .from(Places)
@@ -33,7 +39,7 @@ const selectPlaces = () => dbClient
 
 router.get("/", async (req, res) => {
   try {
-    const { floor, search, building_id, place_type } = req.query;
+    const { floor, search, building_id, place_type, room_status } = req.query;
 
     if (floor !== undefined && (typeof floor !== "string" || parseFloorNumber(floor) === null)) {
       return res.status(400).json({ message: "floor must be an integer" });
@@ -47,15 +53,19 @@ router.get("/", async (req, res) => {
     if (place_type !== undefined && !isPlaceType(place_type)) {
       return res.status(400).json({ message: "place_type is invalid" });
     }
+    if (room_status !== undefined && !isRoomStatus(room_status)) {
+      return res.status(400).json({ message: "room_status is invalid" });
+    }
 
     // ค้นหาสถานที่จากเลขชั้น ชื่อสถานที่ เลขห้อง หรือคำค้น
+    // สร้างรายการเงื่อนไขเฉพาะ query ที่ผู้ใช้ส่งมา แล้วรวมด้วย AND ตอนท้าย
     const filters = [];
     if (floor !== undefined) filters.push(eq(Floors.floor_number, Number(floor)));
     if (search !== undefined) {
       filters.push(or(
         ilike(Places.place_name, `%${search.trim()}%`),
         ilike(Places.room_number, `%${search.trim()}%`),
-        // EXISTS ตรวจว่ามีคำค้นตรงหรือไม่ โดยไม่ทำให้สถานที่ซ้ำหลายแถว
+        // EXISTS ตอบเพียงว่ามี keyword ตรงหรือไม่ จึงไม่ทำให้สถานที่ซ้ำหลายแถว
         exists(dbClient.select({ id: PlaceKeywords.keyword_id })
           .from(PlaceKeywords)
           .where(and(
@@ -66,6 +76,7 @@ router.get("/", async (req, res) => {
     }
     if (building_id !== undefined) filters.push(eq(Buildings.building_id, building_id));
     if (place_type !== undefined) filters.push(eq(Places.place_type, place_type));
+    if (room_status !== undefined) filters.push(eq(Places.room_status, room_status));
 
     const query = selectPlaces();
     const places = filters.length > 0
@@ -247,7 +258,10 @@ router.get("/:place_id", async (req, res) => {
 // Developer เป็นผู้เพิ่มข้อมูลสถานที่เริ่มต้น
 router.post("/", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
   try {
-    const { floor_id, place_name, place_type, room_number, description, image_url } = req.body;
+    const {
+      floor_id, place_name, place_type, room_number, room_status,
+      capacity, opening_time, closing_time, description, image_url,
+    } = req.body;
 
     if (typeof floor_id !== "string" || !isUUID(floor_id)) {
       return res.status(400).json({ message: "floor_id is required and must be a valid UUID" });
@@ -260,6 +274,18 @@ router.post("/", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
     }
     if (place_type !== undefined && place_type !== null && !isPlaceType(place_type)) {
       return res.status(400).json({ message: "place_type is invalid" });
+    }
+    if (room_status !== undefined && !isRoomStatus(room_status)) {
+      return res.status(400).json({ message: "room_status is invalid" });
+    }
+    if (capacity !== undefined && capacity !== null && !isValidCapacity(capacity)) {
+      return res.status(400).json({ message: "capacity must be a non-negative integer or null" });
+    }
+    if (opening_time !== undefined && opening_time !== null && !isValidTime(opening_time)) {
+      return res.status(400).json({ message: "opening_time must use HH:MM format or be null" });
+    }
+    if (closing_time !== undefined && closing_time !== null && !isValidTime(closing_time)) {
+      return res.status(400).json({ message: "closing_time must use HH:MM format or be null" });
     }
     if (description !== undefined && (typeof description !== "string" || description.trim().length > 500)) {
       return res.status(400).json({ message: "description must not exceed 500 characters" });
@@ -289,6 +315,10 @@ router.post("/", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
         place_name: place_name.trim(),
         place_type: place_type ?? null,
         room_number: typeof room_number === "string" ? room_number.trim() || null : null,
+        room_status: room_status ?? "UNKNOWN",
+        capacity: capacity ?? null,
+        opening_time: opening_time ?? null,
+        closing_time: closing_time ?? null,
         description: typeof description === "string" ? description.trim() || null : null,
         image_url: typeof image_url === "string" ? image_url.trim() || null : null,
       })
@@ -304,7 +334,10 @@ router.post("/", requireAuth, requireRole("DEVELOPER"), async (req, res) => {
 router.put("/:place_id", requireAuth, requireRole("ADMIN", "DEVELOPER"), async (req, res) => {
   try {
     const place_id = typeof req.params.place_id === "string" ? req.params.place_id : "";
-    const { floor_id, place_name, place_type, room_number, description, image_url } = req.body;
+    const {
+      floor_id, place_name, place_type, room_number, room_status,
+      capacity, opening_time, closing_time, description, image_url,
+    } = req.body;
 
     if (!isUUID(place_id)) {
       return res.status(400).json({ message: "place_id must be a valid UUID" });
@@ -313,11 +346,12 @@ router.put("/:place_id", requireAuth, requireRole("ADMIN", "DEVELOPER"), async (
     if (res.locals.auth.role === "ADMIN" &&
         (floor_id !== undefined || place_type !== undefined || room_number !== undefined)) {
       return res.status(403).json({
-        message: "Admin can only update place_name, description, and image_url",
+        message: "Admin cannot update floor_id, place_type, or room_number",
       });
     }
     if (floor_id === undefined && place_name === undefined && place_type === undefined && room_number === undefined &&
-        description === undefined && image_url === undefined) {
+        room_status === undefined && capacity === undefined && opening_time === undefined &&
+        closing_time === undefined && description === undefined && image_url === undefined) {
       return res.status(400).json({ message: "At least one editable field is required" });
     }
 
@@ -326,6 +360,10 @@ router.put("/:place_id", requireAuth, requireRole("ADMIN", "DEVELOPER"), async (
       place_name?: string;
       place_type?: PlaceType | null;
       room_number?: string | null;
+      room_status?: RoomStatus;
+      capacity?: number | null;
+      opening_time?: string | null;
+      closing_time?: string | null;
       description?: string | null;
       image_url?: string | null;
     } = {};
@@ -369,6 +407,34 @@ router.put("/:place_id", requireAuth, requireRole("ADMIN", "DEVELOPER"), async (
         return res.status(400).json({ message: "room_number must not exceed 30 characters" });
       }
       updateData.room_number = room_number.trim() || null;
+    }
+
+    if (room_status !== undefined) {
+      if (!isRoomStatus(room_status)) {
+        return res.status(400).json({ message: "room_status is invalid" });
+      }
+      updateData.room_status = room_status;
+    }
+
+    if (capacity !== undefined) {
+      if (capacity !== null && !isValidCapacity(capacity)) {
+        return res.status(400).json({ message: "capacity must be a non-negative integer or null" });
+      }
+      updateData.capacity = capacity;
+    }
+
+    if (opening_time !== undefined) {
+      if (opening_time !== null && !isValidTime(opening_time)) {
+        return res.status(400).json({ message: "opening_time must use HH:MM format or be null" });
+      }
+      updateData.opening_time = opening_time;
+    }
+
+    if (closing_time !== undefined) {
+      if (closing_time !== null && !isValidTime(closing_time)) {
+        return res.status(400).json({ message: "closing_time must use HH:MM format or be null" });
+      }
+      updateData.closing_time = closing_time;
     }
 
     if (image_url !== undefined) {

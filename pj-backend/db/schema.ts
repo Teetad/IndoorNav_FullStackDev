@@ -7,6 +7,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+// schema เปรียบเหมือนพิมพ์เขียวฐานข้อมูล แต่การแก้ไฟล์นี้ยังไม่เปลี่ยน DB จริง
+// หลังแก้ต้องสร้าง migration และรัน pnpm db:migrate เสมอ
+
 export const Users = pgTable("users", {
   // user_id เป็น ID ภายในระบบ ส่วน oauth_subject เป็น ID ที่ CPE OAuth ส่งมา
   user_id: uuid("user_id").primaryKey().defaultRandom(),
@@ -52,6 +55,11 @@ export const Places = pgTable("places", {
   // null หมายถึงยังไม่ทราบประเภท เช่น ห้อง 712
   place_type: varchar("place_type", { length: 40 }),
   room_number: varchar("room_number", { length: 30 }),
+  // UNKNOWN ใช้เมื่อยังไม่ได้ตรวจสอบสถานะจริงของห้อง
+  room_status: varchar("room_status", { length: 20 }).default("UNKNOWN").notNull(),
+  capacity: integer("capacity"),
+  opening_time: varchar("opening_time", { length: 5 }),
+  closing_time: varchar("closing_time", { length: 5 }),
   description: varchar("description", { length: 500 }),
   image_url: varchar("image_url", { length: 500 }),
   favCount: integer("fav_count").default(0).notNull(),

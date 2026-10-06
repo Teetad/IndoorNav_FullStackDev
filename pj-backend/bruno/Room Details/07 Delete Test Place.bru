@@ -1,0 +1,22 @@
+meta {
+  name: 07 Delete Test Place
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/places/{{roomDetailPlaceId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{developerToken}}
+}
+
+tests {
+  test("ลบสถานที่ทดสอบหลังทดสอบเสร็จ", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.place_id).to.equal(bru.getVar("roomDetailPlaceId"));
+  });
+}

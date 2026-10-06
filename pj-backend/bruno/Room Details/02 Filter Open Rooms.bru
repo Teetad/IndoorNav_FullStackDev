@@ -1,0 +1,19 @@
+meta {
+  name: 02 Filter Open Rooms
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/places?room_status=OPEN
+  body: none
+  auth: none
+}
+
+tests {
+  test("กรองเฉพาะสถานที่ที่เปิดได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().every(place => place.room_status === "OPEN")).to.equal(true);
+    expect(res.getBody().some(place => place.place_id === bru.getVar("roomDetailPlaceId"))).to.equal(true);
+  });
+}
