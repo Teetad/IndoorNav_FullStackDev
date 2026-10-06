@@ -2,7 +2,7 @@ import { dbClient } from "@db/client.js";
 import { Buildings, Floors, PlaceImages, PlaceKeywords, Places } from "@db/schema.js";
 import { isPlaceType, type PlaceType } from "@db/place-types.js";
 import { isRoomStatus, type RoomStatus } from "@db/room-statuses.js";
-import { and, eq, exists, ilike, or } from "drizzle-orm";
+import { and, eq, exists, ilike, or,isNotNull } from "drizzle-orm";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
 import { requireAuth, requireRole } from "../../auth/middleware.js";
@@ -126,6 +126,29 @@ router.get("/:place_id/images", async (req, res) => {
   } catch (error) {
     console.error("GET /places/:place_id/images failed:", error);
     return res.status(500).json({ message: "Unable to get place images" });
+  }
+});
+
+router.get("/types", async (req, res) => {
+  try {
+    const typesData = await dbClient
+      .selectDistinct({
+        place_type: Places.place_type,
+      })
+      .from(Places)
+      // กรองเอาเฉพาะข้อมูลที่ place_type ไม่เป็น null
+      .where(isNotNull(Places.place_type));
+
+    // Drizzle จะคืนค่ามาเป็น Array of Objects เช่น [{ place_type: 'A' }, { place_type: 'B' }]
+    // เราจึงต้องใช้ .map() เพื่อแปลงให้เป็น Array ของ String ธรรมดาตามที่คุณต้องการ
+    const typesArray = typesData.map((row) => row.place_type);
+
+    // ผลลัพธ์ที่ส่งกลับไปจะเป็นแบบนี้: ["MEETING_ROOM", "OFFICE", "RESTROOM"]
+    return res.status(200).json(typesArray);
+    
+  } catch (error) {
+    console.error("GET /types failed:", error);
+    return res.status(500).json({ message: "Unable to get place types" });
   }
 });
 
