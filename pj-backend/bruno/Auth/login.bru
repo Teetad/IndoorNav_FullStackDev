@@ -1,0 +1,16 @@
+meta {
+  name: login
+  type: http
+  seq: 7
+}
+
+get {
+  url:  http://localhost:3000/auth/login
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  forwardAuthorizationHeader: false
+}

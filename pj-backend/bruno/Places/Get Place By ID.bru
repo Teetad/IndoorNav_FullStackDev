@@ -10,6 +10,10 @@ get {
   auth: none
 }
 
+vars:pre-request {
+  seedPlaceId: cfd82f59-72fd-5c2c-9509-1e0a5870b00a
+}
+
 tests {
   test("returns a place", function () {
     expect(res.getStatus()).to.equal(200);
