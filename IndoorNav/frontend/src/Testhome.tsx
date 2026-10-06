@@ -10,7 +10,7 @@ export default function TestHome() {
   return (
     <div>
       <div style={{ padding: 12, background: "#222", color: "#fff" }}>Header</div>
-      <MapEmbed startRoom={START} goalRoom={GOAL} floor="5" debug />
+      <MapEmbed startRoom={START} goalRoom={GOAL} floor="4" debug />
     </div>
   );
 }
