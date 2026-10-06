@@ -2,7 +2,8 @@ import { dbClient } from "@db/client.js";
 import { Buildings, Floors, PlaceImages, PlaceKeywords, Places } from "@db/schema.js";
 import { isPlaceType, type PlaceType } from "@db/place-types.js";
 import { isRoomStatus, type RoomStatus } from "@db/room-statuses.js";
-import { and, eq, exists, ilike, isNotNull, or } from "drizzle-orm";
+import { and, eq, exists, ilike, or,isNotNull } from "drizzle-orm";
+
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
 import { requireAuth, requireRole } from "../../auth/middleware.js";
