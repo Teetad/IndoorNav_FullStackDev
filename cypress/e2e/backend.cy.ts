@@ -1,108 +1,96 @@
-before(() => {
-  const url = Cypress.expose("BACKEND_URL");
-  cy.request({
-    method: "POST",
-    url: `${url}/todo/all`,
-  });
-});
+const backendUrl = () => Cypress.env("BACKEND_URL") as string;
 
-describe("Backend", () => {
-  it("checks env", () => {
-    cy.log(JSON.stringify(Cypress.expose()));
-  });
-
-  it("checks CORS disabled", () => {
-    const url = Cypress.expose("BACKEND_URL");
-    cy.request({
-      method: "GET",
-      url: `${url}/todo`,
-    }).then((res) => {
-      // cy.log(JSON.stringify(res));
-      expect(res.headers).to.not.have.property("access-control-allow-origin");
+describe("pj-backend public API", () => {
+  it("responds on the root endpoint", () => {
+    cy.request(`${backendUrl()}/`).then((res) => {
+      expect(res.status).to.equal(200);
+      expect(res.body).to.deep.equal({
+        message: "Indoor Navigation Backend is running",
+      });
     });
   });
 
-  it("checks get response", () => {
-    const url = Cypress.expose("BACKEND_URL");
-    cy.request({
-      method: "GET",
-      url: `${url}/todo`,
-    }).then((res) => {
+  it("returns database health information", () => {
+    cy.request(`${backendUrl()}/health/database`).then((res) => {
+      expect(res.status).to.equal(200);
+      expect(res.body.message).to.equal("Database connection is working");
+      expect(res.body.tableCounts).to.include.all.keys(
+        "buildings",
+        "floors",
+        "places",
+        "users",
+        "favorites",
+        "reviews",
+        "reviewLikes",
+        "reports",
+      );
+    });
+  });
+
+  it("lists buildings, floors, places, and place types", () => {
+    cy.request(`${backendUrl()}/buildings`).then((res) => {
+      expect(res.status).to.equal(200);
+      expect(res.body).to.be.a("array");
+    });
+
+    cy.request(`${backendUrl()}/floors`).then((res) => {
+      expect(res.status).to.equal(200);
+      expect(res.body).to.be.a("array");
+    });
+
+    cy.request(`${backendUrl()}/places`).then((res) => {
+      expect(res.status).to.equal(200);
+      expect(res.body).to.be.a("array");
+    });
+
+    cy.request(`${backendUrl()}/places/types`).then((res) => {
+      expect(res.status).to.equal(200);
       expect(res.body).to.be.a("array");
     });
   });
 
-  it("creates todo", () => {
-    const url = Cypress.expose("BACKEND_URL");
-    cy.request({
-      method: "PUT",
-      url: `${url}/todo`,
-      body: {
-        todoText: "New Todo",
-      },
-    }).then((res) => {
-      cy.log(JSON.stringify(res.body));
-      expect(res.body).to.have.all.keys("msg", "data");
-      expect(res.body.data).to.all.keys("id", "todoText");
+  it("filters places by floor and search term", () => {
+    cy.request(`${backendUrl()}/places?floor=4`).then((res) => {
+      expect(res.status).to.equal(200);
+      expect(res.body).to.be.a("array");
+      res.body.forEach((place: any) => {
+        expect(place.floor_number).to.equal(4);
+      });
+    });
+
+    cy.request(`${backendUrl()}/places?search=room`).then((res) => {
+      expect(res.status).to.equal(200);
+      expect(res.body).to.be.a("array");
     });
   });
 
-  it("deletes todo", () => {
-    const url = Cypress.expose("BACKEND_URL");
+  it("validates malformed query and route parameters", () => {
+    cy.request({
+      url: `${backendUrl()}/places?floor=not-a-number`,
+      failOnStatusCode: false,
+    }).then((res) => {
+      expect(res.status).to.equal(400);
+      expect(res.body.message).to.equal("floor must be an integer");
+    });
 
     cy.request({
-      method: "PUT",
-      url: `${url}/todo`,
-      body: {
-        todoText: "New Todo",
-      },
+      url: `${backendUrl()}/places/not-a-uuid`,
+      failOnStatusCode: false,
     }).then((res) => {
-      const todo = res.body.data;
-      cy.request({
-        method: "DELETE",
-        url: `${url}/todo`,
-        body: {
-          id: todo.id,
-        },
-      }).then((res) => {
-        cy.log(JSON.stringify(res.body));
-        expect(res.body).to.have.all.keys("msg", "data");
-        expect(res.body.data).to.all.keys("id");
-      });
+      expect(res.status).to.equal(400);
+      expect(res.body.message).to.equal("place_id must be a valid UUID");
     });
   });
 
-  it("updates todo", () => {
-    const url = Cypress.expose("BACKEND_URL");
-
+  it("protects developer-only writes from guests", () => {
     cy.request({
-      method: "PUT",
-      url: `${url}/todo`,
-      body: {
-        todoText: "New Todo",
-      },
+      method: "POST",
+      url: `${backendUrl()}/buildings`,
+      body: { building_name: `Cypress ${Date.now()}` },
+      failOnStatusCode: false,
     }).then((res) => {
-      const todo = res.body.data;
-      cy.wrap(todo.id).as("currentId"); // Storing id for using later in the chain
-      cy.request({
-        method: "PATCH",
-        url: `${url}/todo`,
-        body: {
-          id: todo.id,
-          todoText: "Updated Text",
-        },
-      }).then((res) => {
-        cy.request({
-          method: "GET",
-          url: `${url}/todo`,
-        }).then(function (res) {
-          // Notice that arrow function is not used here due to "this" issue
-          const currentId = this.currentId; // Get value from context
-          const todos = res.body;
-          const todo = todos.find((el: any) => el.id === currentId);
-          expect(todo.todoText).to.equal("Updated Text");
-        });
-      });
+      expect(res.status).to.equal(401);
+      expect(res.body.message).to.equal("Session token is required");
     });
   });
 });

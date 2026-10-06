@@ -1,58 +1,76 @@
-before(() => {
-  const url = Cypress.expose("BACKEND_URL");
-  cy.request({
-    method: "POST",
-    url: `${url}/todo/all`,
+const frontendUrl = () => Cypress.env("FRONTEND_URL") as string;
+
+const samplePlace = {
+  place_id: "6371ac8c-4c35-538b-a8a7-4d8ef25b2ec8",
+  place_name: "Room 413A",
+  place_type: "CLASSROOM",
+  room_number: "413A",
+  room_status: "OPEN",
+  capacity: 40,
+  opening_time: "08:00",
+  closing_time: "18:00",
+  description: "A test classroom returned by Cypress.",
+  image_url: null,
+  favCount: 0,
+  floor_number: 4,
+  building_name: "Building 30",
+};
+
+const stubFrontendApi = () => {
+  cy.intercept("GET", "http://localhost:3000/places/types", [
+    "CLASSROOM",
+    "LAB",
+    "OFFICE",
+  ]).as("placeTypes");
+
+  cy.intercept("GET", "http://localhost:3000/places?place_type=CLASSROOM", [
+    samplePlace,
+  ]).as("placesByType");
+
+  cy.intercept("GET", `http://localhost:3000/places/${samplePlace.place_id}`, {
+    ...samplePlace,
+  }).as("placeDetail");
+};
+
+describe("pj-frontend", () => {
+  beforeEach(() => {
+    stubFrontendApi();
   });
-});
 
-describe("Frontend", () => {
-  it("connects", () => {
-    const url = Cypress.expose("FRONTEND_URL");
-    cy.visit(url);
-  });
-  it("creates todo", () => {
-    const url = Cypress.expose("FRONTEND_URL");
-    const text = new Date().getTime().toString();
-    cy.visit(url);
-    cy.get("[data-cy='input-text']").type(text);
-    cy.get("[data-cy='submit']").click();
-    cy.contains(text);
+  it("renders the default floor map", () => {
+    cy.visit(frontendUrl());
+    cy.contains("Dashboard").should("be.visible");
+    cy.get("input[placeholder='Search location here']").should("be.visible");
+    cy.get("img[alt='Floor 4 Map']").should("be.visible");
+    cy.wait("@placeTypes");
   });
 
-  it("deletes todo", () => {
-    const url = Cypress.expose("FRONTEND_URL");
+  it("navigates between floor routes", () => {
+    cy.visit(`${frontendUrl()}/floor-5`);
+    cy.get("img[alt='Floor 5 Map']").should("be.visible");
 
-    const text = new Date().getTime().toString();
-    cy.visit(url);
-    cy.get("[data-cy='input-text']").type(text);
-    cy.get("[data-cy='submit']").click();
-    cy.get("[data-cy='todo-item-wrapper']")
-      .contains(text)
-      .parent()
-      .within(() => {
-        cy.get("[data-cy='todo-item-delete']").click();
-      });
-    cy.contains(text).should("not.exist");
+    cy.visit(`${frontendUrl()}/floor-6`);
+    cy.get("img[alt='Floor 6 Map']").should("be.visible");
+
+    cy.visit(`${frontendUrl()}/floor-7`);
+    cy.get("img[alt='Floor 7 Map']").should("be.visible");
   });
 
-  it("updates todo", () => {
-    const url = Cypress.expose("FRONTEND_URL");
+  it("opens category results from backend data", () => {
+    cy.visit(frontendUrl());
+    cy.wait("@placeTypes");
 
-    const text = new Date().getTime().toString();
-    const textUpdated = "123456";
-    cy.visit(url);
-    cy.get("[data-cy='input-text']").type(text);
-    cy.get("[data-cy='submit']").click();
-    cy.get("[data-cy='todo-item-wrapper']")
-      .contains(text)
-      .parent()
-      .within(() => {
-        cy.get("[data-cy='todo-item-update']").click();
-      });
-    cy.get("[data-cy='input-text']").clear().type(textUpdated);
-    cy.get("[data-cy='submit']").click();
-    cy.contains(textUpdated);
-    cy.contains(text).should("not.exist");
+    cy.contains("button", "CLASSROOM").click();
+    cy.wait("@placesByType");
+    cy.contains("CLASSROOM").should("be.visible");
+    cy.contains("Descriptions").should("be.visible");
+  });
+
+  it("opens room details from a floor hotspot", () => {
+    cy.visit(frontendUrl());
+    cy.get("div[style*='66.5%'][style*='18%']").first().click({ force: true });
+    cy.wait("@placeDetail");
+    cy.contains("Room 413A").should("be.visible");
+    cy.contains("A test classroom returned by Cypress.").should("be.visible");
   });
 });

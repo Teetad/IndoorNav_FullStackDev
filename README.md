@@ -4,11 +4,19 @@
 - `pnpm install`
 - `pnpm exec cypress install`
 - `pnpm exec cypress verify`
-- `pnpm run test`
+- Start `pj-backend` and `pj-frontend`
+- `pnpm run test` opens Cypress
+- `pnpm run test:run` runs Cypress headlessly
 
 # Setup from scratch
 
 - See https://cmu.to/fullstack69
+
+# What this tests
+
+- `backend.cy.ts` checks the public backend health, read, validation, and guest-protected write behavior.
+- `frontend.cy.ts` checks the main floor pages and room/category UI while stubbing the frontend's `http://localhost:3000` API calls.
+- `min.cy.ts` checks the test environment wiring.
 
 # Issue
 
