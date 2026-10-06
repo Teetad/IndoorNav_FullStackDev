@@ -1,0 +1,17 @@
+meta {
+  name: 05 Reject Invalid Status
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/places?room_status=BROKEN
+  body: none
+  auth: none
+}
+
+tests {
+  test("ไม่รับสถานะที่ระบบไม่รู้จัก", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

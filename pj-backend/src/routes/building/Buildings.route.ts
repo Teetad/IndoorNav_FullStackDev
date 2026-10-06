@@ -7,6 +7,8 @@ import { requireAuth, requireRole } from "../../auth/middleware.js";
 
 const router = Router();
 
+// Route นี้ดูแลเฉพาะอาคาร: GET อ่านข้อมูล ส่วน POST/DELETE จำกัดให้ Developer
+
 router.get("/", async (_req, res) => {
   try {
     return res.status(200).json(await dbClient.select().from(Buildings));
@@ -24,6 +26,7 @@ router.get("/:building_id", async (req, res) => {
     if (!isUUID(building_id)) {
       return res.status(400).json({ message: "building_id must be a valid UUID" });
     }
+    // Drizzle คืนผลเป็น array; [building] คือหยิบแถวแรกออกมา
     const [building] = await dbClient.select().from(Buildings)
       .where(eq(Buildings.building_id, building_id));
     if (!building) return res.status(404).json({ message: "Building not found" });

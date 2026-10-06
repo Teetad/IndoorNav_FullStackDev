@@ -9,6 +9,7 @@ import { useMapScale } from "../hooks/useMapScale";
 import type { FitMode } from "../hooks/useMapScale";
 import { useRouteSearch } from "../hooks/useRouteSearch";
 import { MapGrid } from "./MapGrid";
+import type { RouteDirections } from "../types";
 
 /** "4", "4F", " 4f " -> matching floor, or undefined. */
 const matchFloor = (input?: string) => {
@@ -28,6 +29,8 @@ export type MapViewProps = {
   floor?: string;
   /** Called with the floors the route passes through, e.g. ["4", "3"]. */
   onRouteReady?: (floors: FloorId[]) => void;
+  /** Turn-by-turn instructions for the route (null when there is no route). */
+  onDirections?: (directions: RouteDirections | null) => void;
   /** Called when something goes wrong (room not found, no stairs, no path). */
   onError?: (message: string) => void;
   /** Render inside someone else's layout (a div) instead of as a full page. */
@@ -42,7 +45,7 @@ export type MapViewProps = {
 
 /** Plain map. No inputs, no buttons: everything is controlled by props. */
 export default function MapView({
-  startRoom, goalRoom, floor, onRouteReady, onError,
+  startRoom, goalRoom, floor, onRouteReady, onDirections, onError,
   embedded = false, fit = "width", className, style, debug = false,
 }: MapViewProps) {
   const [autoFloorId, setAutoFloorId] = useState<FloorId>(FLOORS[0].id);
@@ -54,12 +57,13 @@ export default function MapView({
   const { path, loading } = usePath(selectedFloorId, walls, start, goal);
   const { scale, shellRef } = useMapScale([], embedded ? fit : "viewport");
 
-  const { findRoute, routeSummary } = useRouteSearch({
+  const { findRoute, routeSummary, directions } = useRouteSearch({
     roomsByFloor: data.roomsByFloor,
     stairsByFloor: data.stairsByFloor,
     wallsByFloor: data.wallsByFloor,
     setEndpointsByFloor: data.setEndpointsByFloor,
     setSelectedFloorId: setAutoFloorId,
+    floorLabel: (id) => FLOORS.find((f) => f.id === id)?.label ?? `${id}F`,
     setNotice: (msg) => {
       if (!msg) return;
       setLastError(msg);
@@ -77,6 +81,7 @@ export default function MapView({
 
   useEffect(() => {
     if (routeSummary) onRouteReady?.(routeSummary.floors);
+    onDirections?.(directions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeSummary]);
 

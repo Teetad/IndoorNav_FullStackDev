@@ -7,6 +7,8 @@ import { requireAuth } from "../../auth/middleware.js";
 
 const router = Router();
 
+// Favorite เป็นตารางเชื่อม User กับ Place และใช้ user_id จาก token เสมอ
+
 // อ่านรายการ Favorite ของผู้ใช้ที่ login อยู่
 router.get("/", requireAuth, async (_req, res) => {
   try {
@@ -50,7 +52,7 @@ router.post("/:place_id", requireAuth, async (req, res) => {
       .where(eq(Places.place_id, placeId));
     if (!place) return res.status(404).json({ message: "Place not found" });
 
-    // เพิ่มรายการและเพิ่มตัวนับพร้อมกัน ถ้าขั้นหนึ่งพังจะยกเลิกทั้งคู่
+    // transaction ทำสองคำสั่งเป็นชุดเดียว: ถ้าขั้นหนึ่งพังจะย้อนกลับทั้งคู่
     const favorite = await dbClient.transaction(async tx => {
       const [favorite] = await tx.insert(Favorites)
         .values({ user_id: userId, place_id: placeId })
@@ -58,6 +60,7 @@ router.post("/:place_id", requireAuth, async (req, res) => {
         .returning();
       if (!favorite) return null;
 
+      // sql`` ใช้ให้ PostgreSQL บวกจากค่าปัจจุบัน ป้องกันการอ่านแล้วเขียนทับกัน
       await tx.update(Places)
         .set({ favCount: sql`${Places.favCount} + 1` })
         .where(eq(Places.place_id, placeId));

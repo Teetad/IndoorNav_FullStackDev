@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "@tsconfig/node-lts/tsconfig.json",
+    "@tsconfig/node-ts/tsconfig.json"
+  ],
+  "compilerOptions": {
+    "types": ["node", "cypress"],
+    "rootDir": ".",
+    "outDir": "./dist"
+  },
+  "include": ["**/*.ts"]
+}

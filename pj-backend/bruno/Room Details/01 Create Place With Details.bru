@@ -1,0 +1,39 @@
+meta {
+  name: 01 Create Place With Details
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/places
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{developerToken}}
+}
+
+body:json {
+  {
+    "floor_id": "{{seedFloorId}}",
+    "place_name": "ห้องทดสอบข้อมูลห้อง",
+    "place_type": "classroom",
+    "room_number": "TEST-ROOM",
+    "room_status": "OPEN",
+    "capacity": 40,
+    "opening_time": "08:00",
+    "closing_time": "17:00"
+  }
+}
+
+tests {
+  test("Developer เพิ่มสถานที่พร้อมข้อมูลห้องได้", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().room_status).to.equal("OPEN");
+    expect(res.getBody().capacity).to.equal(40);
+    expect(res.getBody().opening_time).to.equal("08:00");
+    expect(res.getBody().closing_time).to.equal("17:00");
+    bru.setVar("roomDetailPlaceId", res.getBody().place_id);
+  });
+}

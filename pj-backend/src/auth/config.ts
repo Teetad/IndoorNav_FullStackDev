@@ -5,6 +5,11 @@ const userInfoUrl = "https://oauth497.cpecmu.com/application/o/userinfo/";
 
 export type UserRole = "USER" | "ADMIN" | "DEVELOPER";
 
+// ตรวจค่าจากฐานข้อมูลหรือ token ก่อนบอก TypeScript ว่าค่านี้เป็น role จริง
+export function isUserRole(value: unknown): value is UserRole {
+  return value === "USER" || value === "ADMIN" || value === "DEVELOPER";
+}
+
 // อ่านค่าที่จำเป็นจาก .env ถ้าไม่มีให้หยุดและแจ้งชื่อค่าที่ขาด
 function required(name: string): string {
   const value = process.env[name]?.trim();

@@ -14,6 +14,10 @@ headers {
   Cookie: session_token={{sessionToken}}
 }
 
+vars:pre-request {
+  sessionToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNpcmVldGhvcm5fcGludGhvbmdAY211LmFjLnRoIiwibmFtZSI6IlNJUkVFVEhPUk4gUElOVEhPTkciLCJyb2xlIjoiVVNFUiIsInN1YiI6ImJhMDM4YWU0LWRiYjItNDNkMS1hYTcxLWM2MTNmN2E5YTFiOSIsImlzcyI6ImluZG9vci1uYXZpZ2F0aW9uLWJhY2tlbmQiLCJhdWQiOiJpbmRvb3ItbmF2aWdhdGlvbi1jbGllbnQiLCJpYXQiOjE3OTEyNTU2NTksImV4cCI6MTc5MTI4NDQ1OX0.TtZNQy0D0WyUWfkWP5qy__w5Qp74aGh54SySGCbZLrg
+}
+
 tests {
   test("อ่านข้อมูลผู้ใช้จาก cookie ได้", function () {
     expect(res.getStatus()).to.equal(200);

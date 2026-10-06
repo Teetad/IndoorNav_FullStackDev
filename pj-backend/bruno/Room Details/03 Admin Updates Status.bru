@@ -1,0 +1,28 @@
+meta {
+  name: 03 Admin Updates Status
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/places/{{roomDetailPlaceId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{adminToken}}
+}
+
+body:json {
+  {
+    "room_status": "MAINTENANCE"
+  }
+}
+
+tests {
+  test("Admin เปลี่ยนสถานะห้องได้", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().room_status).to.equal("MAINTENANCE");
+  });
+}

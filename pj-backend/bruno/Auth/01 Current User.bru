@@ -14,6 +14,10 @@ headers {
   Authorization: Bearer {{sessionToken}}
 }
 
+vars:pre-request {
+  sessionToken: 2846ac9a926d44478d7a086d6b6ae525&state=fa305ad1-e558-42af-8e15-1ab3ee3bee43
+}
+
 tests {
   test("เข้าสู่ระบบแล้วและเป็นผู้ใช้ทั่วไป", function () {
     expect(res.getStatus()).to.equal(200);

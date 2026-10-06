@@ -1,6 +1,8 @@
-import { FLOORS } from "../Floor_Information";
 import type { FloorId, Point, RoomsByFloor, StairsByFloor } from "../Floor_Information";
 import type { Arrow } from "../types";
+
+/** Floor ids in a ByFloor record (works without importing the floor list). */
+const floorIdsOf = (record: Record<string, unknown>) => Object.keys(record) as FloorId[];
 
 export const cellKey = (x: number, y: number) => `${x}-${y}`;
 
@@ -35,9 +37,9 @@ export function findRoom(
 ): { floorId: FloorId; point: Point } | null {
   const target = number.trim().toLowerCase();
   if (!target) return null;
-  for (const floor of FLOORS) {
-    const match = roomsByFloor[floor.id].find((r) => r.number.trim().toLowerCase() === target);
-    if (match) return { floorId: floor.id, point: { x: match.x, y: match.y } };
+  for (const floorId of floorIdsOf(roomsByFloor)) {
+    const match = roomsByFloor[floorId].find((r) => r.number.trim().toLowerCase() === target);
+    if (match) return { floorId, point: { x: match.x, y: match.y } };
   }
   return null;
 }
@@ -64,11 +66,11 @@ export function findFloorSequence(
   while (queue.length > 0) {
     const path = queue.shift()!;
     const last = path[path.length - 1];
-    for (const floor of FLOORS) {
-      if (visited.has(floor.id) || sharedStairs(stairsByFloor, last, floor.id).length === 0) continue;
-      const next = [...path, floor.id];
-      if (floor.id === to) return next;
-      visited.add(floor.id);
+    for (const id of floorIdsOf(stairsByFloor)) {
+      if (visited.has(id) || sharedStairs(stairsByFloor, last, id).length === 0) continue;
+      const next = [...path, id];
+      if (id === to) return next;
+      visited.add(id);
       queue.push(next);
     }
   }
