@@ -20,6 +20,10 @@ body:json {
   }
 }
 
+vars:pre-request {
+  seedPlaceId: cfd82f59-72fd-5c2c-9509-1e0a5870b00a
+}
+
 tests {
   test("User ส่ง Report ได้", function () {
     expect(res.getStatus()).to.equal(201);

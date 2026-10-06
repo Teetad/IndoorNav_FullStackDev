@@ -14,6 +14,10 @@ headers {
   Authorization: Bearer {{sessionToken}}
 }
 
+vars:pre-request {
+  sessionToken: ba038ae4-dbb2-43d1-aa71-c613f7a9a1b9
+}
+
 tests {
   test("User อ่าน Report ของตัวเองได้", function () {
     expect(res.getStatus()).to.equal(200);
