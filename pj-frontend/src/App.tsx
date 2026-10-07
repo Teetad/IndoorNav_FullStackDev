@@ -4,7 +4,6 @@ import Floor_4 from './pages/Explore/floor_4.tsx';
 import Floor_5 from './pages/Explore/floor_5.tsx';
 import Floor_6 from './pages/Explore/floor_6.tsx';
 import Floor_7 from './pages/Explore/floor_7.tsx';
-import MainLayout from './layouts/MainLayout.tsx';
 import ReportPage from './pages/UserReportPage.tsx';
 import LogInPage from './pages/LogInPage.tsx';
 import SearchPage from './pages/SearchPage.tsx';
