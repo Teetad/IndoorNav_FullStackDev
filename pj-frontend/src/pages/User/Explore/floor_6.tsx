@@ -1,12 +1,12 @@
 import { useState } from "react";
-import SearchBar from "../../components/SearchBar";
-import FloorControl from "../../components/FloorControl";
-import ShowRoom from "../../components/ShowRoom";
-import ShowAllRoom from "../../components/ShowAllRoom";
-import MapSpot from "../../components/MapSpot";
-import CategoryChips from "../../components/CategoryChips";
+import SearchBar from "../../../components/SearchBar";
+import FloorControl from "../../../components/FloorControl";
+import ShowRoom from "../../../components/ShowRoom";
+import ShowAllRoom from "../../../components/ShowAllRoom";
+import MapSpot from "../../../components/MapSpot";
+import CategoryChips from "../../../components/CategoryChips";
 import { useNavigate } from 'react-router-dom';
-import BottomNav from "../../components/BottomNav";
+import BottomNav from "../../../components/BottomNav";
 
 const Floor_6 = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -138,7 +138,7 @@ const Floor_6 = () => {
       
       {/* SearchBar และ CategoryChips ด้านบน */}
       <div 
-      className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
+      className="absolute top-4 left-4 right-4 z-50 max-w-md mx-auto">
         <SearchBar
           value={searchQuery}
           onChange={handleSearchChange}

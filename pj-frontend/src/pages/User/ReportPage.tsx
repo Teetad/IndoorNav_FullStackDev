@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User, Check, Mail, Send } from 'lucide-react';
-import BottomNav from '../components/BottomNav';
+import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 
 // กำหนดโครงสร้างข้อมูลที่ได้จาก API

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { MapPin } from "lucide-react";
-import StartNavigateButton from "../components/StartNavigateButton";
+import StartNavigateButton from "../../components/StartNavigateButton";
 
 const StartNavigation: React.FC = () => {
   const navigate = useNavigate();
@@ -12,7 +12,6 @@ const StartNavigation: React.FC = () => {
 
   const [startQuery, setStartQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
   // ยิง API ค้นหาจุดเริ่มต้นอัตโนมัติเมื่อพิมพ์
@@ -23,17 +22,14 @@ const StartNavigation: React.FC = () => {
     }
 
     const timer = setTimeout(() => {
-      setLoading(true);
       fetch(`http://localhost:3000/places?search=${encodeURIComponent(startQuery)}`)
         .then((res) => res.json())
         .then((data) => {
           const list = Array.isArray(data) ? data : data.places || [];
           setResults(list);
-          setLoading(false);
         })
         .catch((err) => {
           console.error("Failed to fetch search results:", err);
-          setLoading(false);
         });
     }, 300);
 

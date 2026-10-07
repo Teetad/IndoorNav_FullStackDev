@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Image as ImageIcon } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
 const AddReportPage: React.FC = () => {
   const navigate = useNavigate();

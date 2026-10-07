@@ -32,6 +32,7 @@ const LogInPage = () => {
       // 3. ล้างค่า State ของ User ในหน้าปัจจุบัน
       setUserData(null);
 
+
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -52,6 +53,8 @@ const LogInPage = () => {
         if (response.ok) {
           const data = await response.json();
           setUserData(data); 
+
+      
         } else {
           setUserData(null);
         }
