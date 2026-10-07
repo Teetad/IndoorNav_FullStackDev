@@ -150,7 +150,7 @@ export const Reports = pgTable("reports", {
     .references(() => Places.place_id, { onDelete: "cascade" })
     .notNull(),
   description: varchar("description", { length: 500 }).notNull(),
-  status: varchar("status", { length: 20 }).default("PENDING").notNull(),
+  status: varchar("status", { length: 20 }).default("Submitting").notNull(),
   admin_note: varchar("admin_note", { length: 500 }),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
