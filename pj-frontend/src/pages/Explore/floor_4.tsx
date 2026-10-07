@@ -170,10 +170,6 @@ const Floor_4 = () => {
   
   ];
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
   const handleProfileClick = () => {
     navigate('/login');
   };
@@ -196,8 +192,7 @@ const Floor_4 = () => {
       <div 
       className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
         <SearchBar
-          value={searchQuery}
-          onChange={handleSearchChange}
+          value=""
           placeholder="Search location here"
           BackgroundColor="bg-primary-light backdrop-blur-md shadow-md" 
           onProfileClick={handleProfileClick}

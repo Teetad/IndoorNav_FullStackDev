@@ -5,9 +5,13 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/places?floor=6
+  url: http://localhost:3000/places?floor=6
   body: none
   auth: none
+}
+
+params:query {
+  floor: 6
 }
 
 tests {

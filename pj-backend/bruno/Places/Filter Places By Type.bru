@@ -5,9 +5,13 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/places?place_type=laboratory
+  url: http://localhost:3001/places?place_type=laboratory
   body: none
   auth: none
+}
+
+params:query {
+  place_type: laboratory
 }
 
 tests {

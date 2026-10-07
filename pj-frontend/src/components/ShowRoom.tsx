@@ -77,7 +77,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className="w-full max-w-md bg-[#D9CDBF]/95 backdrop-blur-md rounded-t-[30px] p-6 shadow-2xl flex flex-col h-[90vh] max-h-[100vh] animate-slide-up overflow-hidden"
+        className="w-full max-w-md bg-primary backdrop-blur-md rounded-t-[30px] p-6 shadow-2xl flex flex-col h-[90vh] max-h-[100vh] animate-slide-up overflow-hidden"
       >
         
         {/* ขีดจับด้านบน (Grab bar) */}
