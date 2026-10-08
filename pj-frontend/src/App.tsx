@@ -1,15 +1,16 @@
 import './index.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Floor_4 from './pages/Explore/floor_4.tsx';
-import Floor_5 from './pages/Explore/floor_5.tsx';
-import Floor_6 from './pages/Explore/floor_6.tsx';
-import Floor_7 from './pages/Explore/floor_7.tsx';
-import ReportPage from './pages/ReportPage.tsx';
-import LogInPage from './pages/LogInPage.tsx';
-import SearchPage from './pages/SearchPage.tsx';
-import StartNavigation from './pages/StartNavigation.tsx';
-import AuthCallback from './pages/AuthCallback.tsx';
-import AddReportPage from './pages/AddReportPage.tsx';
+import Floor_4 from './pages/User/Explore/floor_4.tsx';
+import Floor_5 from './pages/User/Explore/floor_5.tsx';
+import Floor_6 from './pages/User/Explore/floor_6.tsx';
+import Floor_7 from './pages/User/Explore/floor_7.tsx';
+import ReportPage from './pages/User/ReportPage.tsx';
+import LogInPage from './pages/User/LogInPage.tsx';
+import SearchPage from './pages/User/SearchPage.tsx';
+import StartNavigation from './pages/User/StartNavigation.tsx';
+import AuthCallback from './pages/User/AuthCallback.tsx';
+import AddReportPage from './pages/User/AddReportPage.tsx';
+import DashBoardPage from './pages/Admin/DashBoardPage.tsx'
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
           <Route path="/addreport" element={<AddReportPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/start-navigation" element={<StartNavigation />} />
+
+          <Route path="/admin" element={<DashBoardPage />} />
       </Routes>
     </Router>
     </>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import SearchBar from "../components/SearchBar"; 
-import ShowRoom from "../components/ShowRoom"; 
+import SearchBar from "../../components/SearchBar"; 
+import ShowRoom from "../../components/ShowRoom"; 
 import { useNavigate } from 'react-router-dom';
 
 const SearchPage = () => {
