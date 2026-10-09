@@ -74,7 +74,7 @@ export const INITIAL_STAIRS_BY_FLOOR: StairsByFloor = {
 const INITIAL_ROOMS_4: Room[] = [
   { number: "422", x: 17, y: 4 },
   { number: "415A", x: 11, y: 13 },
-  { number: "AS lab", x: 7, y: 13 },
+  { number: "AS LAB", x: 7, y: 13 },
   { number: "413B", x: 4, y: 15 },
   { number: "413A", x: 4, y: 19 },
   { number: "412", x: 8, y: 22 },
@@ -96,22 +96,22 @@ const INITIAL_ROOMS_5: Room[] = [
   { number: "520", x: 8, y: 19 },
   { number: "521", x: 11, y: 13 },
   { number: "518", x: 4, y: 15 },
-  { number: "OASYS lab", x: 7, y: 22 },
+  { number: "OASYS LAB", x: 7, y: 22 },
   { number: "516", x: 17, y: 22 },
   { number: "515", x: 18, y: 21 },
   { number: "514", x: 21, y: 20 },
   { number: "558", x: 7, y: 7 },
   { number: "restroom", x: 9, y: 2 },
-  { number: "network admin", x: 15, y: 4 },
+  { number: "Network Admin", x: 15, y: 4 },
   { number: "559", x: 25, y: 7 }
 ];
 
 const INITIAL_ROOMS_6: Room[] = [
     { number: "ห้องประชุม", x: 18, y: 10 },
-    { number: "Lab2", x: 4, y: 15 },
-    { number: "Lab1", x: 4, y: 19 },
-    { number: "Lab3", x: 14, y: 4 },
-    { number: "Lab4", x: 17, y: 4 },
+    { number: "ห้องวิจัย 2 (Lab 2)", x: 4, y: 15 },
+    { number: "ห้องวิจัย 1 (Lab 1)", x: 4, y: 19 },
+    { number: "Lab 3", x: 14, y: 4 },
+    { number: "Lab 4", x: 17, y: 4 },
     { number: "restroom", x: 9, y: 2 },
     { number: "ห้องอเนกประสงค์ 1", x: 11, y: 22 },
     { number: "ห้องอเนกประสงค์ 2", x: 11, y: 13 },
