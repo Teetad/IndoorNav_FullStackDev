@@ -1,6 +1,6 @@
 import SideBar from "../../components/SideBar";
 
-const DashBoardPage = () => {
+const MapAdminPage = () => {
     return(
         <div className="bg-map-bg">
             <SideBar/>
@@ -8,4 +8,4 @@ const DashBoardPage = () => {
     );
 }
 
-export default DashBoardPage;
+export default MapAdminPage;

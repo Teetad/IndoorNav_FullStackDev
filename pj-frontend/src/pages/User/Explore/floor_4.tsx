@@ -7,7 +7,7 @@ import MapSpot from "../../../components/MapSpot";
 import CategoryChips from "../../../components/CategoryChips";
 import BottomNav from "../../../components/BottomNav";
 import { useNavigate } from 'react-router-dom';
-// import { MapEmbed } from "../../../IndoorNav/frontend/src/components/MapView";
+import { MapEmbed } from "../../../../../IndoorNav/frontend/src/components/MapView";
 
 const Floor_4 = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -187,7 +187,7 @@ const Floor_4 = () => {
 
   return (
     <div className={`absolute inset-0 w-full h-[100dvh] bg-[#F3EFEA] flex flex-col ${isHidden ? 'overflow-hidden' : 'overflow-auto'}`}>
-      
+      <MapEmbed startRoom="411A" goalRoom="411B" floor="4"/>
       {/* SearchBar และ CategoryChips ด้านบน */}
       <div 
       className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">

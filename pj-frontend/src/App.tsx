@@ -10,7 +10,9 @@ import SearchPage from './pages/User/SearchPage.tsx';
 import StartNavigation from './pages/User/StartNavigation.tsx';
 import AuthCallback from './pages/User/AuthCallback.tsx';
 import AddReportPage from './pages/User/AddReportPage.tsx';
-import DashBoardPage from './pages/Admin/DashBoardPage.tsx'
+import DashBoardPage from './pages/Admin/DashBoardPage.tsx';
+import MapAdminPage from './pages/Admin/MapAdmin.tsx';
+import ReportAdminPage from './pages/Admin/ReportAdmin.tsx';
 
 function App() {
   return (
@@ -28,8 +30,9 @@ function App() {
           <Route path="/addreport" element={<AddReportPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/start-navigation" element={<StartNavigation />} />
-
-          <Route path="/admin" element={<DashBoardPage />} />
+          <Route path="/mapadmin" element={<MapAdminPage />} />
+          <Route path="/reportadmin" element={<ReportAdminPage />} />
+          <Route path="/dashboard" element={<DashBoardPage />} />
       </Routes>
     </Router>
     </>
