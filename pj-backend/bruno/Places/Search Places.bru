@@ -5,9 +5,13 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/places?search=lab
+  url: http://localhost:3001/places?search=lab
   body: none
   auth: none
+}
+
+params:query {
+  search: lab
 }
 
 tests {

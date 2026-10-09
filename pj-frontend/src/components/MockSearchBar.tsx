@@ -4,7 +4,7 @@ import { User, Search } from 'lucide-react'; // 1. นำเข้า Search เ
 // กำหนด TypeScript Interface สำหรับ Props ของ SearchBar
 interface SearchBarProps {
   value: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   BackgroundColor?: string; // เช่น คลาส Tailwind สำหรับสีพื้นหลัง
   placeholder?: string;
   onProfileClick?: () => void; // ฟังก์ชันเมื่อคลิกที่ไอคอนโปรไฟล์ (ถ้ามี)
@@ -24,11 +24,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
       className={`flex items-center justify-between w-full px-4 py-2 rounded-full shadow-sm ${BackgroundColor}`}
     >
       {/* กลุ่มฝั่งซ้าย: ไอคอนค้นหา + ช่องพิมพ์ข้อความ */}
-      <div 
-      onClick={onSearchClick}
-      className="flex items-center w-full gap-2">
-        <Search className="w-5 h-5 text-stone-400 flex-shrink-0 ml-1" 
-      />
+      <div className="flex items-center w-full gap-2">
+        <Search className="w-5 h-5 text-stone-400 flex-shrink-0 ml-1" onClick={onSearchClick}/>
         <input
           type="text"
           value={value}

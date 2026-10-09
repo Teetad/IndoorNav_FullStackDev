@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   MapPin,
@@ -15,7 +14,7 @@ const BottomNav = () => {
   };
 
   // เช็คพิเศษสำหรับหน้า Explore (ถ้าอยู่ชั้น 4, 5, 6, 7 ให้ถือว่าแอคทีฟทั้งหมด)
-  const isExploreActive = ['/floor-4', '/floor-5', '/floor-6', '/floor-7', '/'].some(
+  const isExploreActive = ['/floor-4', '/floor-5', '/floor-6', '/floor-7', '/','/search'].some(
     (path) => location.pathname === path
   );
 

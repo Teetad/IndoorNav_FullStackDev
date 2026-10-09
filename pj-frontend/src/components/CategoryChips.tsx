@@ -11,7 +11,7 @@ const CategoryChips: React.FC<CategoryChipsProps> = ({ onSelectType }) => {
 
   // ยิง API ดึงข้อมูลประเภทสถานที่เมื่อ Component โหลดครั้งแรก
   useEffect(() => {
-    fetch("http://localhost:3001/places/types")
+    fetch("http://localhost:3000/places/types")
       .then((res) => res.json())
       .then((data) => {
         // สมมติว่าโครงสร้าง API ส่งมาเป็น Array ของสตริงหรืออาร์เรย์ของออบเจกต์

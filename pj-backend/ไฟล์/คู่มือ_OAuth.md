@@ -3,6 +3,7 @@
 ## การทำงานปัจจุบัน
 
 1. เปิด `GET http://localhost:3000/auth/login`
+หรือ `http://localhost:3000/auth/login?mode=json`
 2. ระบบพาไป Login กับ CPE OAuth
 3. OAuth ส่งกลับมาที่ `/auth/callback`
 4. Backend บันทึกผู้ใช้ เก็บ session ใน cookie แล้วกลับไปหน้า Frontend

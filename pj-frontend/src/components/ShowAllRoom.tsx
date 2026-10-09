@@ -10,15 +10,13 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
   const [places, setPlaces] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // ยิง API ดึงข้อมูลสถานที่ตาม type ที่ถูกส่งเข้ามา
   useEffect(() => {
     if (!selectedType) return;
 
     setLoading(true);
-    fetch(`http://localhost:3001/places?place_type=${encodeURIComponent(selectedType)}`)
+    fetch(`http://localhost:3000/places?place_type=${encodeURIComponent(selectedType)}`)
       .then((res) => res.json())
       .then((data) => {
-        // รองรับทั้งกรณีที่ API ส่งกลับมาเป็น Array ตรงๆ หรืออยู่ใน Object (เช่น { places: [...] })
         const roomList = Array.isArray(data) ? data : data.places || [];
         setPlaces(roomList);
         setLoading(false);
@@ -32,18 +30,19 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
   if (!selectedType) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex pt-8 justify-center bg-black/30 backdrop-blur-xs transition-opacity overscroll-none">
+    // 👇 แก้ไขบรรทัดนี้: ลบ pt-8 ออก และเติม items-end
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 backdrop-blur-xs transition-opacity overscroll-none">
       
-      {/* กล่อง Bottom Sheet สีฟ้า/เทา (ใช้โทนสี primary ของแอป เช่น bg-[#B6C4CF]) */}
+      {/* กล่อง Bottom Sheet */}
       <div className="w-full max-w-md bg-[#B6C4CF]/95 backdrop-blur-md rounded-t-[30px] p-6 shadow-2xl flex flex-col h-[90vh] max-h-[100vh] animate-slide-up overflow-hidden">
         
-        {/* ขีดจับด้านบน (Grab bar) สำหรับกดปิดได้ */}
+        {/* ขีดจับด้านบน (Grab bar) */}
         <div 
           onClick={onClose}
           className="w-12 h-1.5 bg-stone-500/50 rounded-full mx-auto mb-4 flex-shrink-0 cursor-pointer"
         ></div>
 
-        {/* 📌 ส่วนหัว (แสดงชื่อ Type ที่เลือก) */}
+        {/* 📌 ส่วนหัว */}
         <div className="flex-shrink-0 mb-4 pb-2 border-b border-stone-400/40 flex justify-between items-center">
           <h2 className="text-2xl font-bold text-stone-800 capitalize">{selectedType}</h2>
           <button 
@@ -64,7 +63,7 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
             places.map((place, index) => (
               <div 
                 key={index}
-                onClick={() => onSelectLocation(place)} // กดเลือกสถานที่เพื่อเปิด ShowRoom รายละเอียดเดี่ยว
+                onClick={() => onSelectLocation(place)} 
                 className="bg-white/40 p-4 rounded-2xl shadow-sm cursor-pointer hover:bg-white/60 transition-all flex flex-col gap-3"
               >
                 {/* กล่องรูปภาพสถานที่ */}
@@ -78,9 +77,9 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
 
                 {/* ชื่อและคำอธิบาย */}
                 <div>
-                  <h3 className="font-bold text-stone-800 text-base">{place.name}</h3>
-                  <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                    {place.description || "Descriptions ... bla bla (รายละเอียดเพิ่มเติมของสถานที่)"}
+                  <h3 className="font-bold text-stone-800 text-base">{place.place_name}</h3>
+                  <p className="text-[10px] text-stone-600 mt-0.5 leading-relaxed">
+                    {place.description || ""}
                   </p>
                 </div>
               </div>

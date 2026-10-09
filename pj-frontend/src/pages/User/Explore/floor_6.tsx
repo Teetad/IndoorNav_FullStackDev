@@ -1,74 +1,115 @@
 import { useState } from "react";
-import SearchBar from "../../components/SearchBar";
-import FloorControl from "../../components/FloorControl";
-import ShowRoom from "../../components/ShowRoom";
-import ShowAllRoom from "../../components/ShowAllRoom";
-import MapSpot from "../../components/MapSpot";
-import CategoryChips from "../../components/CategoryChips";
+import SearchBar from "../../../components/SearchBar";
+import FloorControl from "../../../components/FloorControl";
+import ShowRoom from "../../../components/ShowRoom";
+import ShowAllRoom from "../../../components/ShowAllRoom";
+import MapSpot from "../../../components/MapSpot";
+import CategoryChips from "../../../components/CategoryChips";
+import { useNavigate } from 'react-router-dom';
+import BottomNav from "../../../components/BottomNav";
 
-const Floor_7 = () => {
+const Floor_6 = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<any>(null); // เก็บทั้ง Object หรือ Place ID
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const floor7Rooms = [
-    //701
+  const floor6Rooms = [
+    //lab3
     {
-      placeId: "078de9fb-e9a1-5f05-b757-b6e8b2acae5c", 
+      placeId: "dd96ffed-8af7-5917-a4bb-b1ded378f462", 
       top: "0%",
-      left: "66%",
-      width: "17%",
-      height: "26%",
+      left: "50%",
+      width: "8.5%",
+      height: "17%",
     },
-    //702
+    //lab4
     {
-      placeId: "f6a95c6c-be33-5381-9f62-012edc5fb151", 
+      placeId: "1bf424d8-52c6-5fa2-bf9f-55ed70955502", 
       top: "0%",
-      left: "83%",
-      width: "17%",
-      height: "26%",
+      left: "58.5%",
+      width: "8.5%",
+      height: "17%",
     },
-    //713
+    //603
     {
-      placeId: "bc427080-3b42-5e7e-b3f1-b042287ba47c", 
-      top: "81%",
-      left: "49%",
-      width: "19%",
-      height: "19%",
-    },
-    //718
-    {
-      placeId: "259aed8f-4ebe-56d6-8c56-d7772ca59470", 
-      top: "81%",
-      left: "18%",
-      width: "31%",
-      height: "19%",
-    },
-    //719
-    {
-      placeId: "0954520a-4653-577b-84bd-a433a5f7495f", 
-      top: "49%",
-      left: "0%",
-      width: "18%",
-      height: "33%",
-    },
-    //720
-    {
-      placeId: "3b33d6d1-2cde-52b0-bed7-6141163572a0", 
+      placeId: "11111111-1111-4111-8111-111111110003", 
       top: "33%",
-      left: "16.5%",
+      left: "66.5%",
+      width: "24.5%",
+      height: "17.5%",
+    },
+    //ห้องอเนกประสงค์ 1 620
+    {
+      placeId: "09ff059e-4197-51c3-9697-0163eead0c203", 
+      top: "82%",
+      left: "17%",
+      width: "41%",
+      height: "18%",
+    },
+    //ห้องอเนกประสงค์ 2 
+    {
+      placeId: "e28f78d5-1554-59a4-85b6-c0a656ef7615", 
+      top: "33%",
+      left: "17%",
       width: "34%",
       height: "18%",
     },
-    //712
+    //lab1
     {
-      placeId: "77d8e8f0-15a0-55aa-baf9-48fb27cae256", 
-      top: "73%",
-      left: "65%",
-      width: "18.5%",
-      height: "10%",
+      placeId: "31daf14a-1579-5bd0-b292-3cc4c047a43e", 
+      top: "66%",
+      left: "0%",
+      width: "18%",
+      height: "17%",
     },
-
+    //lab2
+    {
+      placeId: "08f080d9-cdb3-511d-bee7-79323c9f64a9", 
+      top: "49%",
+      left: "0%",
+      width: "18%",
+      height: "17%",
+    },
+    //professor room
+    {
+      placeId: "8cf3929d-9e11-5681-b171-5785a511f4fa", 
+      top: "0%",
+      left: "71%",
+      width: "20.5%",
+      height: "8.5%",
+    },
+    {
+      placeId: "8cf3929d-9e11-5681-b171-5785a511f4fa", 
+      top: "25%",
+      left: "66.5%",
+      width: "17.5%",
+      height: "8.5%",
+    },
+    //8
+    {
+      placeId: "648a1b8b-8a13-5b76-b540-1d8b9630366f", 
+      top: "58%",
+      left: "25.5%",
+      width: "9%",
+      height: "8.5%",
+    },
+    //9
+    {
+      placeId: "4b5e1ec5-0c58-5dfd-befe-8e823bcd4e20", 
+      top: "66.5%",
+      left: "25.5%",
+      width: "9%",
+      height: "8.5%",
+    },
+    {
+      placeId: "da537344-a094-5508-b972-0a8278e2aa48", 
+      top: "82%",
+      left: "58%",
+      width: "9.5%",
+      height: "17%",
+    },
+    
     
     
   ];
@@ -78,11 +119,11 @@ const Floor_7 = () => {
   };
 
   const handleProfileClick = () => {
-    console.log('Profile icon clicked!');
+    navigate('/login');
   };
 
-  const handleSearch = () => {
-    console.log('Search clicked!');
+    const handleSearch = () => {
+    navigate('/search')
   };
 
   const isHidden = Boolean(selectedLocation) || Boolean(selectedCategory);
@@ -96,7 +137,8 @@ const Floor_7 = () => {
     <div className={`absolute inset-0 w-full h-[100dvh] bg-[#F3EFEA] flex flex-col ${isHidden ? 'overflow-hidden' : 'overflow-auto'}`}>
       
       {/* SearchBar และ CategoryChips ด้านบน */}
-      <div className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
+      <div 
+      className="absolute top-4 left-4 right-4 z-50 max-w-md mx-auto">
         <SearchBar
           value={searchQuery}
           onChange={handleSearchChange}
@@ -119,13 +161,13 @@ const Floor_7 = () => {
           
           {/* รูปภาพแผนที่เรนเดอร์ครั้งเดียวจบ ไม่มีการทับซ้อน */}
           <img 
-            src="/Images/floor7.jpg" 
-            alt="Floor 7 Map"
+            src="/Images/floor6.jpg" 
+            alt="Floor 6 Map"
             className="w-full h-auto object-contain select-none pointer-events-none block"
           />
 
           {/* 📌 2. วนลูป (Map) สร้างจุด Hotspot ทุกห้องจากอาเรย์ข้างบน */}
-          {floor7Rooms.map((room) => (
+          {floor6Rooms.map((room) => (
             <MapSpot 
               key={room.placeId}
               Top={room.top} 
@@ -158,11 +200,13 @@ const Floor_7 = () => {
 
       {/* ปุ่มควบคุมชั้น */}
       <div className="absolute bottom-6 right-4 z-30">
-        <FloorControl currentFloor={7} isHidden={isHidden} />
+        <FloorControl currentFloor={6} isHidden={isHidden} />
       </div>
+
+      <BottomNav/>
 
     </div>
   );
 };
 
-export default Floor_7;
+export default Floor_6;

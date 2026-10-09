@@ -1,108 +1,78 @@
 import { useState } from "react";
-import SearchBar from "../../components/SearchBar";
-import FloorControl from "../../components/FloorControl";
-import ShowRoom from "../../components/ShowRoom";
-import ShowAllRoom from "../../components/ShowAllRoom";
-import MapSpot from "../../components/MapSpot";
-import CategoryChips from "../../components/CategoryChips";
+import SearchBar from "../../../components/SearchBar";
+import FloorControl from "../../../components/FloorControl";
+import ShowRoom from "../../../components/ShowRoom";
+import ShowAllRoom from "../../../components/ShowAllRoom";
+import MapSpot from "../../../components/MapSpot";
+import CategoryChips from "../../../components/CategoryChips";
+import { useNavigate } from 'react-router-dom';
+import BottomNav from "../../../components/BottomNav";
 
-const Floor_5 = () => {
+const Floor_7 = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<any>(null); // เก็บทั้ง Object หรือ Place ID
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const floor5Rooms = [
-    //501
+  const floor7Rooms = [
+    //701
     {
-      placeId: "1bfacf39-7a8b-501d-a253-b59cfaeb8e92", 
+      placeId: "078de9fb-e9a1-5f05-b757-b6e8b2acae5c", 
       top: "0%",
-      left: "66.5%",
+      left: "66%",
       width: "17%",
       height: "26%",
     },
-    //502
+    //702
     {
-      placeId: "b0bfb141-001e-5f85-a678-d143b14c0a14", 
+      placeId: "f6a95c6c-be33-5381-9f62-012edc5fb151", 
       top: "0%",
       left: "83%",
       width: "17%",
       height: "26%",
     },
-    //518
+    //713
     {
-      placeId: "37496701-2811-5ee5-b2d7-22e8d6bc36de", 
+      placeId: "bc427080-3b42-5e7e-b3f1-b042287ba47c", 
+      top: "81%",
+      left: "49%",
+      width: "19%",
+      height: "19%",
+    },
+    //718
+    {
+      placeId: "259aed8f-4ebe-56d6-8c56-d7772ca59470", 
+      top: "81%",
+      left: "18%",
+      width: "31%",
+      height: "19%",
+    },
+    //719
+    {
+      placeId: "0954520a-4653-577b-84bd-a433a5f7495f", 
       top: "49%",
       left: "0%",
-      width: "18.5%",
+      width: "18%",
       height: "33%",
     },
-    //521
+    //720
     {
-      placeId: "44e76102-45d9-542b-8892-6c5cad63a9f7", 
+      placeId: "3b33d6d1-2cde-52b0-bed7-6141163572a0", 
       top: "33%",
-      left: "17%",
+      left: "16.5%",
       width: "34%",
       height: "18%",
     },
-    //516
+    //712
     {
-      placeId: "3b8b6c84-f057-52a2-988d-51ebeace341b", 
-      top: "82%",
-      left: "34%",
-      width: "34%",
-      height: "18%",
-    },
-    //OASIS
-    {
-      placeId: "efdbd80c-dbf3-5314-a354-8d1287280c00", 
-      top: "82%",
-      left: "0%",
-      width: "34%",
-      height: "18%",
-    },
-    //ห้องอาจารย์
-    {
-      placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
-      top: "26%",
-      left: "17%",
-      width: "14%",
-      height: "7%",
-    },
-    {
-      placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
-      top: "58%",
-      left: "26%",
-      width: "8.5%",
-      height: "17%",
-    },
-    {
-      placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
-      top: "33%",
-      left: "62.5%",
-      width: "9%",
-      height: "18%",
-    },
-    {
-      placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
-      top: "43.5%",
-      left: "75%",
-      width: "29%",
-      height: "14%",
-    },
-    {
-      placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
+      placeId: "77d8e8f0-15a0-55aa-baf9-48fb27cae256", 
       top: "73%",
-      left: "66%",
-      width: "18%",
-      height: "10.5%",
+      left: "65%",
+      width: "18.5%",
+      height: "10%",
     },
-    {
-      placeId: "7300f9fe-54df-5f4b-a752-24c5be7335bd", 
-      top: "26%",
-      left: "89%",
-      width: "11%",
-      height: "15%",
-    },
+
+    
     
   ];
 
@@ -111,11 +81,11 @@ const Floor_5 = () => {
   };
 
   const handleProfileClick = () => {
-    console.log('Profile icon clicked!');
+    navigate('/login');
   };
 
   const handleSearch = () => {
-    console.log('Search clicked!');
+    navigate('/search')
   };
 
   const isHidden = Boolean(selectedLocation) || Boolean(selectedCategory);
@@ -129,7 +99,8 @@ const Floor_5 = () => {
     <div className={`absolute inset-0 w-full h-[100dvh] bg-[#F3EFEA] flex flex-col ${isHidden ? 'overflow-hidden' : 'overflow-auto'}`}>
       
       {/* SearchBar และ CategoryChips ด้านบน */}
-      <div className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
+      <div 
+      className="absolute top-4 left-4 right-4 z-50 max-w-md mx-auto">
         <SearchBar
           value={searchQuery}
           onChange={handleSearchChange}
@@ -152,13 +123,13 @@ const Floor_5 = () => {
           
           {/* รูปภาพแผนที่เรนเดอร์ครั้งเดียวจบ ไม่มีการทับซ้อน */}
           <img 
-            src="/Images/floor5.jpg" 
-            alt="Floor 5 Map"
+            src="/Images/floor7.jpg" 
+            alt="Floor 7 Map"
             className="w-full h-auto object-contain select-none pointer-events-none block"
           />
 
           {/* 📌 2. วนลูป (Map) สร้างจุด Hotspot ทุกห้องจากอาเรย์ข้างบน */}
-          {floor5Rooms.map((room) => (
+          {floor7Rooms.map((room) => (
             <MapSpot 
               key={room.placeId}
               Top={room.top} 
@@ -191,11 +162,13 @@ const Floor_5 = () => {
 
       {/* ปุ่มควบคุมชั้น */}
       <div className="absolute bottom-6 right-4 z-30">
-        <FloorControl currentFloor={5} isHidden={isHidden} />
+        <FloorControl currentFloor={7} isHidden={isHidden} />
       </div>
+
+      <BottomNav/>
 
     </div>
   );
 };
 
-export default Floor_5;
+export default Floor_7;
