@@ -13,10 +13,12 @@ import AddReportPage from './pages/User/AddReportPage.tsx';
 import DashBoardPage from './pages/Admin/DashBoardPage.tsx';
 import MapAdminPage from './pages/Admin/MapAdmin.tsx';
 import ReportAdminPage from './pages/Admin/ReportAdmin.tsx';
+import { NavigationProvider } from './context/NavigationContext.tsx';
 
 function App() {
   return (
     <>
+    <NavigationProvider>
       <Router>
        <Routes>
           <Route path="/" element={<Floor_4 />} />
@@ -35,6 +37,7 @@ function App() {
           <Route path="/dashboard" element={<DashBoardPage />} />
       </Routes>
     </Router>
+   </NavigationProvider>
     </>
   )
 }
