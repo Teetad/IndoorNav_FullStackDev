@@ -7,10 +7,10 @@ import MapSpot from "../../../components/MapSpot";
 import CategoryChips from "../../../components/CategoryChips";
 import BottomNav from "../../../components/BottomNav";
 import { useNavigate } from 'react-router-dom';
-// import { MapEmbed } from "../../../IndoorNav/frontend/src/components/MapView";
+import CallMapEmbed from "../../../components/CallMapEmbed";
+import { useNavigation } from "../../../context/NavigationContext";
 
 const Floor_4 = () => {
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<any>(null); // เก็บทั้ง Object หรือ Place ID
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -185,6 +185,9 @@ const Floor_4 = () => {
     ? selectedLocation?.place_id || selectedLocation?.id 
     : selectedLocation;
 
+  const { startNode, goalNode, isNavigating, stopNavigation } = useNavigation();
+  console.log("ค่าที่ส่งไปให้แผนที่:", { startNode, goalNode });
+
   return (
     <div className={`absolute inset-0 w-full h-[100dvh] bg-[#F3EFEA] flex flex-col ${isHidden ? 'overflow-hidden' : 'overflow-auto'}`}>
       
@@ -209,6 +212,10 @@ const Floor_4 = () => {
 
       <div className="w-full h-full overflow-auto relative flex items-center justify-center pt-20 pb-20">
         <div className="relative w-full max-w-[800px] flex-shrink-0">
+
+          <div className="absolute inset-0 z-10 w-full h-full pointer-events-none">
+             <CallMapEmbed start={startNode} goal={goalNode} currentFloor="4"/>
+          </div>
           
           {/* รูปภาพแผนที่เรนเดอร์ครั้งเดียวจบ ไม่มีการทับซ้อน */}
           <img 
@@ -218,17 +225,19 @@ const Floor_4 = () => {
           />
 
           {/* 📌 2. วนลูป (Map) สร้างจุด Hotspot ทุกห้องจากอาเรย์ข้างบน */}
-          {floor4Rooms.map((room) => (
-            <MapSpot 
-              key={room.placeId}
-              Top={room.top} 
-              Left={room.left} 
-              Width={room.width} 
-              Height={room.height} 
-              onClick={() => setSelectedLocation(room.placeId)} 
-              placeId={room.placeId}
-            />
-          ))}
+          <div className="absolute inset-0 z-20 pointer-events-auto">
+            {floor4Rooms.map((room) => (
+              <MapSpot 
+                key={room.placeId}
+                Top={room.top} 
+                Left={room.left} 
+                Width={room.width} 
+                Height={room.height} 
+                onClick={() => setSelectedLocation(room.placeId)} 
+                placeId={room.placeId}
+              />
+            ))}
+          </div>
 
         </div>
       </div>

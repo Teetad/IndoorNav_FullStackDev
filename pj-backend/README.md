@@ -30,3 +30,6 @@
 ## Build
 
 - Run `pnpm build`
+
+## admin email
+-sireethorn_pinthong@cmu.ac.th

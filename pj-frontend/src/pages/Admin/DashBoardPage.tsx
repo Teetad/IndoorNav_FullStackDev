@@ -1,9 +1,9 @@
-
+import SideBar from "../../components/SideBar";
 
 const DashBoardPage = () => {
     return(
-        <div>
-            Hello
+        <div className="bg-map-bg">
+            <SideBar/>
         </div>
     );
 }

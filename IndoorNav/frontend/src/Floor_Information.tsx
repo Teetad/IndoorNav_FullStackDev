@@ -9,7 +9,7 @@ export const IMAGE_WIDTH = 1260;
 export const IMAGE_HEIGHT = 1260;
 
 export const FLOORS = [
-  { id: "4", label: "4th Floor", image: fourthFloorPlan },
+  { id: "4", label: "4th Floor", image: "" },
   { id: "5", label: "5th Floor", image: fifthFloorPlan },
   { id: "6", label: "6th Floor", image: sixthFloorPlan },
   { id: "7", label: "7th Floor", image: seventhFloorPlan },
@@ -72,38 +72,38 @@ export const INITIAL_STAIRS_BY_FLOOR: StairsByFloor = {
 
 // Default room tags. Coordinates are grid cells (0-26), not pixels.
 const INITIAL_ROOMS_4: Room[] = [
-  { number: "422", x: 17, y: 4 },
-  { number: "415A", x: 11, y: 13 },
+  { number: "ร้านค้าสาขาวิศวกรรมคอมพิวเตอร์ 422", x: 17, y: 4 },
+  { number: "ห้องเรียน Network 415A", x: 11, y: 13 },
   { number: "AS LAB", x: 7, y: 13 },
-  { number: "413B", x: 4, y: 15 },
-  { number: "413A", x: 4, y: 19 },
-  { number: "412", x: 8, y: 22 },
-  { number: "411B", x: 11, y: 22 },
-  { number: "411A", x: 16, y: 22 },
+  { number: "ห้องเรียน 413B", x: 4, y: 15 },
+  { number: "ห้องเรียน 413A", x: 4, y: 19 },
+  { number: "ห้องเรียน 412", x: 8, y: 22 },
+  { number: "ห้องเรียน Computer 411B", x: 11, y: 22 },
+  { number: "ห้องเรียน 411A", x: 16, y: 22 },
   { number: "restroom", x: 9, y: 2 }
 ];
 
 const INITIAL_ROOMS_5: Room[] = [
-  { number: "501", x: 21, y: 6 },
-  { number: "502", x: 23, y: 6 },
-  { number: "509", x: 18, y: 12 },
-  { number: "508", x: 18, y: 10 },
-  { number: "504", x: 23, y: 12 },
-  { number: "503", x: 25, y: 10 },
-  { number: "505", x: 25, y: 12 },
-  { number: "510", x: 21, y: 14 },
-  { number: "519", x: 8, y: 16 },
-  { number: "520", x: 8, y: 19 },
-  { number: "521", x: 11, y: 13 },
-  { number: "518", x: 4, y: 15 },
+  { number: "ห้องเรียน 501", x: 21, y: 6 },
+  { number: "ห้องเรียน 502", x: 23, y: 6 },
+  { number: "ห้องอาจารย์ 509", x: 18, y: 12 },
+  { number: "ห้องอาจารย์ 508", x: 18, y: 10 },
+  { number: "ห้องอาจารย์ 504", x: 23, y: 12 },
+  { number: "ห้องอาจารย์ 503", x: 25, y: 10 },
+  { number: "ห้องอาจารย์ 505", x: 25, y: 12 },
+  { number: "ห้องอาจารย์ 510", x: 21, y: 14 },
+  { number: "ห้องอาจารย์ 519", x: 8, y: 16 },
+  { number: "ห้องอาจารย์ 520", x: 8, y: 19 },
+  { number: "ห้องเรียน 521", x: 11, y: 13 },
+  { number: "ห้องเรียน 518", x: 4, y: 15 },
   { number: "OASYS LAB", x: 7, y: 22 },
-  { number: "516", x: 17, y: 22 },
-  { number: "515", x: 18, y: 21 },
-  { number: "514", x: 21, y: 20 },
-  { number: "558", x: 7, y: 7 },
+  { number: "ห้องเรียน 516", x: 17, y: 22 },
+  { number: "ห้องอาจารย์ 515", x: 18, y: 21 },
+  { number: "ห้องอาจารย์ 514", x: 21, y: 20 },
+  { number: "ห้องอาจารย์ 558", x: 7, y: 7 },
   { number: "restroom", x: 9, y: 2 },
   { number: "Network Admin", x: 15, y: 4 },
-  { number: "559", x: 25, y: 7 }
+  { number: "ห้องอาจารย์ 559", x: 25, y: 7 }
 ];
 
 const INITIAL_ROOMS_6: Room[] = [
@@ -118,15 +118,14 @@ const INITIAL_ROOMS_6: Room[] = [
     { number: "ห้องบัณฑิต", x: 18, y: 20 }
 ];
 const INITIAL_ROOMS_7: Room[] = [
-    { number: "720", x: 11, y: 13 },
-    { number: "701", x: 21, y: 6 },
-    { number: "702", x: 23, y: 6 },
-    { number: "711", x: 18, y: 9 },
-    { number: "719", x: 4, y: 15 },
-    { number: "718", x: 7, y: 22 },
-    { number: "713", x: 16, y: 22 },
-    { number: "712", x: 18, y: 20 },
-    { number: "restroom", x: 9, y: 2 }
+    { number: "ห้องเรียน 720", x: 11, y: 13 },
+    { number: "ห้องเรียน 701", x: 21, y: 6 },
+    { number: "ห้องเรียน 702", x: 23, y: 6 },
+    { number: "ห้องเรียน 711", x: 18, y: 9 },
+    { number: "ห้องเรียน 719", x: 4, y: 15 },
+    { number: "ห้องเรียน 718", x: 7, y: 22 },
+    { number: "ห้องเรียน 713", x: 16, y: 22 },
+    { number: "ห้อง 712", x: 18, y: 20 },
 ];
 
 export const INITIAL_ROOMS_BY_FLOOR: RoomsByFloor = {
