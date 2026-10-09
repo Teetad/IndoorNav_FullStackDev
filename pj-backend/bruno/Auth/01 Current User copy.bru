@@ -14,10 +14,6 @@ headers {
   Authorization: Bearer {{sessionToken}}
 }
 
-vars:pre-request {
-  sessionToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IndpY2hhaS50QGNtdS5hYy50aCIsIm5hbWUiOiJXSUNIQUkgVEFOVElXQVRUQU5BS1VMIiwicm9sZSI6IlVTRVIiLCJzdWIiOiJjYTk0NGZlZi03N2VmLTQwMjYtYTZkZS0zMTZjNzgxZGRkNWUiLCJpc3MiOiJpbmRvb3ItbmF2aWdhdGlvbi1iYWNrZW5kIiwiYXVkIjoiaW5kb29yLW5hdmlnYXRpb24tY2xpZW50IiwiaWF0IjoxNzkxMjU3MjM3LCJleHAiOjE3OTEyODYwMzd9.NXlNA9jwSkME0sh5dDFBB-C7XTKVY8SVV7TdQORryFs
-}
-
 tests {
   test("เข้าสู่ระบบแล้วและเป็นผู้ใช้ทั่วไป", function () {
     expect(res.getStatus()).to.equal(200);
