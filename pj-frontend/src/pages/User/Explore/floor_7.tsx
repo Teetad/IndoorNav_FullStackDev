@@ -17,6 +17,14 @@ const Floor_7 = () => {
   const navigate = useNavigate();
 
   const floor7Rooms = [
+    //700
+    {
+      placeId: "f7610b1a-f023-5dcf-b3e4-c8ea7b2028d4", 
+      top: "0%",
+      left: "50%",
+      width: "16%",
+      height: "17%",
+    },
     //701
     {
       placeId: "078de9fb-e9a1-5f05-b757-b6e8b2acae5c", 

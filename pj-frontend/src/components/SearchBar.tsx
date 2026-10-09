@@ -33,6 +33,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           type="text"
           value={value}
           onChange={onChange}
+          readOnly={!onChange} 
           placeholder={placeholder}
           className="w-full bg-transparent border-none outline-none text-stone-600 placeholder-stone-400 text-base px-1 focus:ring-0"
         />
