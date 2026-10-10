@@ -14,10 +14,12 @@ import DashBoardPage from './pages/Admin/DashBoardPage.tsx';
 import MapAdminPage from './pages/Admin/MapAdmin.tsx';
 import ReportAdminPage from './pages/Admin/ReportAdmin.tsx';
 import { NavigationProvider } from './context/NavigationContext.tsx';
+import { AuthProvider } from './context/AuthContext.tsx';
 
 function App() {
   return (
     <>
+    <AuthProvider>
     <NavigationProvider>
       <Router>
        <Routes>
@@ -38,6 +40,7 @@ function App() {
       </Routes>
     </Router>
    </NavigationProvider>
+   </AuthProvider>
     </>
   )
 }
