@@ -1,0 +1,24 @@
+[33mcfbb6b1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: commit: add more room in floor 4
+[33md3c2ec4[m HEAD@{1}: pull --tags origin main: Fast-forward
+[33m3af3e06[m HEAD@{2}: pull --tags origin main: Merge made by the 'ort' strategy.
+[33me2b6d61[m HEAD@{3}: commit: change floor name to match database
+[33ma846bb5[m HEAD@{4}: commit: Add testing as normal module
+[33m05a828c[m HEAD@{5}: commit: add simpler nav for floor plan
+[33ma4eeb28[m HEAD@{6}: pull --tags origin main: Merge made by the 'ort' strategy.
+[33m8f44832[m HEAD@{7}: commit: add floor to test map
+[33macfc164[m HEAD@{8}: pull --tags origin main: Merge made by the 'ort' strategy.
+[33mcdee1de[m HEAD@{9}: commit: ready to use nav
+[33m61a1dc3[m HEAD@{10}: commit: add readme
+[33mff012f1[m HEAD@{11}: commit: refactor
+[33m4886d30[m HEAD@{12}: pull origin main: Fast-forward
+[33m3698332[m HEAD@{13}: commit: Ready to use floor Information
+[33md08b4a1[m HEAD@{14}: commit: add room memery
+[33m959147d[m HEAD@{15}: commit (merge): Merge branch 'main' of https://github.com/Teetad/IndoorNav_FullStackDev
+[33m30608f9[m HEAD@{16}: commit: add seventh floor
+[33m0ed237d[m HEAD@{17}: commit (merge): Merge branch 'main' of https://github.com/Teetad/IndoorNav_FullStackDev
+[33m0aa29ee[m HEAD@{18}: commit: a* star prototype
+[33me2b4d76[m HEAD@{19}: pull origin main: Fast-forward
+[33me07a4e2[m HEAD@{20}: commit: barebone
+[33me0db53b[m HEAD@{21}: reset: moving to HEAD
+[33me0db53b[m HEAD@{22}: Branch: renamed refs/heads/main to refs/heads/main
+[33me0db53b[m HEAD@{24}: commit (initial): barebone

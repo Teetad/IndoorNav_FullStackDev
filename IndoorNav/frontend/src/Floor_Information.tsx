@@ -9,7 +9,7 @@ export const IMAGE_WIDTH = 1260;
 export const IMAGE_HEIGHT = 1260;
 
 export const FLOORS = [
-  { id: "4", label: "4th Floor", image: "" },
+  { id: "4", label: "4th Floor", image: fourthFloorPlan },
   { id: "5", label: "5th Floor", image: fifthFloorPlan },
   { id: "6", label: "6th Floor", image: sixthFloorPlan },
   { id: "7", label: "7th Floor", image: seventhFloorPlan },
