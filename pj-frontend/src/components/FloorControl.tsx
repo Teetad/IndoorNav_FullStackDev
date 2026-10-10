@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 interface FloorControlProps {
   currentFloor: number; // ชั้นปัจจุบัน เช่น 4, 5, 6, 7
   isHidden?: boolean;   // 📌 เพิ่ม prop นี้เพื่อรับค่าสั่งซ่อนปุ่มเมื่อ Popup เปิด
+  isAdmin?:boolean
 }
 
-const Floor: React.FC<FloorControlProps> = ({ currentFloor, isHidden = false }) => {
+const Floor: React.FC<FloorControlProps> = ({ currentFloor, isHidden = false, isAdmin=false }) => {
   const navigate = useNavigate();
   const minFloor = 4;
   const maxFloor = 7;
@@ -18,16 +19,24 @@ const Floor: React.FC<FloorControlProps> = ({ currentFloor, isHidden = false }) 
   const handleIncrement = () => {
     if (currentFloor < maxFloor) {
       const nextFloor = currentFloor + 1;
+      if(!isAdmin){
       navigate(`/floor-${nextFloor}`);
+      }else{
+        navigate(`/afloor-${nextFloor}`);
+      }
     }
   };
 
   const handleDecrement = () => {
     if (currentFloor > minFloor) {
       const prevFloor = currentFloor - 1;
+      if(!isAdmin){
       navigate(`/floor-${prevFloor}`);
+      }else{
+        navigate(`/afloor-${prevFloor}`);
+      }
     }
-  };
+    };
 
   return (
     <div className="fixed bottom-20 right-4 z-40 flex flex-col items-center justify-between w-20 h-25 bg-[#8E796E] rounded-3xl shadow-lg select-none overflow-hidden animate-fade-in">

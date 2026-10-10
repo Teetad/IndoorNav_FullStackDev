@@ -17,7 +17,7 @@ const SideBar = () => {
   };
 
   // เช็คสถานะ Active สำหรับหน้า Map
-  const isMapActive = ['/mapadmin'].some(
+  const isMapActive = ['/afloor-4'].some(
     (path) => location.pathname === path
   );
 
@@ -50,7 +50,7 @@ const SideBar = () => {
           className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
             isActive(['/dashboard']) 
               ? 'bg-secondary text-black font-semibold' 
-              : 'text-gray-700 hover:bg-gray-100 font-medium'
+              : 'text-gray-700 hover:bg-[#D9D9D9] font-medium'
           }`}
         >
           <LayoutDashboard className="h-6 w-6" />
@@ -59,11 +59,11 @@ const SideBar = () => {
 
         {/* Map */}
         <Link 
-          to="/mapadmin" 
+          to="/afloor-4" 
           className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
             isMapActive 
               ? 'bg-secondary text-black font-semibold' 
-              : 'text-gray-700 hover:bg-gray-100 font-medium'
+              : 'text-gray-700 hover:bg-[#D9D9D9] font-medium'
           }`}
         >
           <Map className="h-6 w-6" />
@@ -76,7 +76,7 @@ const SideBar = () => {
           className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
             isActive(['/reportadmin']) 
               ? 'bg-secondary text-black font-semibold' 
-              : 'text-gray-700 hover:bg-gray-100 font-medium'
+              : 'text-gray-700 hover:bg-[#D9D9D9] font-medium'
           }`}
         >
           <ConciergeBell className="h-6 w-6" />

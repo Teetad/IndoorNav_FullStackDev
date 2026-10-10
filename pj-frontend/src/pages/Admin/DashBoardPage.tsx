@@ -1,17 +1,16 @@
-
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SideBar from "../../components/SideBar";
 import SearchBar from "../../components/SearchBar";
-import { Bell, Send, Mail, Check, User } from "lucide-react";
+import { Bell, Send, Mail, Check } from "lucide-react";
 import ReportCard from "../../components/ReportCard";
-import { useAuth } from "../../context/AuthContext";
+import LogInHeader from "../../components/LogInHeader";
 
 interface Report {
   id: string;
   place_name: string;
   description: string;
-  status: "Submitting" | "Received" | "Resolved" | "Pending";
+  status: "Pending" | "In progress" | "Resolved" ;
   createdAt: string;
   updated_at: string;
 }
@@ -45,55 +44,48 @@ const formatTimeAgo = (dateString: string) => {
 // รองรับ Pending ที่อาจถูกส่งมาจาก Backend
 const normalizeStatus = (status: string) => {
   const value = status.toLowerCase();
-
   if (value === "pending" || value === "submitting") {
-    return "Submitting";
+    return "Pending"; // 📌 1. เปลี่ยนตรงนี้เป็น "Pending"
   }
-  if (value === "received") return "Received";
+  if (value === "received" || value === "in_progress") { // 📌 2. เพิ่ม in_progress ด้วย
+    return "Received";
+  }
   if (value === "resolved") return "Resolved";
 
   return status;
-};
+}
 
 const DashBoardPage = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
 
   // Reports
   const [reports, setReports] = useState<Report[]>([]);
   const [isReportsLoading, setReportsLoading] = useState(true);
 
+  const goToMap = () => {
+    navigate("/afloor-4");
+    return;
+  }
+
+  // 📌 เพิ่ม useEffect เพื่อดึงข้อมูล Reports ล่าสุดมาแสดงในตาราง
   useEffect(() => {
     const fetchReports = async () => {
+      setReportsLoading(true);
       try {
         const response = await fetch("http://localhost:3000/reports", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
+          credentials: "include", // แนบ Cookie ของ Admin ไปด้วย
         });
 
-        if (response.status === 401) {
-          logout();
-          navigate("/login");
-          return;
+        if (response.ok) {
+          const data = await response.json();
+          setReports(data);
+        } else {
+          console.error("Failed to fetch reports");
         }
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch reports");
-        }
-
-        const data = await response.json();
-
-        // รองรับ API ที่คืนค่าเป็น Array หรือ { reports: [...] }
-        const list = Array.isArray(data)
-          ? data
-          : Array.isArray(data.reports)
-            ? data.reports
-            : [];
-
-        setReports(list);
       } catch (error) {
         console.error("Error fetching reports:", error);
       } finally {
@@ -102,26 +94,7 @@ const DashBoardPage = () => {
     };
 
     fetchReports();
-  }, [logout, navigate]);
-
-  const totalReportsCount = reports.length;
-
-  const submittingCount = reports.filter(
-    (r) => normalizeStatus(r.status) === "Submitting"
-  ).length;
-
-  const receivedCount = reports.filter(
-    (r) => normalizeStatus(r.status) === "Received"
-  ).length;
-
-  const resolvedCount = reports.filter(
-    (r) => normalizeStatus(r.status) === "Resolved"
-  ).length;
-
-  const goToMap = () => {
-    navigate("/mapadmin");
-    return;
-  }
+  }, []);
 
   // เรียงจากรายงานใหม่ไปเก่า และแสดงไม่เกิน 3 รายการ
   const recentReports = [...reports]
@@ -138,7 +111,7 @@ const DashBoardPage = () => {
 
   const getStatusStyle = (status: string) => {
     switch (normalizeStatus(status)) {
-      case "Submitting":
+      case "Pending":
         return {
           color: "bg-[#6B8E9B]",
           Icon: Send,
@@ -155,11 +128,12 @@ const DashBoardPage = () => {
         };
       default:
         return {
-          color: "bg-stone-500",
-          Icon: Bell,
+          color: "bg-[#C29053]",
+          Icon: Mail,
         };
     }
   };
+
 
   return (
     <div className="flex h-dvh overflow-hidden bg-[#F8F6F2] font-sans">
@@ -168,7 +142,7 @@ const DashBoardPage = () => {
       <main className="ml-64 flex min-w-0 flex-1 flex-col overflow-y-auto px-10 py-6">
         {/* Header */}
         <div className="mb-6 flex shrink-0 items-center justify-between gap-8">
-          <div className="relative w-full max-w-md">
+          <div className="relative w-ful l max-w-md">
             <SearchBar
               value={""}
               onChange={()=>{}}
@@ -180,49 +154,40 @@ const DashBoardPage = () => {
             />
 
           </div>
-
-          <div className="flex shrink-0 items-center gap-3 rounded-full bg-[#EAE1D3] px-4 py-2 font-medium text-stone-800 shadow-sm">
-            <div className="rounded-full bg-[#8E796E] p-1.5 text-[#F3EFEA]">
-              <User className="h-5 w-5" />
-            </div>
-            <span>{user?.name || "Admin"}</span>
-          </div>
+          <LogInHeader></LogInHeader>
+          
         </div>
 
         {/* Dashboard Overview */}
-        <h1 className="mb-2 shrink-0 text-3xl font-bold text-stone-800">
+        <h1 className="mb-2 shrink-0 text-3xl font-bold text-stone-800 ">
           Dashboard Overview
         </h1>
 
-        <h2 className="mb-6 shrink-0 text-xl font-semibold text-stone-700">
+        <h2 className="mb-6 shrink-0 text-xl font-semibold text-stone-700 py-8">
           Reports issues
         </h2>
 
         {/* Status Cards */}
         <div className="mb-8 grid shrink-0 grid-cols-4 gap-4">
           <ReportCard
-            Status="New Reports"
+            Status="All reports"
             Icon={Bell}
             ColorClass="bg-[#B85C5C]"
-            Count={totalReportsCount}
           />
           <ReportCard
-            Status="Submitting"
+            Status="Pending"
             Icon={Send}
             ColorClass="bg-[#6B8E9B]"
-            Count={submittingCount}
           />
           <ReportCard
             Status="Received"
             Icon={Mail}
             ColorClass="bg-[#C29053]"
-            Count={receivedCount}
           />
           <ReportCard
             Status="Resolved"
             Icon={Check}
             ColorClass="bg-[#5B8A66]"
-            Count={resolvedCount}
           />
         </div>
 
