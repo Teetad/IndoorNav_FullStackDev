@@ -63,7 +63,7 @@ const DashBoardPage = () => {
   const [isReportsLoading, setReportsLoading] = useState(true);
 
   const goToMap = () => {
-    navigate("/mapadmin");
+    navigate("/afloor-4");
     return;
   }
 
