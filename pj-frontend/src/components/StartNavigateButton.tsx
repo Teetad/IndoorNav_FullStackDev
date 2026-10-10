@@ -1,14 +1,10 @@
 import React from "react";
 
 interface StartNavigateButtonProps {
-  startLocation: string;
-  destination: string;
-  onNavigate?: () => void; // ฟังก์ชันเมื่อกดเริ่มนำทาง
+  onNavigate: () => void; // ฟังก์ชันเมื่อกดเริ่มนำทาง
 }
 
 const StartNavigateButton: React.FC<StartNavigateButtonProps> = ({
-  startLocation,
-  destination,
   onNavigate,
 }) => {
   return (

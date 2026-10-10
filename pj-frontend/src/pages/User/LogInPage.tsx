@@ -1,37 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
-
-interface UserProfile {
-  user_id: string;
-  email: string;
-  display_name: string;
-  role?: string;
-}
+// 📌 1. Import useAuth เข้ามา (ปรับ path ให้ตรงกับที่เก็บไฟล์ AuthContext ของคุณ)
+import { useAuth } from '../../context/AuthContext';
 
 const LogInPage = () => {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // 📌 2. ดึงข้อมูลและฟังก์ชันจาก Global State
+  const { user, login, logout } = useAuth(); 
+
   const handleClose = () => {
-    navigate(-1); // กลับไปหน้าก่อนหน้า
+    navigate(-1); 
   };
 
   const handleLogOut = async () => {
     try {
-      // 1. ยิง API ไปบอก Backend ให้ลบ Session
       await fetch('http://localhost:3000/auth/logout', {
         method: 'POST',
         credentials: 'include',
       });
 
-      // 2. ลบข้อมูลใน Local Storage
-      localStorage.clear(); 
-
-      // 3. ล้างค่า State ของ User ในหน้าปัจจุบัน
-      setUserData(null);
-
+      // 📌 3. เรียกใช้ logout() จาก Context แทนการ clear เอง
+      // ฟังก์ชันนี้จะจัดการลบ LocalStorage และล้าง State ให้เราอัตโนมัติ
+      logout(); 
 
     } catch (error) {
       console.error('Error logging out:', error);
@@ -52,21 +45,30 @@ const LogInPage = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setUserData(data); 
-
+          
+          // 📌 4. เมื่อดึงข้อมูลสำเร็จ ให้อัปเดตเข้า Global State ทันที
+          // สมมติว่าระบบของคุณไม่ได้ใช้ JWT (เพราะใช้ credentials: 'include') 
+          // ให้ส่ง token จำลองไป หรือถ้ามี token ก็ใส่ token จริงๆ ได้เลย
+          login("session-active", {
+            id: data.user_id,
+            name: data.display_name,
+            email: data.email
+          }); 
       
         } else {
-          setUserData(null);
+          // ถ้าดึงข้อมูลไม่ได้ (เช่น session หมดอายุ) ให้เคลียร์ State
+          logout();
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
-        setUserData(null);
+        logout();
       } finally {
         setLoading(false); 
       }
     };
 
     fetchUserData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -87,15 +89,14 @@ const LogInPage = () => {
         
         {loading ? (
           <div className="mt-20 text-grey-700 font-medium">Loading...</div>
-        ) : userData ? (
+        ) : user ? ( // 📌 5. เปลี่ยนจาก userData เป็น user (ตัวแปรจาก Context)
           
           /* ----------------- UI เมื่อ Log in สำเร็จ ----------------- */
           <div className="w-full flex flex-col items-center pt-2">
             
-            {/* Header: Email ตรงกลาง และ ปุ่ม Done ขวาบน */}
             <div className="w-full relative flex items-center justify-center mb-8">
               <span className="text-grey-700 font-normal text-lg">
-                {userData.email}
+                {user.email} {/* 📌 ดึงค่าจาก Context */}
               </span>
               <button 
                 onClick={handleClose}
@@ -105,15 +106,14 @@ const LogInPage = () => {
               </button>
             </div>
 
-            {/* รูปโปรไฟล์ */}
             <div className="flex flex-col items-center mt-12">
               <div className="flex items-center justify-center w-24 h-24 rounded-full bg-[#8E796E] text-[#F3EFEA] shadow-md mb-4">
                 <User className="w-12 h-12" />
               </div>
-              <h2 className="text-2xl font-medium text-grey-700"> Hi, {userData.display_name || "User"}!</h2>
+              {/* 📌 ดึงชื่อจาก Context */}
+              <h2 className="text-2xl font-medium text-grey-700"> Hi, {user.name || "User"}!</h2>
             </div>
 
-            {/* ปุ่ม Log out */}
             <div className="w-full px-2 space-y-4 pt-10">
               <button 
                 onClick={handleLogOut}
@@ -130,7 +130,6 @@ const LogInPage = () => {
           /* ----------------- UI เมื่อยังไม่ Log in ----------------- */
           <div className="w-full flex flex-col items-center">
             
-            {/* ปุ่ม Done ขวาบน */}
             <div className="w-full flex justify-end">
               <button 
                 onClick={handleClose}
@@ -140,7 +139,6 @@ const LogInPage = () => {
               </button>
             </div>
 
-            {/* รูปโปรไฟล์ตอนยังไม่เข้าระบบ */}
             <div className="flex flex-col items-center mt-12">
               <div className="flex items-center justify-center w-24 h-24 rounded-full bg-[#8E796E] text-[#F3EFEA] shadow-md mb-4">
                 <User className="w-12 h-12" />
@@ -148,7 +146,6 @@ const LogInPage = () => {
               <h2 className="text-2xl font-medium text-grey-700">Please log in</h2>
             </div>
 
-            {/* ปุ่ม Log in */}
             <div className="w-full px-2 space-y-4 pt-10">
               <button 
                 onClick={handleLogIn}

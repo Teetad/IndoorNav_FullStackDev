@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { MapPin } from "lucide-react";
 import StartNavigateButton from "../../components/StartNavigateButton";
+import { useNavigation } from "../../context/NavigationContext";
 
 const StartNavigation: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  const { startNavigation } = useNavigation();
   
   // รับค่าชื่อห้องปลายทางจาก query param (เช่น ?room=422) หรือค่าเริ่มต้น
   const roomName = searchParams.get("room") || "422";
@@ -13,6 +16,11 @@ const StartNavigation: React.FC = () => {
   const [startQuery, setStartQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  const handleNavigate = () => {
+    startNavigation(startQuery, roomName);
+    navigate('/');
+  };
 
   // ยิง API ค้นหาจุดเริ่มต้นอัตโนมัติเมื่อพิมพ์
   useEffect(() => {
@@ -117,12 +125,7 @@ const StartNavigation: React.FC = () => {
 
       {/* ส่วนแสดงปุ่ม Start Navigate ด้านล่าง */}
       {startQuery.trim() !== "" && (
-        <StartNavigateButton 
-          startLocation={startQuery}
-          destination={roomName}
-          onNavigate={() => {
-            console.log("Navigating from", startQuery, "to", roomName);
-          }}
+        <StartNavigateButton onNavigate={handleNavigate}
         />
       )}
 

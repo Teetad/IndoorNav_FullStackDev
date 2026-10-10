@@ -9,13 +9,13 @@
   background: #f5f7f8;
 }
 
-button {
+/* button {
   border: 1px solid #cbd5d8;
   border-radius: 8px;
   background: #ffffff;
   color: #172026;
   font: inherit;
-}
+} */
 
 button:hover {
   border-color: #74868c;
@@ -161,8 +161,8 @@ h1 {
   color: #4b5b60;
 }
 
-.map-shell {
-  /* Hug the (scaled) map and center it on the page. */
+/* .map-shell {
+
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
@@ -171,7 +171,7 @@ h1 {
   border-radius: 8px;
   background: #ffffff;
   box-shadow: 0 16px 40px rgba(25, 43, 52, 0.12);
-}
+} */
 
 .grid-container {
   display: grid;

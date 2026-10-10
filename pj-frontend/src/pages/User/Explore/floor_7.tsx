@@ -7,6 +7,8 @@ import MapSpot from "../../../components/MapSpot";
 import CategoryChips from "../../../components/CategoryChips";
 import { useNavigate } from 'react-router-dom';
 import BottomNav from "../../../components/BottomNav";
+import CallMapEmbed from "../../../components/CallMapEmbed";
+import { useNavigation } from "../../../context/NavigationContext";
 
 const Floor_7 = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,6 +17,14 @@ const Floor_7 = () => {
   const navigate = useNavigate();
 
   const floor7Rooms = [
+    //700
+    {
+      placeId: "f7610b1a-f023-5dcf-b3e4-c8ea7b2028d4", 
+      top: "0%",
+      left: "50%",
+      width: "16%",
+      height: "17%",
+    },
     //701
     {
       placeId: "078de9fb-e9a1-5f05-b757-b6e8b2acae5c", 
@@ -95,6 +105,9 @@ const Floor_7 = () => {
     ? selectedLocation?.place_id || selectedLocation?.id 
     : selectedLocation;
 
+   const { startNode, goalNode, isNavigating, stopNavigation } = useNavigation();
+      console.log("ค่าที่ส่งไปให้แผนที่:", { startNode, goalNode });
+
   return (
     <div className={`absolute inset-0 w-full h-[100dvh] bg-[#F3EFEA] flex flex-col ${isHidden ? 'overflow-hidden' : 'overflow-auto'}`}>
       
@@ -102,8 +115,7 @@ const Floor_7 = () => {
       <div 
       className="absolute top-4 left-4 right-4 z-50 max-w-md mx-auto">
         <SearchBar
-          value={searchQuery}
-          onChange={handleSearchChange}
+          value=""
           placeholder="Search location here"
           BackgroundColor="bg-primary-light backdrop-blur-md shadow-md" 
           onProfileClick={handleProfileClick}
@@ -120,6 +132,10 @@ const Floor_7 = () => {
 
       <div className="w-full h-full overflow-auto relative flex items-center justify-center pt-20 pb-20">
         <div className="relative w-full max-w-[800px] flex-shrink-0">
+
+          <div className="absolute inset-0 z-10 w-full h-full pointer-events-none">
+             <CallMapEmbed start={startNode} goal={goalNode} currentFloor="7"/>
+          </div>
           
           {/* รูปภาพแผนที่เรนเดอร์ครั้งเดียวจบ ไม่มีการทับซ้อน */}
           <img 
@@ -129,17 +145,19 @@ const Floor_7 = () => {
           />
 
           {/* 📌 2. วนลูป (Map) สร้างจุด Hotspot ทุกห้องจากอาเรย์ข้างบน */}
-          {floor7Rooms.map((room) => (
-            <MapSpot 
-              key={room.placeId}
-              Top={room.top} 
-              Left={room.left} 
-              Width={room.width} 
-              Height={room.height} 
-              onClick={() => setSelectedLocation(room.placeId)} 
-              placeId={room.placeId}
-            />
-          ))}
+          <div className="absolute inset-0 z-20 pointer-events-auto">
+            {floor7Rooms.map((room) => (
+              <MapSpot 
+                key={room.placeId}
+                Top={room.top} 
+                Left={room.left} 
+                Width={room.width} 
+                Height={room.height} 
+                onClick={() => setSelectedLocation(room.placeId)} 
+                placeId={room.placeId}
+              />
+            ))}
+          </div>
 
         </div>
       </div>
@@ -165,7 +183,7 @@ const Floor_7 = () => {
         <FloorControl currentFloor={7} isHidden={isHidden} />
       </div>
 
-      <BottomNav/>
+      <BottomNav></BottomNav>
 
     </div>
   );
