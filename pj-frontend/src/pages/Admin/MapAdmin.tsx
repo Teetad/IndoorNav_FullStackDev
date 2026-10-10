@@ -51,61 +51,69 @@ const MapAdminPage = () => {
           clearTimeout(timer);
         };
       }, [searchText]);
-    return(
+    return (
+  // 📌 1. เพิ่ม div ครอบทั้งหมด พร้อมตั้งค่า h-screen (สูงเต็มจอ) และ flex
+  <div className="flex h-screen w-full bg-[#F8F6F2] font-sans">
+    
+    {/* 📌 2. นำ SideBar ออกมาวางไว้ข้างนอก main */}
+    <SideBar />
 
-      <main className="ml-64 flex min-w-0 flex-1 flex-col overflow-y-auto px-10 py-6">
-            <SideBar/>
-            <div className="relative w-full max-w-md">
-            <SearchBar
-              value={searchText}
-              onChange={(e) => {
-                setSearchText(e.target.value);
-                setShowDropdown(true);
-              }}
-              placeholder="Search location here"
-              BackgroundColor="bg-[#EAE1D3] text-stone-700 placeholder-stone-500"
-              onProfileClick={() => {}}
-              onSearchClick={() => setShowDropdown(true)}
-              isShowProfile={false}
-            />
+    {/* 📌 3. ส่วน main ขยับ margin ซ้าย (ml-64) เพื่อหลบพื้นที่ให้ SideBar */}
+    <main className="ml-64 flex min-w-0 flex-1 flex-col overflow-y-auto px-10 py-6">
+      
+      <div className="relative w-full max-w-md">
+        <SearchBar
+          value={searchText}
+          onChange={(e) => {
+            setSearchText(e.target.value);
+            setShowDropdown(true);
+          }}
+          placeholder="Search location here"
+          BackgroundColor="bg-[#EAE1D3] text-stone-700 placeholder-stone-500"
+          onProfileClick={() => {}}
+          onSearchClick={() => setShowDropdown(true)}
+          isShowProfile={false}
+        />
 
-            {showDropdown && searchText.trim() !== "" && (
-              <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-60 overflow-y-auto rounded-2xl border border-[#EAE1D3] bg-[#F4EFE9] shadow-lg">
-                {isSearchLoading ? (
-                  <p className="p-4 text-center text-sm text-stone-500">
-                    Searching...
-                  </p>
-                ) : searchResults.length > 0 ? (
-                  searchResults.map((place, index) => (
-                    <button
-                      key={place.place_id ?? place.id ?? index}
-                      type="button"
-                      className="w-full border-b border-[#EAE1D3]/50 px-4 py-3 text-left text-sm text-stone-700 transition-colors last:border-none hover:bg-[#EAE1D3]"
-                      onClick={() => {
-                        setSearchText(
-                          place.place_name ?? place.name ?? ""
-                        );
-                        setShowDropdown(false);
-                      }}
-                    >
-                      {place.place_name ?? place.name ?? "Unnamed place"}
-                      {place.building_name && (
-                        <span className="ml-2 text-xs text-stone-500">
-                          ({place.building_name})
-                        </span>
-                      )}
-                    </button>
-                  ))
-                ) : (
-                  <p className="p-4 text-center text-sm text-stone-500">
-                    No results found.
-                  </p>
-                )}
-              </div>
+        {showDropdown && searchText.trim() !== "" && (
+          <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-60 overflow-y-auto rounded-2xl border border-[#EAE1D3] bg-[#F4EFE9] shadow-lg">
+            {isSearchLoading ? (
+              <p className="p-4 text-center text-sm text-stone-500">
+                Searching...
+              </p>
+            ) : searchResults.length > 0 ? (
+              searchResults.map((place, index) => (
+                <button
+                  key={place.place_id ?? place.id ?? index}
+                  type="button"
+                  className="w-full border-[#EAE1D3]/50 px-4 py-3 text-left text-sm text-stone-700 transition-colors last:border-none hover:bg-[#EAE1D3]"
+                  onClick={() => {
+                    setSearchText(
+                      place.place_name ?? place.name ?? ""
+                    );
+                    setShowDropdown(false);
+                  }}
+                >
+                  {place.place_name ?? place.name ?? "Unnamed place"}
+                  {place.building_name && (
+                    <span className="ml-2 text-xs text-stone-500">
+                      ({place.building_name})
+                    </span>
+                  )}
+                </button>
+              ))
+            ) : (
+              <p className="p-4 text-center text-sm text-stone-500">
+                No results found.
+              </p>
             )}
           </div>
-        </main>
-    );
+        )}
+      </div>
+      
+    </main>
+  </div>
+);
 }
 
 export default MapAdminPage;
