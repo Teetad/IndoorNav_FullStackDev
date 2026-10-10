@@ -32,6 +32,9 @@ const EditRoomPage = () => {
   const [editedPlaceName, setEditedPlaceName] = useState<string>("");
   const [editedDescription, setEditedDescription] = useState<string>("");
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  
+  // 📌 เพิ่ม State สำหรับเก็บจำนวน Favorite
+  const [favCount, setFavCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchRoomData = async () => {
@@ -47,9 +50,12 @@ const EditRoomPage = () => {
         if (placeRes.ok) {
           const placeData = await placeRes.json();
           setPlace(placeData);
-          // 📌 นำข้อมูลจาก DB มาตั้งเป็นค่าเริ่มต้นในช่อง Input
           setEditedPlaceName(placeData.place_name || "");
           setEditedDescription(placeData.description || "");
+          
+          // 📌 ดึงค่าจำนวน Favorite จาก API มาใส่ใน State
+          // (เปลี่ยนชื่อฟิลด์ placeData.favorite_count ให้ตรงกับที่ Backend ส่งมาได้เลยครับ)
+          setFavCount(placeData.favorite_count || placeData.fav_count || placeData.like_count || 0);
         }
 
         const reviewsRes = await fetch(`http://localhost:3000/places/${placeId}/reviews`, {
@@ -72,7 +78,6 @@ const EditRoomPage = () => {
     fetchRoomData();
   }, [placeId]);
 
-  // 📌 2. ฟังก์ชันยิง API อัปเดตข้อมูลห้องเมื่อกดปุ่ม UPDATE
   const handleUpdatePlace = async () => {
     if (!placeId) return;
     setIsUpdating(true);
@@ -80,19 +85,18 @@ const EditRoomPage = () => {
     try {
       const response = await fetch(`http://localhost:3000/places/${placeId}`, {
         method: "PUT",
-        credentials: "include", // ต้องแนบ Token
+        credentials: "include", 
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           place_name: editedPlaceName,
-          description: editedDescription || null, // ถ้าลบจนว่าง ให้ส่ง null ได้
+          description: editedDescription || null, 
         }),
       });
 
       if (response.ok) {
         alert("Successfully updated room details!");
-        // อัปเดต state ตัวหลักเพื่อแสดงผล
         setPlace(prev => prev ? { ...prev, place_name: editedPlaceName, description: editedDescription } : null);
       } else {
         alert("เกิดข้อผิดพลาดในการอัปเดตข้อมูล");
@@ -146,7 +150,6 @@ const EditRoomPage = () => {
             </button>
             
             <div className="bg-[#EAE1D3] px-8 py-2.5 rounded-2xl min-w-[250px]">
-              {/* 📌 3. เปลี่ยนจาก h1 เป็น input เพื่อให้พิมพ์แก้ได้ */}
               {isLoading ? (
                 <span className="text-2xl font-bold text-stone-800">Loading...</span>
               ) : (
@@ -168,7 +171,6 @@ const EditRoomPage = () => {
           
           <div className="flex flex-col h-full">
             <h2 className="text-2xl font-bold text-stone-800 mb-4">Description</h2>
-            {/* 📌 4. เชื่อม state เข้ากับ textarea และนำ readOnly ออก */}
             <textarea
               className="flex-1 w-full bg-[#EAE1D3] rounded-[24px] p-6 text-stone-700 text-lg resize-none outline-none focus:ring-2 focus:ring-[#6B8E9B] placeholder-stone-500"
               value={editedDescription}
@@ -179,6 +181,12 @@ const EditRoomPage = () => {
 
           <div className="flex flex-col h-full overflow-hidden">
             
+            {/* 📌 ส่วนแสดง Favorites[cite: 10] */}
+            <div className="flex items-center gap-4 mb-6">
+              <h2 className="text-xl font-bold text-stone-800">Like Count</h2>
+              <span className="text-stone-700 text-[17px]">{isLoading ? "..." : favCount}</span>
+            </div>
+
             <h2 className="text-xl font-bold text-stone-800 mb-4">Photos</h2>
             <div className="flex gap-4 mb-8 shrink-0">
               <div className="w-28 h-28 bg-[#DCD7D2] rounded-2xl shrink-0"></div>
@@ -232,7 +240,6 @@ const EditRoomPage = () => {
         </div>
 
         <div className="absolute bottom-8 right-10">
-          {/* 📌 5. ผูกฟังก์ชัน handleUpdatePlace เข้ากับปุ่ม */}
           <button 
             onClick={handleUpdatePlace}
             disabled={isUpdating}
