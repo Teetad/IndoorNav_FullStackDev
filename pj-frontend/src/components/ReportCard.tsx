@@ -62,7 +62,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ Icon, Status, ColorClass }) => 
     return (
         <div className={`${ColorClass} text-white p-6 rounded-2xl shadow-md relative overflow-hidden`}>
             <div className="flex justify-between items-start">
-                <span className="font-medium text-white/90">{Status}</span>
+                <span className="font-medium text-xl text-white/90">{Status}</span>
                 <Icon className="w-6 h-6 text-white/80" />
             </div>
             {/* แสดง ... ตอนกำลังโหลดข้อมูล */}

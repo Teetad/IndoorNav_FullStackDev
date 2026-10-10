@@ -159,11 +159,11 @@ const DashBoardPage = () => {
         </div>
 
         {/* Dashboard Overview */}
-        <h1 className="mb-2 shrink-0 text-3xl font-bold text-stone-800">
+        <h1 className="mb-2 shrink-0 text-3xl font-bold text-stone-800 ">
           Dashboard Overview
         </h1>
 
-        <h2 className="mb-6 shrink-0 text-xl font-semibold text-stone-700">
+        <h2 className="mb-6 shrink-0 text-xl font-semibold text-stone-700 py-8">
           Reports issues
         </h2>
 
