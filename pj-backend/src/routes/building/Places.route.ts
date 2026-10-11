@@ -192,12 +192,15 @@ router.get("/types", async (req, res) => {
 
 // Admin เพิ่ม URL รูปและกำหนดลำดับที่ Frontend จะแสดง
 
+
 router.post(
   "/:place_id/images",
   requireAuth,
   requireRole("ADMIN"),
   upload.single("image"),
   async (req, res) => {
+    let filePath: string | undefined;
+
     try {
       const place_id =
         typeof req.params.place_id === "string"
@@ -216,35 +219,53 @@ router.post(
         });
       }
 
+      filePath = req.file.path;
+
       const [place] = await dbClient
         .select({ id: Places.place_id })
         .from(Places)
         .where(eq(Places.place_id, place_id));
 
       if (!place) {
-        fs.unlinkSync(req.file.path);
+        await fs.promises.unlink(filePath).catch(() => {});
         return res.status(404).json({
           message: "Place not found",
         });
       }
 
-      const image_url =
-        `/images/places/uploads/${req.file.filename}`;
+      // URL สำหรับเรียกดูไฟล์รูป
+      const image_url = `/images/places/uploads/${req.file.filename}`;
 
-      const [updatedPlace] = await dbClient
-        .update(Places)
-        .set({ image_url })
-        .where(eq(Places.place_id, place_id))
+      // หา display_order ถัดไป
+      const existingImages = await dbClient
+        .select({ display_order: PlaceImages.display_order })
+        .from(PlaceImages)
+        .where(eq(PlaceImages.place_id, place_id));
+
+      const nextOrder =
+        existingImages.reduce(
+          (max, image) =>
+            Math.max(max, image.display_order ?? -1),
+          -1
+        ) + 1;
+
+      // บันทึกรูปลง PlaceImages
+      const [newImage] = await dbClient
+        .insert(PlaceImages)
+        .values({
+          place_id,
+          image_url,
+          display_order: nextOrder,
+        })
         .returning();
 
-      return res.status(200).json({
+      return res.status(201).json({
         message: "Image uploaded successfully",
-        image_url,
-        place: updatedPlace,
+        data: newImage,
       });
     } catch (error) {
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
+      if (filePath) {
+        await fs.promises.unlink(filePath).catch(() => {});
       }
 
       console.error("Upload place image failed:", error);
