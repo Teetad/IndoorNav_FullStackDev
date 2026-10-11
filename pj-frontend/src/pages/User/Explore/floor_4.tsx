@@ -167,6 +167,14 @@ const Floor_4 = () => {
       width: "9%",
       height: "8%",
     },
+    //422
+    {
+      placeId: "1bdc1491-ea0b-5537-b5ac-7143efebd56f",  
+      top: "0%",
+      left: "49.5%",
+      width: "51%",
+      height: "26%",
+    },
   
   ];
 
@@ -185,7 +193,7 @@ const Floor_4 = () => {
     ? selectedLocation?.place_id || selectedLocation?.id 
     : selectedLocation;
 
-  const { startNode, goalNode, isNavigating, stopNavigation } = useNavigation();
+  const { startNode, goalNode } = useNavigation();
   console.log("ค่าที่ส่งไปให้แผนที่:", { startNode, goalNode });
 
   return (
@@ -193,7 +201,7 @@ const Floor_4 = () => {
       
       {/* SearchBar และ CategoryChips ด้านบน */}
       <div 
-      className="absolute top-4 left-4 right-4 z-10 max-w-md mx-auto">
+      className="absolute top-4 left-4 right-4 z-50 max-w-md mx-auto">
         <SearchBar
           value=""
           placeholder="Search location here"

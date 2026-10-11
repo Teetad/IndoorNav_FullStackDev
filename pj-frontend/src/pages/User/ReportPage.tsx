@@ -158,7 +158,7 @@ const ReportPage = () => {
       );
     }
 
-    if (status === 'received') {
+    if (status === 'in_progress') {
       return (
         <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#C89B68] text-white rounded-full text-sm font-medium">
           <Mail className="w-4 h-4" />

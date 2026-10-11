@@ -89,8 +89,6 @@ const INITIAL_ROOMS_4: Room[] = [
   { number:"ห้องอาจารย์ จุด 7",x:1,y:24},
   { number:"ห้องอาจารย์ จุด 8",x:8,y:19},
   { number:"ห้องอาจารย์ จุด 9",x:8,y:16}
-
-  
 ];
 
 const INITIAL_ROOMS_5: Room[] = [
@@ -116,7 +114,7 @@ const INITIAL_ROOMS_5: Room[] = [
 ];
 
 const INITIAL_ROOMS_6: Room[] = [
-    { number: "ห้องประชุม", x: 18, y: 10 },
+    { number: "Meeting Room", x: 18, y: 10 },
     { number: "ห้องวิจัย 2 (Lab 2)", x: 4, y: 15 },
     { number: "ห้องวิจัย 1 (Lab 1)", x: 4, y: 19 },
     { number: "Lab 3", x: 14, y: 4 },
@@ -126,6 +124,7 @@ const INITIAL_ROOMS_6: Room[] = [
     { number: "ห้องบัณฑิต", x: 18, y: 20 }
 ];
 const INITIAL_ROOMS_7: Room[] = [
+    { number: "ห้องเรียน 700", x: 15, y: 5 },
     { number: "ห้องเรียน 720", x: 11, y: 13 },
     { number: "ห้องเรียน 701", x: 21, y: 6 },
     { number: "ห้องเรียน 702", x: 23, y: 6 },

@@ -128,4 +128,37 @@ router.delete("/reports/:report_id", requireAuth, requireRole("ADMIN"), async (r
   }
 });
 
+// Admin อ่าน Report โดยกรองตาม Status (เช่น /reports/PENDING)
+router.get("/reports/:status", requireAuth, requireRole("ADMIN"), async (req, res) => {
+  try {
+    // ดึงค่า status จาก URL และแปลงเป็นตัวพิมพ์ใหญ่เผื่อกรณีผู้ใช้พิมพ์ตัวเล็ก
+    const statusParam = typeof req.params.status === "string" ? req.params.status.toUpperCase() : "";
+    
+    if (!isReportStatus(statusParam)) {
+      return res.status(400).json({ message: "Invalid status. Must be PENDING, IN_PROGRESS, or RESOLVED" });
+    }
+
+    const reports = await dbClient.select({
+      report_id: Reports.report_id,
+      user_id: Reports.user_id,
+      user_email: Users.email,
+      place_id: Reports.place_id,
+      place_name: Places.place_name,
+      description: Reports.description,
+      status: Reports.status,
+      admin_note: Reports.admin_note,
+      created_at: Reports.created_at,
+      updated_at: Reports.updated_at,
+    }).from(Reports)
+      .innerJoin(Users, eq(Reports.user_id, Users.user_id))
+      .innerJoin(Places, eq(Reports.place_id, Places.place_id))
+      .where(eq(Reports.status, statusParam)); // เพิ่มเงื่อนไข where status
+
+    return res.status(200).json(reports);
+  } catch (error) {
+    console.error("GET /reports/:status failed:", error);
+    return res.status(500).json({ message: "Unable to get reports by status" });
+  }
+});
+
 export default router;
