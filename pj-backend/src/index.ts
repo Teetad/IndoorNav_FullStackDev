@@ -17,7 +17,9 @@ import reportRouter from "./routes/user/Reports.route.js";
 // app คือจุดรับ HTTP request ก่อนส่งต่อให้ route ของแต่ละหมวด
 const app = express();
 app.use(morgan("dev"));
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 // อนุญาตให้ Frontend ส่ง session cookie มาหา Backend
 app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:5173",

@@ -40,6 +40,9 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
   const [isFavorited, setIsFavorited] = useState<boolean>(false);
   const [isFavLoading, setIsFavLoading] = useState<boolean>(false);
 
+  // 📌 State สำหรับเก็บรูปภาพ
+  const [images, setImages] = useState<any[]>([]);
+
   useEffect(() => {
     if (placeId) {
       document.body.classList.add("showroom-open");
@@ -47,7 +50,8 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
       document.body.classList.remove("showroom-open");
       setRoomDetail(null);
       setReviews([]); 
-      setIsFavorited(false); // เคลียร์สถานะ
+      setImages([]); // เคลียร์รูปภาพเมื่อปิดห้อง
+      setIsFavorited(false); 
     }
     return () => {
       document.body.classList.remove("showroom-open");
@@ -72,7 +76,20 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
           setReviews(reviewsData);
         }
 
-        // 📌 1. ดึงข้อมูลว่าห้องนี้ถูก Favorite โดยผู้ใช้นี้หรือยัง
+        // 📌 ดึงข้อมูลรููปภาพทั้งหมดของห้องนี้
+        const imagesRes = await fetch(`http://localhost:3000/places/${placeId}/images`);
+        if (imagesRes.ok) {
+          const imagesData = await imagesRes.json();
+          console.log("ดึงข้อมูลรูปภาพของห้องนี้:", imagesData); // ดูใน Console (F12) ว่าห้อง 411A มีรูปไหม
+          
+          // เช็คชัวร์ๆ ว่าเป็น Array ค่อย set
+          if (Array.isArray(imagesData)) {
+            setImages(imagesData);
+          } else {
+            setImages([]);
+          }
+        }
+
         if (user) {
           const favRes = await fetch(`http://localhost:3000/favorites`, {
             method: "GET",
@@ -80,7 +97,6 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
           });
           if (favRes.ok) {
             const favData = await favRes.json();
-            // เช็คว่าในลิสต์ Favorite มี PlaceId นี้อยู่หรือไม่
             const isFav = favData.some((fav: any) => fav.place_id === placeId || fav.id === placeId);
             setIsFavorited(isFav);
           }
@@ -95,7 +111,6 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
     fetchPlaceAndReviews();
   }, [placeId, user]);
 
-  // 📌 2. ฟังก์ชันกดปุ่ม Favorite สลับไปมา
   const handleToggleFavorite = async () => {
     if (!user) {
       alert("Please login to save places.");
@@ -106,14 +121,12 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
 
     try {
       if (isFavorited) {
-        // กรณีกดออก (Unfavorite) -> ยิง DELETE
         const res = await fetch(`http://localhost:3000/favorites/${placeId}`, {
           method: "DELETE",
           credentials: "include"
         });
         if (res.ok) setIsFavorited(false);
       } else {
-        // กรณีกดบันทึก (Favorite) -> ยิง POST
         const res = await fetch(`http://localhost:3000/favorites/${placeId}`, {
           method: "POST",
           credentials: "include"
@@ -146,7 +159,6 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
 
       if (response.ok) {
         const createdReview = await response.json();
-        // 📌 แก้ปัญหา Anonymous โดยการนำ display_name ของคนพิมพ์ยัดกลับเข้าไปด้วย
         const newReviewToDisplay = {
           ...createdReview,
           display_name: user.name || user.name || "Your Name"
@@ -234,7 +246,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className="w-full max-w-md bg-primary backdrop-blur-md rounded-t-[30px] p-6 shadow-2xl flex flex-col h-[90vh] max-h-[100vh] animate-slide-up overflow-hidden"
+        className="w-full max-w-md bg-[#DFD9CE] backdrop-blur-md rounded-t-[30px] p-6 shadow-2xl flex flex-col h-[90vh] max-h-[100vh] animate-slide-up overflow-hidden"
       >
         <div className="w-12 h-1.5 bg-stone-400 rounded-full mx-auto mb-4 flex-shrink-0 cursor-grab"></div>
 
@@ -251,7 +263,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
             <div className="text-center py-8 text-stone-600 text-xs">Loading room details...</div>
           ) : (
             <>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap pb-4">
                 <button className="flex items-center gap-1.5 px-3.5 py-2 bg-[#8E796E] text-white rounded-full text-xs font-medium shadow-sm hover:opacity-95 cursor-pointer">
                   <Info className="w-4 h-4" /> Information
                 </button>
@@ -265,14 +277,13 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
                   <Navigation className="w-4 h-4" /> Start
                 </button>
 
-                {/* 📌 3. อัปเดตปุ่ม Save ให้เป็นปุ่ม Favorite ทำงานเปลี่ยนสีตามสถานะได้ */}
                 <button 
                   onClick={handleToggleFavorite}
                   disabled={isFavLoading}
                   className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-medium shadow-sm cursor-pointer transition-colors ${
                     isFavorited 
-                      ? "bg-[#8E796E] text-white hover:bg-[#7a675e]" // ปุ่มทึบ (สีน้ำตาลเข้ม)
-                      : "bg-[#E6DFD5] text-stone-800 hover:opacity-95" // ปุ่มโปร่ง (สีเนื้ออ่อน)
+                      ? "bg-[#8E796E] text-white hover:bg-[#7a675e]"
+                      : "bg-[#E6DFD5] text-stone-800 hover:opacity-95" 
                   }`}
                 >
                   <Heart className={`w-4 h-4 ${isFavorited ? "fill-current" : ""}`} /> 
@@ -280,15 +291,31 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
                 </button>
               </div>
 
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-                {roomDetail?.image_url ? (
+              {/* 📌 ส่วนแสดงรูปภาพ (ปรับให้เลื่อนซ้ายขวาได้ และรองรับหลายรูป) */}
+              {/* 📌 ส่วนแสดงรูปภาพ (ปรับให้เลื่อนซ้ายขวาได้ และรองรับหลายรูป) */}
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
+                {images && images.length > 0 ? (
+                  images.map((img: any, idx: number) => (
+                    <img 
+                      key={idx}
+                      src={`http://localhost:3000${img.image_url}`} 
+                      alt={`Room ${roomDetail?.place_name} - ${idx + 1}`} 
+                      className="w-36 h-48 object-cover rounded-xl shadow-sm shrink-0 snap-center bg-white/60" 
+                    />
+                  ))
+                ) : roomDetail?.image_url ? (
                   <img 
-                    src={roomDetail.image_url} 
+                    // ตรงนี้ก็เช่นกัน เช็คให้แน่ใจว่า roomDetail.image_url มี / นำหน้าหรือไม่
+                    // ถ้ามี ก็ใช้แบบเดียวกับด้านบน ถ้าไม่มีอาจจะต้องเป็น src={`http://localhost:3000/${roomDetail.image_url}`}
+                    src={roomDetail.image_url.startsWith('/') 
+                      ? `http://localhost:3000${roomDetail.image_url}` 
+                      : `http://localhost:3000/${roomDetail.image_url}`
+                    }
                     alt={roomDetail.place_name} 
-                    className="w-full h-40 object-cover rounded-2xl shadow-inner" 
+                    className="w-36 h-48 object-cover rounded-xl shadow-sm shrink-0 snap-center bg-white/60" 
                   />
                 ) : (
-                  <div className="w-full h-32 bg-white/60 rounded-2xl flex items-center justify-center shadow-inner">
+                  <div className="w-full h-32 bg-white/60 rounded-2xl flex items-center justify-center shadow-inner shrink-0 snap-center">
                     <span className="text-xs text-stone-400">No Image Available</span>
                   </div>
                 )}
@@ -298,8 +325,9 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
                 {roomDetail?.description || "No description available for this place."}
               </p>
 
-              <div className="mt-8 pt-4">
+              <div className="mt-8 pt-4 border-t border-stone-300/40">
                 <h3 className="text-lg font-bold text-stone-800 mb-4">Reviews</h3>
+                {/* ... (โค้ดส่วน Review ด้านล่างยังคงเดิมทั้งหมด) ... */}
 
                 <div className="flex items-start gap-3 mb-8">
                   <div className="bg-[#9A8175] text-white p-1.5 rounded-full mt-1 shrink-0">
