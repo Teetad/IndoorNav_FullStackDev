@@ -246,7 +246,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className="w-full max-w-md bg-[#DFD9CE] backdrop-blur-md rounded-t-[30px] p-6 shadow-2xl flex flex-col h-[90vh] max-h-[100vh] animate-slide-up overflow-hidden"
+        className="w-full max-w-md bg-primary backdrop-blur-md rounded-t-[30px] p-6 shadow-2xl flex flex-col h-[90vh] max-h-[100vh] animate-slide-up overflow-hidden"
       >
         <div className="w-12 h-1.5 bg-stone-400 rounded-full mx-auto mb-4 flex-shrink-0 cursor-grab"></div>
 
@@ -277,18 +277,20 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
                   <Navigation className="w-4 h-4" /> Start
                 </button>
 
-                <button 
-                  onClick={handleToggleFavorite}
-                  disabled={isFavLoading}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-medium shadow-sm cursor-pointer transition-colors ${
-                    isFavorited 
-                      ? "bg-[#8E796E] text-white hover:bg-[#7a675e]"
-                      : "bg-[#E6DFD5] text-stone-800 hover:opacity-95" 
-                  }`}
-                >
-                  <Heart className={`w-4 h-4 ${isFavorited ? "fill-current" : ""}`} /> 
-                  {isFavorited ? "Liked" : "Like"}
-                </button>
+                {user && (
+                  <button 
+                    onClick={handleToggleFavorite}
+                    disabled={isFavLoading}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-medium shadow-sm cursor-pointer transition-colors ${
+                      isFavorited 
+                        ? "bg-[#8E796E] text-white hover:bg-[#7a675e]"
+                        : "bg-[#E6DFD5] text-stone-800 hover:opacity-95" 
+                    }`}
+                  >
+                    <Heart className={`w-4 h-4 ${isFavorited ? "fill-current" : ""}`} /> 
+                    {isFavorited ? "Liked" : "Like"}
+                  </button>
+                )}
               </div>
 
               {/* 📌 ส่วนแสดงรูปภาพ (ปรับให้เลื่อนซ้ายขวาได้ และรองรับหลายรูป) */}
@@ -326,9 +328,10 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
               </p>
 
               <div className="mt-8 pt-4 border-t border-stone-300/40">
-                <h3 className="text-lg font-bold text-stone-800 mb-4">Reviews</h3>
+                <h3 className="text-lg font-bold text-stone-800 mb-4 py-4">Reviews</h3>
                 {/* ... (โค้ดส่วน Review ด้านล่างยังคงเดิมทั้งหมด) ... */}
 
+                {user &&
                 <div className="flex items-start gap-3 mb-8">
                   <div className="bg-[#9A8175] text-white p-1.5 rounded-full mt-1 shrink-0">
                     <User className="w-5 h-5" />
@@ -359,6 +362,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
                     </div>
                   </div>
                 </div>
+}
 
                 <div className="flex flex-col gap-6">
                   {reviews.length === 0 ? (
