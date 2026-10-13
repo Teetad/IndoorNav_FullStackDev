@@ -13,24 +13,58 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
   useEffect(() => {
     if (!selectedType) return;
 
-    setLoading(true);
-    fetch(`http://localhost:3000/places?place_type=${encodeURIComponent(selectedType)}`)
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchPlacesAndImages = async () => {
+      setLoading(true);
+      try {
+        // 1. ดึงข้อมูลสถานที่ทั้งหมดตามประเภท
+        const res = await fetch(`http://localhost:3000/places?place_type=${encodeURIComponent(selectedType)}`);
+        const data = await res.json();
         const roomList = Array.isArray(data) ? data : data.places || [];
-        setPlaces(roomList);
-        setLoading(false);
-      })
-      .catch((err) => {
+
+        // 2. ดึงรูปภาพสำหรับแต่ละสถานที่ (เอาแค่รูปแรก)
+        const placesWithImages = await Promise.all(
+          roomList.map(async (place: any) => {
+            try {
+              const imgRes = await fetch(`http://localhost:3000/places/${place.place_id}/images`);
+              if (imgRes.ok) {
+                const imagesData = await imgRes.json();
+                
+                // ตรวจสอบว่ามีรูปภาพและเป็น Array หรือไม่
+                if (Array.isArray(imagesData) && imagesData.length > 0) {
+                  const firstImage = imagesData[0]; // เอารูปแรกรูปเดียว
+                  const rawUrl = firstImage.image_url || firstImage.url || "";
+                  
+                  if (rawUrl) {
+                    if (rawUrl.startsWith('http')) {
+                      place.firstImage = encodeURI(rawUrl);
+                    } else {
+                      const cleanedPath = rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`;
+                      place.firstImage = encodeURI(`http://localhost:3000${cleanedPath}`);
+                    }
+                  }
+                }
+              }
+            } catch (imgErr) {
+              console.error(`Failed to fetch image for place ${place.place_id}:`, imgErr);
+            }
+            return place;
+          })
+        );
+
+        setPlaces(placesWithImages);
+      } catch (err) {
         console.error("Failed to fetch places by type:", err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchPlacesAndImages();
   }, [selectedType]);
 
   if (!selectedType) return null;
 
   return (
-    // 👇 แก้ไขบรรทัดนี้: ลบ pt-8 ออก และเติม items-end
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 backdrop-blur-xs transition-opacity overscroll-none">
       
       {/* กล่อง Bottom Sheet */}
@@ -66,10 +100,17 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
                 onClick={() => onSelectLocation(place)} 
                 className="bg-white/40 p-4 rounded-2xl shadow-sm cursor-pointer hover:bg-white/60 transition-all flex flex-col gap-3"
               >
-                {/* กล่องรูปภาพสถานที่ */}
+                {/* 📌 กล่องรูปภาพสถานที่ (แสดงรูปแรกที่ดึงมา) */}
                 <div className="w-full h-36 bg-stone-300/60 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
-                  {place.image ? (
-                    <img src={place.image} alt={place.name} className="w-full h-full object-cover" />
+                  {place.firstImage ? (
+                    <img 
+                      src={place.firstImage} 
+                      alt={place.place_name} 
+                      className="w-full h-full object-cover" 
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none'; // ซ่อนไอคอนรูปแตกถ้า URL พัง
+                      }}
+                    />
                   ) : (
                     <span className="text-xs text-stone-500">No Image</span>
                   )}
