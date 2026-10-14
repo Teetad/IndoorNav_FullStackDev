@@ -1,0 +1,16 @@
+**
+
+!pj-frontend/
+!pj-frontend/**
+pj-frontend/.env
+pj-frontend/.env.*
+pj-frontend/dist
+pj-frontend/node_modules
+
+!IndoorNav/
+!IndoorNav/frontend/
+!IndoorNav/frontend/**
+IndoorNav/frontend/.env
+IndoorNav/frontend/.env.*
+IndoorNav/frontend/dist
+IndoorNav/frontend/node_modules
