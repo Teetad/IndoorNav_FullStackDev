@@ -220,7 +220,7 @@ const AFloor7Page = () => {
                 <div className="flex w-full flex-1 items-center justify-center min-h-0">
                     <div className="relative w-full max-w-5xl">
                         <img
-                            src="/Images/floor7.jpg"
+                            src="/Images/floor7.jpg?v=20261014"
                             alt="Floor 7 Map"
                             className="block h-auto w-full select-none"
                             draggable={false}

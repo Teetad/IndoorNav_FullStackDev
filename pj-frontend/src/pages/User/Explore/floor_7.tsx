@@ -146,7 +146,7 @@ const Floor_7 = () => {
           
           {/* รูปภาพแผนที่เรนเดอร์ครั้งเดียวจบ ไม่มีการทับซ้อน */}
           <img 
-            src="/Images/floor7.jpg" 
+            src="/Images/floor7.jpg?v=20261014"
             alt="Floor 7 Map"
             className="w-full h-auto object-contain select-none pointer-events-none block"
           />
