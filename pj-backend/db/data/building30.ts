@@ -59,6 +59,12 @@ const facilities = (): MapPlace[] => [
   named("stairs", "บันได", "stairs"),
 ].map(place => ({ ...place, description: "อ้างอิงสัญลักษณ์ในแผนที่ " }));
 
+const roomImages = (floor: number, number: string, count: number): string[] =>
+  Array.from(
+    { length: count },
+    (_, index) => `/images/places/floor-${floor}/${number}/${number}-${index + 1}.jpg`,
+  );
+
 // ห้องเรียนชั้น 7 มีข้อมูลจากหน้าห้องและมีรูปจริงห้องละ 5 รูป
 const floor7Classroom = (number: string, capacity: number): MapPlace => ({
   ...room(number),
@@ -79,10 +85,13 @@ export const mapFloors = [
     floor_number: 4,
     source: "ที่มา/2028-4th-floor.pdf",
     places: [
-      room("413A"), room("413B"), room("415A", "ห้องเรียน Network"),
+      room("413A"),
+      { ...room("413B"), image_urls: roomImages(4, "413B", 2) },
+      room("415A", "ห้องเรียน Network"),
       room("412"), room("411A"), room("411B", "ห้องเรียน Computer"),
       {
         ...room("422", "ร้านค้าสาขาวิศวกรรมคอมพิวเตอร์", "shop"),
+        image_urls: roomImages(4, "422", 2),
         description: "ร้านค้าของสาขาวิศวกรรมคอมพิวเตอร์ มีขนมและสินค้า อยู่บริเวณฝั่ง ป.ตรี ชั้น 4",
       },
       named("as-lab", "AS LAB", "laboratory"), named("administration", "ธุรการ", "administrative_office"),
@@ -93,7 +102,8 @@ export const mapFloors = [
     floor_number: 5,
     source: "ที่มา/2028-5th-floor.pdf",
     places: [
-      ...["501", "502", "518", "521", "516"].map(n => room(n)),
+      ...["501", "502", "518", "521"].map(n => room(n)),
+      { ...room("516"), image_urls: roomImages(5, "516", 3) },
       named("oasys-lab", "OASYS LAB", "laboratory"), named("network-admin", "Network Admin", "administrative_office"),
       ...offices(["558", "559", "503", "504", "505", "508", "509", "510", "514", "515", "519", "520"]),
       ...facilities(),
@@ -108,6 +118,11 @@ export const mapFloors = [
       named("lab-1", "ห้องวิจัย 1 (Lab 1)", "laboratory"), named("lab-2", "ห้องวิจัย 2 (Lab 2)", "laboratory"),
       named("lab-3", "Lab 3", "laboratory"), named("lab-4", "Lab 4", "laboratory"),
       named("meeting", "ห้องประชุม", "meeting_room"), named("graduate", "ห้องบัณฑิต", "graduate_room"),
+      {
+        ...room("620"),
+        image_urls: roomImages(6, "620", 2),
+        description: "ห้องเรียน 620 ชั้น 6 อาคาร 30 ปี",
+      },
       {
         ...named("cpe-administration", "ธุรการภาควิชาวิศวกรรมคอมพิวเตอร์", "administrative_office"),
         room_status: "OPEN",
