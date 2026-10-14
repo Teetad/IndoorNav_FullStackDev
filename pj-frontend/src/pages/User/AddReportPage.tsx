@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
@@ -23,7 +24,7 @@ const AddReportPage: React.FC = () => {
     }
 
     const timer = setTimeout(() => {
-      fetch(`http://localhost:3000/places?search=${encodeURIComponent(placeQuery)}`)
+      fetch(`${API_BASE_URL}/places?search=${encodeURIComponent(placeQuery)}`)
         .then((res) => res.json())
         .then((data) => {
           const list = Array.isArray(data) ? data : data.places || [];
@@ -50,7 +51,7 @@ const AddReportPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`http://localhost:3000/places/${selectedPlaceId}/reports`, {
+      const response = await fetch(`${API_BASE_URL}/places/${selectedPlaceId}/reports`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

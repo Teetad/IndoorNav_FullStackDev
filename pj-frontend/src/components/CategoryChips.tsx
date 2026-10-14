@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import React, { useEffect, useState } from "react";
 
 interface CategoryChipsProps {
@@ -11,7 +12,7 @@ const CategoryChips: React.FC<CategoryChipsProps> = ({ onSelectType }) => {
 
   // ยิง API ดึงข้อมูลประเภทสถานที่เมื่อ Component โหลดครั้งแรก
   useEffect(() => {
-    fetch("http://localhost:3000/places/types")
+    fetch(`${API_BASE_URL}/places/types`)
       .then((res) => res.json())
       .then((data) => {
         // สมมติว่าโครงสร้าง API ส่งมาเป็น Array ของสตริงหรืออาร์เรย์ของออบเจกต์

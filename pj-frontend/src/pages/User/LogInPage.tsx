@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
@@ -17,7 +18,7 @@ const LogInPage = () => {
 
   const handleLogOut = async () => {
     try {
-      await fetch('http://localhost:3000/auth/logout', {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -32,13 +33,13 @@ const LogInPage = () => {
   };
 
   const handleLogIn = () => {
-    window.location.href = 'http://localhost:3000/auth/login';
+    window.location.href = `${API_BASE_URL}/auth/login`;
   };
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/auth/me', {
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
           method: 'GET',
           credentials: 'include' 
         });

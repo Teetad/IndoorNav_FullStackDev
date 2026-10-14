@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import SideBar from "../../../components/SideBar";
 import SearchBar from "../../../components/SearchBar";
 import { useState, useEffect } from "react";
@@ -136,7 +137,7 @@ const AFloor6Page = () => {
 
             try {
                 const response = await fetch(
-                    `http://localhost:3000/places?search=${encodeURIComponent(searchText)}`
+                    `${API_BASE_URL}/places?search=${encodeURIComponent(searchText)}`
                 );
 
                 if (!response.ok) {

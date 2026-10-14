@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -25,7 +26,7 @@ const SideBar = () => {
   const handleLogOut = async () => {
     try {
       // 1. ยิง API ไปบอก Backend ให้ลบ Session
-      await fetch('http://localhost:3000/auth/logout', {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });

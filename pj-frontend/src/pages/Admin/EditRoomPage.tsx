@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -29,7 +30,7 @@ interface PlaceImage {
   display_order?: number;
 }
 
-const API_URL = "http://localhost:3000";
+const API_URL = API_BASE_URL;
 
 const EditRoomPage = () => {
   const { placeId } = useParams<{ placeId: string }>();

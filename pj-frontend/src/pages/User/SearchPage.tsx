@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useState, useEffect } from "react";
 import SearchBar from "../../components/SearchBar"; 
 import ShowRoom from "../../components/ShowRoom"; 
@@ -21,7 +22,7 @@ const SearchPage = () => {
 
     const timer = setTimeout(() => {
       setLoading(true);
-      fetch(`http://localhost:3000/places?search=${encodeURIComponent(searchText)}`)
+      fetch(`${API_BASE_URL}/places?search=${encodeURIComponent(searchText)}`)
         .then((res) => res.json())
         .then((data) => {
           const list = Array.isArray(data) ? data : data.places || [];

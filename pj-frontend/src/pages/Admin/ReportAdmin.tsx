@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import { Send, Mail, Check, User, ChevronDown } from "lucide-react";
 import SideBar from "../../components/SideBar";
@@ -42,8 +43,8 @@ const ReportAdminPage = () => {
       setIsLoading(true);
       try {
         const endpoint = filterStatus === "ALL" 
-          ? "http://localhost:3000/reports" 
-          : `http://localhost:3000/reports/${filterStatus.toLowerCase()}`;
+          ? `${API_BASE_URL}/reports`
+          : `${API_BASE_URL}/reports/${filterStatus.toLowerCase()}`;
 
         const response = await fetch(endpoint, {
           method: "GET",
@@ -77,7 +78,7 @@ const ReportAdminPage = () => {
     
     try {
       // ใช้ PUT หรือ PATCH ขึ้นอยู่กับ Backend ของคุณ (ในที่นี้ตั้งต้นเป็น PATCH)
-      const response = await fetch(`http://localhost:3000/reports/${reportId}/status`, {
+      const response = await fetch(`${API_BASE_URL}/reports/${reportId}/status`, {
         method: "PUT", 
         credentials: "include",
         headers: {

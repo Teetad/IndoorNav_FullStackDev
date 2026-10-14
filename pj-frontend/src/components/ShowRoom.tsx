@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import React, { useEffect, useState } from "react";
 import { Info, Navigation, Heart, User, Pencil, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -64,20 +65,20 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
     const fetchPlaceAndReviews = async () => {
       setLoading(true);
       try {
-        const placeRes = await fetch(`http://localhost:3000/places/${placeId}`);
+        const placeRes = await fetch(`${API_BASE_URL}/places/${placeId}`);
         if (placeRes.ok) {
           const placeData = await placeRes.json();
           setRoomDetail(placeData);
         }
 
-        const reviewsRes = await fetch(`http://localhost:3000/places/${placeId}/reviews`);
+        const reviewsRes = await fetch(`${API_BASE_URL}/places/${placeId}/reviews`);
         if (reviewsRes.ok) {
           const reviewsData = await reviewsRes.json();
           setReviews(reviewsData);
         }
 
         // 📌 ดึงข้อมูลรููปภาพทั้งหมดของห้องนี้
-        const imagesRes = await fetch(`http://localhost:3000/places/${placeId}/images`);
+        const imagesRes = await fetch(`${API_BASE_URL}/places/${placeId}/images`);
         if (imagesRes.ok) {
           const imagesData = await imagesRes.json();
           console.log("ดึงข้อมูลรูปภาพของห้องนี้:", imagesData); // ดูใน Console (F12) ว่าห้อง 411A มีรูปไหม
@@ -91,7 +92,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
         }
 
         if (user) {
-          const favRes = await fetch(`http://localhost:3000/favorites`, {
+          const favRes = await fetch(`${API_BASE_URL}/favorites`, {
             method: "GET",
             credentials: "include"
           });
@@ -121,13 +122,13 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
 
     try {
       if (isFavorited) {
-        const res = await fetch(`http://localhost:3000/favorites/${placeId}`, {
+        const res = await fetch(`${API_BASE_URL}/favorites/${placeId}`, {
           method: "DELETE",
           credentials: "include"
         });
         if (res.ok) setIsFavorited(false);
       } else {
-        const res = await fetch(`http://localhost:3000/favorites/${placeId}`, {
+        const res = await fetch(`${API_BASE_URL}/favorites/${placeId}`, {
           method: "POST",
           credentials: "include"
         });
@@ -145,7 +146,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`http://localhost:3000/places/${placeId}/reviews`, {
+      const response = await fetch(`${API_BASE_URL}/places/${placeId}/reviews`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -179,7 +180,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
     if (!editComment.trim()) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
+      const response = await fetch(`${API_BASE_URL}/reviews/${reviewId}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -204,7 +205,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
     if (!window.confirm("Are you sure you want to delete your review?")) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
+      const response = await fetch(`${API_BASE_URL}/reviews/${reviewId}`, {
         method: "DELETE",
         credentials: "include", 
       });
@@ -300,7 +301,7 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
                   images.map((img: any, idx: number) => (
                     <img 
                       key={idx}
-                      src={`http://localhost:3000${img.image_url}`} 
+                      src={`${API_BASE_URL}${img.image_url}`}
                       alt={`Room ${roomDetail?.place_name} - ${idx + 1}`} 
                       className="w-36 h-48 object-cover rounded-xl shadow-sm shrink-0 snap-center bg-white/60" 
                     />
@@ -308,10 +309,10 @@ const ShowRoom: React.FC<ShowRoomProps> = ({ placeId, onClose }) => {
                 ) : roomDetail?.image_url ? (
                   <img 
                     // ตรงนี้ก็เช่นกัน เช็คให้แน่ใจว่า roomDetail.image_url มี / นำหน้าหรือไม่
-                    // ถ้ามี ก็ใช้แบบเดียวกับด้านบน ถ้าไม่มีอาจจะต้องเป็น src={`http://localhost:3000/${roomDetail.image_url}`}
+                    // ถ้ามี ก็ใช้แบบเดียวกับด้านบน ถ้าไม่มีอาจจะต้องเป็น src={`${API_BASE_URL}/${roomDetail.image_url}`}
                     src={roomDetail.image_url.startsWith('/') 
-                      ? `http://localhost:3000${roomDetail.image_url}` 
-                      : `http://localhost:3000/${roomDetail.image_url}`
+                      ? `${API_BASE_URL}${roomDetail.image_url}`
+                      : `${API_BASE_URL}/${roomDetail.image_url}`
                     }
                     alt={roomDetail.place_name} 
                     className="w-36 h-48 object-cover rounded-xl shadow-sm shrink-0 snap-center bg-white/60" 

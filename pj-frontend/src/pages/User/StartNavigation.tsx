@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { MapPin } from "lucide-react";
@@ -30,7 +31,7 @@ const StartNavigation: React.FC = () => {
     }
 
     const timer = setTimeout(() => {
-      fetch(`http://localhost:3000/places?search=${encodeURIComponent(startQuery)}`)
+      fetch(`${API_BASE_URL}/places?search=${encodeURIComponent(startQuery)}`)
         .then((res) => res.json())
         .then((data) => {
           const list = Array.isArray(data) ? data : data.places || [];

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useState, useEffect } from 'react';
 import { User, Check, Mail, Send } from 'lucide-react';
 import BottomNav from '../../components/BottomNav';
@@ -22,7 +23,7 @@ const ReportPage = () => {
   const navigate = useNavigate();
 
   const handleLogIn = () => {
-    window.location.href = 'http://localhost:3000/auth/login';
+    window.location.href = `${API_BASE_URL}/auth/login`;
   };
 
   const handleReport = () => {
@@ -33,7 +34,7 @@ const ReportPage = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/auth/me', {
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
           method: 'GET',
           credentials: 'include' 
         });
@@ -58,7 +59,7 @@ const ReportPage = () => {
       const fetchMyReports = async () => {
         setLoadingReports(true);
         try {
-          const response = await fetch('http://localhost:3000/reports/me', {
+          const response = await fetch(`${API_BASE_URL}/reports/me`, {
             method: 'GET',
             credentials: 'include'
           });

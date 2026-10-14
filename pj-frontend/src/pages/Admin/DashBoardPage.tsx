@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import  { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SideBar from "../../components/SideBar";
@@ -72,7 +73,7 @@ const DashBoardPage = () => {
     const fetchReports = async () => {
       setReportsLoading(true);
       try {
-        const response = await fetch("http://localhost:3000/reports", {
+        const response = await fetch(`${API_BASE_URL}/reports`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

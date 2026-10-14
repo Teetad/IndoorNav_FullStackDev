@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import React, { useState, useEffect } from "react";
 import type { LucideIcon } from "lucide-react";
 
@@ -31,8 +32,8 @@ const ReportCard: React.FC<ReportCardProps> = ({ Icon, Status, ColorClass }) => 
                 // 2. ประกอบร่าง URL
                 // ถ้า apiPath มีค่า ให้เอาไปต่อท้าย / แต่ถ้าไม่มีให้ดึง /reports เฉยๆ (จะได้ครบทั้งหมด)
                 const endpoint = apiPath 
-                    ? `http://localhost:3000/reports/${apiPath}` 
-                    : `http://localhost:3000/reports`;
+                    ? `${API_BASE_URL}/reports/${apiPath}`
+                    : `${API_BASE_URL}/reports`;
 
                 // 3. ยิง API
                 const response = await fetch(endpoint, {

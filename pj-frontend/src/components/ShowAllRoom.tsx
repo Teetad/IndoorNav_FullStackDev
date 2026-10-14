@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import React, { useEffect, useState } from "react";
 
 interface ShowAllRoomProps {
@@ -17,7 +18,7 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
       setLoading(true);
       try {
         // 1. ดึงข้อมูลสถานที่ทั้งหมดตามประเภท
-        const res = await fetch(`http://localhost:3000/places?place_type=${encodeURIComponent(selectedType)}`);
+        const res = await fetch(`${API_BASE_URL}/places?place_type=${encodeURIComponent(selectedType)}`);
         const data = await res.json();
         const roomList = Array.isArray(data) ? data : data.places || [];
 
@@ -25,7 +26,7 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
         const placesWithImages = await Promise.all(
           roomList.map(async (place: any) => {
             try {
-              const imgRes = await fetch(`http://localhost:3000/places/${place.place_id}/images`);
+              const imgRes = await fetch(`${API_BASE_URL}/places/${place.place_id}/images`);
               if (imgRes.ok) {
                 const imagesData = await imgRes.json();
                 
@@ -39,7 +40,7 @@ const ShowAllRoom: React.FC<ShowAllRoomProps> = ({ selectedType, onClose, onSele
                       place.firstImage = encodeURI(rawUrl);
                     } else {
                       const cleanedPath = rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`;
-                      place.firstImage = encodeURI(`http://localhost:3000${cleanedPath}`);
+                      place.firstImage = encodeURI(`${API_BASE_URL}${cleanedPath}`);
                     }
                   }
                 }

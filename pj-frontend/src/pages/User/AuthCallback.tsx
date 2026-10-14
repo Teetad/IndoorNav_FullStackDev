@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 📌 1. Import useAuth เข้ามา (อย่าลืมเช็ค path ให้ตรงกับที่เก็บไฟล์ AuthContext)
@@ -12,7 +13,7 @@ const AuthCallback = () => {
     const fetchUserData = async () => {
       try {
         // 1. ยิง API เพื่อขอข้อมูล User พร้อมแนบ Cookie
-        const response = await fetch("http://localhost:3000/auth/me", {
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
           credentials: "include",
         });
 
