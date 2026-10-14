@@ -28,7 +28,7 @@ const AFloor6Page = () => {
     const floor6Rooms = [
     //lab3
     {
-      placeId: "dd96ffed-8af7-5917-a4bb-b1ded378f462", 
+      placeId: "95106e89-f702-5c61-9378-d320e93be8c4",
       top: "0%",
       left: "50%",
       width: "8.5%",
@@ -36,7 +36,7 @@ const AFloor6Page = () => {
     },
     //lab4
     {
-      placeId: "1bf424d8-52c6-5fa2-bf9f-55ed70955502", 
+      placeId: "95737465-2ec6-5f47-87dc-e4bf79b6de9b",
       top: "0%",
       left: "58.5%",
       width: "8.5%",
@@ -44,7 +44,7 @@ const AFloor6Page = () => {
     },
     //603
     {
-      placeId: "11111111-1111-4111-8111-111111110003", 
+      placeId: "a4693d8e-22ff-50e1-a239-f6ffa3df281c",
       top: "33%",
       left: "66.5%",
       width: "24.5%",
@@ -52,7 +52,7 @@ const AFloor6Page = () => {
     },
     //ห้องอเนกประสงค์ 1 620
     {
-      placeId: "09ff059e-4197-51c3-9697-0163eead0c203", 
+      placeId: "22ea5c9b-3aa8-5dce-9ac5-7a82de23f03b",
       top: "82%",
       left: "17%",
       width: "41%",
@@ -60,7 +60,7 @@ const AFloor6Page = () => {
     },
     //ห้องอเนกประสงค์ 2 
     {
-      placeId: "e28f78d5-1554-59a4-85b6-c0a656ef7615", 
+      placeId: "da32120f-f303-5b65-bd77-80651eee0e88",
       top: "33%",
       left: "17%",
       width: "34%",
@@ -68,7 +68,7 @@ const AFloor6Page = () => {
     },
     //lab1
     {
-      placeId: "31daf14a-1579-5bd0-b292-3cc4c047a43e", 
+      placeId: "10904390-6922-537a-a853-be67622acc4c",
       top: "66%",
       left: "0%",
       width: "18%",
@@ -76,7 +76,7 @@ const AFloor6Page = () => {
     },
     //lab2
     {
-      placeId: "08f080d9-cdb3-511d-bee7-79323c9f64a9", 
+      placeId: "10faa704-f1ec-54bd-bc59-bb613d3b4567",
       top: "49%",
       left: "0%",
       width: "18%",
@@ -84,14 +84,14 @@ const AFloor6Page = () => {
     },
     //professor room
     {
-      placeId: "8cf3929d-9e11-5681-b171-5785a511f4fa", 
+      placeId: "b13b78d8-cd3f-5522-9406-4dd7a5cee5bd",
       top: "0%",
       left: "71%",
       width: "20.5%",
       height: "8.5%",
     },
     {
-      placeId: "8cf3929d-9e11-5681-b171-5785a511f4fa", 
+      placeId: "b13b78d8-cd3f-5522-9406-4dd7a5cee5bd",
       top: "25%",
       left: "66.5%",
       width: "17.5%",
@@ -99,7 +99,7 @@ const AFloor6Page = () => {
     },
     //8
     {
-      placeId: "648a1b8b-8a13-5b76-b540-1d8b9630366f", 
+      placeId: "124d8b87-939a-5b2c-848a-bdc73b561169",
       top: "58%",
       left: "25.5%",
       width: "9%",
@@ -107,14 +107,14 @@ const AFloor6Page = () => {
     },
     //9
     {
-      placeId: "4b5e1ec5-0c58-5dfd-befe-8e823bcd4e20", 
+      placeId: "c5aa05bf-1dd9-5625-b79d-340fb33a134c",
       top: "66.5%",
       left: "25.5%",
       width: "9%",
       height: "8.5%",
     },
     {
-      placeId: "da537344-a094-5508-b972-0a8278e2aa48", 
+      placeId: "4606eeb5-96d2-5c36-bc59-f6278e46b393",
       top: "82%",
       left: "58%",
       width: "9.5%",

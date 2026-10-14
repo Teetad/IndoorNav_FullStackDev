@@ -28,7 +28,7 @@ const AFloor7Page = () => {
       const floor7Rooms = [
     //700
     {
-      placeId: "f7610b1a-f023-5dcf-b3e4-c8ea7b2028d4", 
+      placeId: "b45ca56e-de5d-5a53-b8e9-a444eebe590f",
       top: "0%",
       left: "50%",
       width: "16%",
@@ -36,7 +36,7 @@ const AFloor7Page = () => {
     },
     //701
     {
-      placeId: "078de9fb-e9a1-5f05-b757-b6e8b2acae5c", 
+      placeId: "1fd8d908-4a02-5cef-a596-740fde2e333f",
       top: "0%",
       left: "66%",
       width: "17%",
@@ -44,7 +44,7 @@ const AFloor7Page = () => {
     },
     //702
     {
-      placeId: "f6a95c6c-be33-5381-9f62-012edc5fb151", 
+      placeId: "e1f7fea5-6fcb-52bc-a3b6-f5ff35242b6b",
       top: "0%",
       left: "83%",
       width: "17%",
@@ -52,7 +52,7 @@ const AFloor7Page = () => {
     },
     //713
     {
-      placeId: "bc427080-3b42-5e7e-b3f1-b042287ba47c", 
+      placeId: "cfa2a390-4143-58a4-bee3-20e498c732e8",
       top: "81%",
       left: "49%",
       width: "19%",
@@ -60,7 +60,7 @@ const AFloor7Page = () => {
     },
     //718
     {
-      placeId: "259aed8f-4ebe-56d6-8c56-d7772ca59470", 
+      placeId: "3397267f-fe78-50f9-8ffd-daf4bcc6b0f9",
       top: "81%",
       left: "18%",
       width: "31%",
@@ -68,7 +68,7 @@ const AFloor7Page = () => {
     },
     //719
     {
-      placeId: "0954520a-4653-577b-84bd-a433a5f7495f", 
+      placeId: "d51c960f-4f49-533c-9c16-9ddfb3e6163c",
       top: "49%",
       left: "0%",
       width: "18%",
@@ -76,7 +76,7 @@ const AFloor7Page = () => {
     },
     //720
     {
-      placeId: "3b33d6d1-2cde-52b0-bed7-6141163572a0", 
+      placeId: "405192e9-6d23-53c4-986c-404a749ab1ae",
       top: "33%",
       left: "16.5%",
       width: "34%",
@@ -84,7 +84,7 @@ const AFloor7Page = () => {
     },
     //712
     {
-      placeId: "77d8e8f0-15a0-55aa-baf9-48fb27cae256", 
+      placeId: "0329e002-03e1-5406-a352-e7d21cd8a34d",
       top: "73%",
       left: "65%",
       width: "18.5%",
@@ -92,7 +92,7 @@ const AFloor7Page = () => {
     },
     //711
     {
-      placeId: "68555f60-6730-53d1-a810-f40eb077b5c2", 
+      placeId: "5e8758d9-ea61-5ab6-8079-0dc5993c4f18",
       top: "33%",
       left: "62%",
       width: "30%",
