@@ -47,7 +47,8 @@ router.get("/login", async (_req, res) => {
       sameSite: "lax",
       secure: process.env.OAUTH_COOKIE_SECURE === "true",
       maxAge: 10 * 60 * 1000,
-      path: "/auth/callback",
+      // ใช้ได้ทั้ง local /auth/callback และ production /api/auth/callback
+      path: "/",
     });
     // mode=json ใช้ตอนต้องการดู token เพื่อนำไปทดสอบใน Bruno
     res.cookie("oauth_mode", _req.query.mode === "json" ? "json" : "frontend", {
@@ -55,7 +56,7 @@ router.get("/login", async (_req, res) => {
       sameSite: "lax",
       secure: process.env.OAUTH_COOKIE_SECURE === "true",
       maxAge: 10 * 60 * 1000,
-      path: "/auth/callback",
+      path: "/",
     });
     const params = new URLSearchParams({
       client_id: config.clientId,
@@ -85,8 +86,8 @@ router.get("/callback", async (req, res) => {
       return res.status(400).json({ message: "OAuth state does not match this browser" });
     }
     // state ใช้ครั้งเดียว หลังตรวจแล้วจึงลบ cookie
-    res.clearCookie("oauth_state", { path: "/auth/callback" });
-    res.clearCookie("oauth_mode", { path: "/auth/callback" });
+    res.clearCookie("oauth_state", { path: "/" });
+    res.clearCookie("oauth_mode", { path: "/" });
 
     const config = getOAuthConfig();
     // ส่ง code ไปแลก access token โดย CLIENT_SECRET อยู่เฉพาะ Backend
