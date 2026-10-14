@@ -3,7 +3,10 @@ import { Buildings, Floors, PlaceImages, PlaceKeywords, Places } from "@db/schem
 import { isPlaceType, type PlaceType } from "@db/place-types.js";
 import { isRoomStatus, type RoomStatus } from "@db/room-statuses.js";
 import { and, eq, exists, ilike, or,isNotNull } from "drizzle-orm";
-
+import multer from "multer";
+import fs from "node:fs";
+import path from "node:path";
+import crypto from "node:crypto";
 import { Router } from "express";
 import { validate as isUUID } from "uuid";
 import { requireAuth, requireRole } from "../../auth/middleware.js";
@@ -37,6 +40,40 @@ const selectPlaces = () => dbClient
   .from(Places)
   .innerJoin(Floors, eq(Places.floor_id, Floors.floor_id))
   .innerJoin(Buildings, eq(Floors.building_id, Buildings.building_id));
+
+
+const uploadDir = path.join(
+  process.cwd(),
+  "public",
+  "images",
+  "places",
+  "uploads"
+);
+
+fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `${crypto.randomUUID()}${ext}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+  fileFilter: (_req, file, cb) => {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.mimetype)) {
+      return cb(new Error("Only JPEG, PNG, and WebP images are allowed"));
+    }
+    cb(null, true);
+  },
+});
 
 router.get("/", async (req, res) => {
   try {
@@ -154,41 +191,91 @@ router.get("/types", async (req, res) => {
 });
 
 // Admin เพิ่ม URL รูปและกำหนดลำดับที่ Frontend จะแสดง
-router.post("/:place_id/images", requireAuth, requireRole("ADMIN"), async (req, res) => {
-  try {
-    const place_id = typeof req.params.place_id === "string" ? req.params.place_id : "";
-    const { image_url, caption, display_order } = req.body ?? {};
-    if (!isUUID(place_id)) return res.status(400).json({ message: "place_id must be a valid UUID" });
-    if (typeof image_url !== "string" || !image_url.trim() || image_url.trim().length > 500) {
-      return res.status(400).json({ message: "image_url must be 1-500 characters" });
-    }
-    if (caption !== undefined && caption !== null &&
-        (typeof caption !== "string" || caption.trim().length > 200)) {
-      return res.status(400).json({ message: "caption must not exceed 200 characters" });
-    }
-    if (display_order !== undefined && (!Number.isInteger(display_order) || display_order < 0)) {
-      return res.status(400).json({ message: "display_order must be a non-negative integer" });
-    }
 
-    const [place] = await dbClient.select({ id: Places.place_id }).from(Places)
-      .where(eq(Places.place_id, place_id));
-    if (!place) return res.status(404).json({ message: "Place not found" });
 
-    const [image] = await dbClient.insert(PlaceImages).values({
-      place_id,
-      image_url: image_url.trim(),
-      caption: typeof caption === "string" ? caption.trim() || null : null,
-      display_order: display_order ?? 0,
-    }).returning();
-    return res.status(201).json(image);
-  } catch (error: any) {
-    if (error?.code === "23505" || error?.cause?.code === "23505") {
-      return res.status(409).json({ message: "This image already exists for the place" });
+router.post(
+  "/:place_id/images",
+  requireAuth,
+  requireRole("ADMIN"),
+  upload.single("image"),
+  async (req, res) => {
+    let filePath: string | undefined;
+
+    try {
+      const place_id =
+        typeof req.params.place_id === "string"
+          ? req.params.place_id
+          : "";
+
+      if (!isUUID(place_id)) {
+        return res.status(400).json({
+          message: "place_id must be a valid UUID",
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({
+          message: "Image file is required",
+        });
+      }
+
+      filePath = req.file.path;
+
+      const [place] = await dbClient
+        .select({ id: Places.place_id })
+        .from(Places)
+        .where(eq(Places.place_id, place_id));
+
+      if (!place) {
+        await fs.promises.unlink(filePath).catch(() => {});
+        return res.status(404).json({
+          message: "Place not found",
+        });
+      }
+
+      // URL สำหรับเรียกดูไฟล์รูป
+      const image_url = `/images/places/uploads/${req.file.filename}`;
+
+      // หา display_order ถัดไป
+      const existingImages = await dbClient
+        .select({ display_order: PlaceImages.display_order })
+        .from(PlaceImages)
+        .where(eq(PlaceImages.place_id, place_id));
+
+      const nextOrder =
+        existingImages.reduce(
+          (max, image) =>
+            Math.max(max, image.display_order ?? -1),
+          -1
+        ) + 1;
+
+      // บันทึกรูปลง PlaceImages
+      const [newImage] = await dbClient
+        .insert(PlaceImages)
+        .values({
+          place_id,
+          image_url,
+          display_order: nextOrder,
+        })
+        .returning();
+
+      return res.status(201).json({
+        message: "Image uploaded successfully",
+        data: newImage,
+      });
+    } catch (error) {
+      if (filePath) {
+        await fs.promises.unlink(filePath).catch(() => {});
+      }
+
+      console.error("Upload place image failed:", error);
+
+      return res.status(500).json({
+        message: "Unable to upload place image",
+      });
     }
-    console.error("POST /places/:place_id/images failed:", error);
-    return res.status(500).json({ message: "Unable to add place image" });
   }
-});
+);
 
 router.delete("/:place_id/images/:image_id", requireAuth, requireRole("ADMIN"), async (req, res) => {
   try {

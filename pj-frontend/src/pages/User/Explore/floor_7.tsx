@@ -81,6 +81,13 @@ const Floor_7 = () => {
       width: "18.5%",
       height: "10%",
     },
+    {
+      placeId: "68555f60-6730-53d1-a810-f40eb077b5c2", 
+      top: "33%",
+      left: "62%",
+      width: "30%",
+      height: "18%",
+    },
 
     
     

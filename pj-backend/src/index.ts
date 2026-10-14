@@ -12,12 +12,15 @@ import placeRouter from "./routes/building/Places.route.js";
 import favoriteRouter from "./routes/user/Favorites.route.js";
 import reviewRouter from "./routes/user/Reviews.route.js";
 import reportRouter from "./routes/user/Reports.route.js";
+import path from "node:path";
 
 // ลำดับทำงานโดยย่อ: request → middleware → route → database → response
 // app คือจุดรับ HTTP request ก่อนส่งต่อให้ route ของแต่ละหมวด
 const app = express();
 app.use(morgan("dev"));
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 // อนุญาตให้ Frontend ส่ง session cookie มาหา Backend
 app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
@@ -26,6 +29,7 @@ app.use(cors({
 app.use(express.json());
 // เปิดไฟล์รูปใน public/images ให้ Frontend เรียกผ่าน /images ได้
 app.use("/images", express.static("public/images"));
+
 
 app.get("/", (_req, res) => res.status(200).json({ message: "Indoor Navigation Backend is running" }));
 

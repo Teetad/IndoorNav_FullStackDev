@@ -11,10 +11,15 @@ import StartNavigation from './pages/User/StartNavigation.tsx';
 import AuthCallback from './pages/User/AuthCallback.tsx';
 import AddReportPage from './pages/User/AddReportPage.tsx';
 import DashBoardPage from './pages/Admin/DashBoardPage.tsx';
-import MapAdminPage from './pages/Admin/MapAdmin.tsx';
 import ReportAdminPage from './pages/Admin/ReportAdmin.tsx';
 import { NavigationProvider } from './context/NavigationContext.tsx';
 import { AuthProvider } from './context/AuthContext.tsx';
+import AFloor4Page from './pages/Admin/MapAdmin/floor_4.tsx';
+import AFloor5Page from './pages/Admin/MapAdmin/floor_5.tsx';
+import AFloor6Page from './pages/Admin/MapAdmin/floor_6.tsx';
+import AFloor7Page from './pages/Admin/MapAdmin/floor_7.tsx';
+import EditRoomPage from './pages/Admin/EditRoomPage.tsx';
+
 
 function App() {
   return (
@@ -34,9 +39,13 @@ function App() {
           <Route path="/addreport" element={<AddReportPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/start-navigation" element={<StartNavigation />} />
-          <Route path="/mapadmin" element={<MapAdminPage />} />
+          <Route path="/afloor-4" element={<AFloor4Page />} />
+          <Route path="/afloor-5" element={<AFloor5Page />} />
+          <Route path="/afloor-6" element={<AFloor6Page />} />
+          <Route path="/afloor-7" element={<AFloor7Page />} />
           <Route path="/reportadmin" element={<ReportAdminPage />} />
           <Route path="/dashboard" element={<DashBoardPage />} />
+          <Route path="/editroom/:placeId" element={<EditRoomPage/>}/>
       </Routes>
     </Router>
    </NavigationProvider>
